@@ -31,7 +31,7 @@ export default function Marketplace() {
   return (
     <section className="container mx-auto px-6 py-16 bg-stone-200/30 rounded-3xl">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-stone-800 mb-3">
+        <h1 className="text-4xl md:text-6xl font-bold text-stone-800 mb-3">
           Story Marketplace
         </h1>
         <div className="w-24 h-1 bg-amber-600 mx-auto rounded-full"></div>
