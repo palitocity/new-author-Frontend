@@ -1,11 +1,8 @@
 import { useState } from "react";
-import {
-  FaFacebookF,
-  FaTwitter,
-  FaInstagram,
-  FaLinkedinIn,
-} from "react-icons/fa";
+
 import logo from "../assets/sankofaseek.png";
+
+import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 // Enhanced Footer Component
 export default function Footer() {
@@ -38,7 +35,6 @@ export default function Footer() {
       <div className="relative container mx-auto px-6 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Logo & Description */}
-          {/* Logo & Description */}
           <div className="flex flex-col space-y-5">
             <div className="flex items-center space-x-3">
               <img
@@ -59,21 +55,42 @@ export default function Footer() {
               past.
             </p>
 
+            {/* Social Links */}
             <div className="flex space-x-3 pt-2">
               {[
-                { Icon: FaFacebookF, href: "#", label: "Facebook" },
-                { Icon: FaTwitter, href: "#", label: "Twitter" },
-                { Icon: FaInstagram, href: "#", label: "Instagram" },
-                { Icon: FaLinkedinIn, href: "#", label: "LinkedIn" },
-              ].map(({ href, label }) => (
+                {
+                  Icon: Instagram,
+                  href: "https://www.instagram.com/sankofaseekarts?igsh=MXhpd284dXUydTBybg==",
+                  label: "Instagram",
+                },
+                {
+                  Icon: Facebook,
+                  href: "https://www.facebook.com/share/14RnpXX4r1u/",
+                  label: "Facebook",
+                },
+                {
+                  Icon: Twitter,
+                  href: "https://x.com/Sankofaseekart?t=JAj0W5pnj3FF3kVqV4WTuQ&s=09",
+                  label: "Twitter / X",
+                },
+                {
+                  Icon: Youtube,
+                  href: "https://youtube.com/@sankofaseekarts?si=HWE9qgmfCbOsVEv6",
+                  label: "YouTube",
+                },
+              ].map(({ Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm 
-        flex items-center justify-center hover:bg-amber-500 hover:scale-110 
-        transition-all duration-300 group"
-                ></a>
+                  flex items-center justify-center hover:bg-amber-500 hover:scale-110 
+                  transition-all duration-300 group"
+                >
+                  <Icon className="w-5 h-5 text-white group-hover:text-black transition" />
+                </a>
               ))}
             </div>
           </div>
