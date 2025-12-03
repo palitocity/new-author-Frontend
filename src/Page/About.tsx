@@ -6,18 +6,6 @@ export default function About() {
       img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80",
       quote: "The past holds the keys to our future",
     },
-    {
-      name: "Kofi Mensah",
-      role: "Cultural Historian",
-      img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
-      quote: "Stories are the bridges between generations",
-    },
-    {
-      name: "Zara Bello",
-      role: "Creative Director",
-      img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80",
-      quote: "Art breathes life into forgotten wisdom",
-    },
   ];
 
   return (
