@@ -6,6 +6,7 @@ import Home from "../Page/Home";
 import Blog from "../Page/Blog";
 import Marketplace from "../Page/marketplace";
 import { TermsAndConditions } from "../Page/Terms";
+import Privacy from "../Page/privacy";
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ export const router = createBrowserRouter([
       {
         path: "terms",
         element: <TermsAndConditions />,
+      },
+      {
+        path: "privacy",
+        element: <Privacy />,
       },
     ],
   },
