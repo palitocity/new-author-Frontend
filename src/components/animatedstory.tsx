@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import bgImage from "../../public/asset/bg.jpg"; //
+import bgImage from "../assets/bg.jpg";
 
 const textLines = [
   "Long ago, before clocks ruled time, humanity walked in spirals, not straight line.",

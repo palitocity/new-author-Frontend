@@ -39,7 +39,6 @@ export default function Hero() {
 
   return (
     <section className="relative h-[90vh] md:h-screen overflow-hidden">
-      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
         style={{
