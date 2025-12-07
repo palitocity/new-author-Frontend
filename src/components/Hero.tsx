@@ -2,27 +2,27 @@ import { useState, useEffect } from "react";
 
 const slides = [
   {
-    image: "../../public/asset/bg.jpg",
+    image: "../assets/bg.jpg",
     text: "Where every step echoes the rhythm of ancient footsteps.",
   },
   {
-    image: "../../public/asset/facesofken.jpg",
+    image: "../assets/facesofken.jpg",
     text: "We remember in firelight — stories passed from soul to sky.",
   },
   {
-    image: "../../public/asset/elephant.jpg",
+    image: "../assets/elephant.jpg",
     text: "Symbols of old. Voices of today. Wisdom in every stitch.",
   },
   {
-    image: "../../public/asset/tribeJumping.jpg",
+    image: "../assets/tribeJumping.jpg",
     text: "In each hand lies the medicine of memory.",
   },
   {
-    image: "../../public/asset/sessionbg.jpg",
+    image: "../assets/sessionbg.jpg",
     text: "Through dance, we carry the pulse of our ancestors.",
   },
   {
-    image: "../../src/assets/web.jpg",
+    image: "../assets/web.jpg",
     text: "Through dance, we carry the pulse of our ancestors.",
   },
 ];
