@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import bgImage from "../assets/bg.jpg";
+import bgImage from "../assets/westafrica.jpg";
 
 const textLines = [
   "Long ago, before clocks ruled time, humanity walked in spirals, not straight line.",
@@ -22,7 +22,7 @@ export default function StoryAnimation() {
   }, []);
 
   // Custom text color variable (change here if needed)
-  const textColor = "#6B4321"; // Try "#8B5A2B" if you want a brighter tone
+  const textColor = "#8B5A2B"; // Try "#8B5A2B" if you want a brighter tone
 
   return (
     <section

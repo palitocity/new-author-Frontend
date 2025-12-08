@@ -1,29 +1,35 @@
+import icon from "../assets/icon.png";
+import drum from "../assets/drum.png";
+import map from "../assets/Saruni Basecamp - Luxury Safari Camps & Lodges in Kenya_files/547143411_1384821923652050_6945800033925993482_n.jpg";
+import pot from "../assets/pot.png";
+import adinka from "../assets/Saruni Basecamp - Luxury Safari Camps & Lodges in Kenya_files/548203159_1388697433264499_7377279747273691692_n.jpg";
+
 export default function CultureBody() {
   return (
     <section className="relative bg-linear-to-b from-[#6B4321] via-[#8A5B38] to-[#D4AF36] text-light py-24 overflow-hidden">
       {/* Background scattered icons */}
       <img
-        src="../../public/asset/icon.png"
+        src={icon}
         alt="mask"
         className="absolute top-10 left-8 w-16 opacity-30 rotate-6 animate-pulse"
       />
       <img
-        src="../../public/asset/drum.png"
+        src={drum}
         alt="drum"
         className="absolute bottom-20 right-16 w-20 opacity-30 -rotate-12 animate-float"
       />
       <img
-        src="/assets/icons/map.png"
+        src={map}
         alt="map"
         className="absolute top-1/2 left-1/3 w-24 opacity-20 hidden md:block"
       />
       <img
-        src="../../public/asset/pot.png"
+        src={pot}
         alt="pot"
         className="absolute bottom-10 left-10 w-16 opacity-25 rotate-12"
       />
       <img
-        src="/assets/icons/adinkra.png"
+        src={adinka}
         alt="adinkra"
         className="absolute top-1/4 right-24 w-14 opacity-20 hidden md:block"
       />
