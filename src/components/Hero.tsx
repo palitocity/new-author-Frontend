@@ -1,28 +1,34 @@
 import { useState, useEffect } from "react";
+import bg from "../assets/bg.jpg";
+import faceken from "../assets/facesofken.jpg";
+import elephant from "../assets/elephant.jpg";
+import tribejumping from "../assets/tribeJumping.jpg";
+import sessionbg from "../assets/sessionbg.jpg";
+import web from "../assets/web.jpg";
 
 const slides = [
   {
-    image: "../assets/bg.jpg",
+    image: bg,
     text: "Where every step echoes the rhythm of ancient footsteps.",
   },
   {
-    image: "../assets/facesofken.jpg",
+    image: faceken,
     text: "We remember in firelight — stories passed from soul to sky.",
   },
   {
-    image: "../assets/elephant.jpg",
+    image: elephant,
     text: "Symbols of old. Voices of today. Wisdom in every stitch.",
   },
   {
-    image: "../assets/tribeJumping.jpg",
+    image: tribejumping,
     text: "In each hand lies the medicine of memory.",
   },
   {
-    image: "../assets/sessionbg.jpg",
+    image: sessionbg,
     text: "Through dance, we carry the pulse of our ancestors.",
   },
   {
-    image: "../assets/web.jpg",
+    image: web,
     text: "Through dance, we carry the pulse of our ancestors.",
   },
 ];

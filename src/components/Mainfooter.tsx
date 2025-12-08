@@ -126,7 +126,6 @@ export default function Footer() {
                 { name: "Contact Us", href: "/contact" },
                 { name: "Privacy Policy", href: "/privacy" },
                 { name: "Terms of Service", href: "/terms" },
-                { name: "FAQ", href: "/faq" },
               ].map((item) => (
                 <a
                   key={item.name}
@@ -202,15 +201,15 @@ export default function Footer() {
               reserved. Crafted with heritage in mind.
             </p>
             <div className="flex items-center space-x-6 text-sm text-gray-300">
-              <a href="/sitemap" className="hover:text-amber-300 transition">
+              {/* <a href="/sitemap" className="hover:text-amber-300 transition">
                 Sitemap
-              </a>
-              <a
+              </a> */}
+              {/* <a
                 href="/accessibility"
                 className="hover:text-amber-300 transition"
               >
                 Accessibility
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
