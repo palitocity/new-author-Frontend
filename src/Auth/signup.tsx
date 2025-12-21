@@ -13,9 +13,12 @@ export default function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "user", // 👈 added
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -37,17 +40,18 @@ export default function Signup() {
           fullname: formData.fullname,
           email: formData.email,
           password: formData.password,
+          role: formData.role, // 👈 sent to API
         }
       );
 
       toast.success(res.data.message || "Account created successfully");
 
-      // Optional: clear form
       setFormData({
         fullname: "",
         email: "",
         password: "",
         confirmPassword: "",
+        role: "user",
       });
 
       // Optional redirect
@@ -72,7 +76,7 @@ export default function Signup() {
         </h2>
         <p className="text-center text-stone-500 mb-6">Join us today</p>
 
-        {/* Name */}
+        {/* Full Name */}
         <div className="mb-4">
           <label className="text-sm text-stone-600">Full Name</label>
           <div className="relative">
@@ -108,6 +112,19 @@ export default function Signup() {
               placeholder="you@example.com"
             />
           </div>
+        </div>
+
+        {/* Role */}
+        <div className="mb-4">
+          <label className="text-sm text-stone-600">Role</label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 border rounded-lg bg-white focus:ring-2 focus:ring-amber-500 outline-none"
+          >
+            <option value="user">User</option>
+          </select>
         </div>
 
         {/* Password */}
