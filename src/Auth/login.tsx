@@ -25,13 +25,15 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const endpoint = "/login";
       const payload = {
         email: formData.email,
         password: formData.password,
       };
 
-      const res = await axios.post(endpoint, payload);
+      const res = await axios.post(
+        "https://sanfossa-backend.onrender.com/apiauth/login",
+        payload
+      );
 
       toast.success(res.data.message || "Success");
 
