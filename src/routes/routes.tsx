@@ -8,6 +8,8 @@ import Marketplace from "../Page/marketplace";
 import { TermsAndConditions } from "../Page/Terms";
 import Privacy from "../Page/privacy";
 import Contact from "../Page/contact";
+import Login from "../Auth/login";
+import Signup from "../Auth/signup";
 
 export const router = createBrowserRouter([
   {
@@ -43,5 +45,13 @@ export const router = createBrowserRouter([
         element: <Contact />,
       },
     ],
+  },
+  {
+    path: "login",
+    element: <Login />,
+  },
+  {
+    path: "signup",
+    element: <Signup />,
   },
 ]);
