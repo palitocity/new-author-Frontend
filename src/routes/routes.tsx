@@ -10,6 +10,8 @@ import Privacy from "../Page/privacy";
 import Contact from "../Page/contact";
 import Login from "../Auth/login";
 import Signup from "../Auth/signup";
+import Adminlayout from "../layout/adminlayout";
+import Main from "../Admin/main";
 
 export const router = createBrowserRouter([
   {
@@ -53,5 +55,15 @@ export const router = createBrowserRouter([
   {
     path: "signup",
     element: <Signup />,
+  },
+  {
+    path: "admin",
+    element: <Adminlayout />,
+    children: [
+      {
+        path: "main",
+        element: <Main />,
+      },
+    ],
   },
 ]);

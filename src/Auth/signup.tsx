@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import axios from "axios";
+import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -34,15 +37,12 @@ export default function Signup() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "https://sanfossa-backend.onrender.com/apiauth/register",
-        {
-          fullname: formData.fullname,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role, // 👈 sent to API
-        }
-      );
+      const res = await axios.post("/admin/register", {
+        fullname: formData.fullname,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role, // 👈 sent to API
+      });
 
       toast.success(res.data.message || "Account created successfully");
 
@@ -53,6 +53,7 @@ export default function Signup() {
         confirmPassword: "",
         role: "user",
       });
+      navigate("/login");
 
       // Optional redirect
       // window.location.href = "/login";
