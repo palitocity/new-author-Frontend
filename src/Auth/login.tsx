@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import axios from "../config/axiosconfiq";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,6 +11,7 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   const [Loading, setLoading] = useState(false);
 
@@ -30,10 +32,11 @@ export default function Login() {
         password: formData.password,
       };
 
-      const res = await axios.post(
-        "https://sanfossa-backend.onrender.com/apiauth/login",
-        payload
-      );
+      const res = await axios.post("/admin/login", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       toast.success(res.data.message || "Success");
 
@@ -41,6 +44,7 @@ export default function Login() {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
+      navigate("/admin/main");
     } catch (error: any) {
       const message = error?.response?.data?.message || "Something went wrong";
       toast.error(message);

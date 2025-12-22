@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://sanfossa-backend.onrender.com/apiauth",
+  baseURL: import.meta.env.VITE_DEVE_URL,
   headers: {
     "Content-Type": "application/json",
   },
