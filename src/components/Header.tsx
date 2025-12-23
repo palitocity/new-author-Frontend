@@ -17,7 +17,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const menuItems = ["Home", "About", "Blog", "Marketplace"];
+  const menuItems = [
+    "Home",
+    "About",
+    "Blog",
+    "TERRÆ & ETHEREA Altar",
+    "Marketplace",
+  ];
 
   return (
     <nav
