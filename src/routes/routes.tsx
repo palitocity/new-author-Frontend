@@ -12,6 +12,8 @@ import Login from "../Auth/login";
 import Signup from "../Auth/signup";
 import Adminlayout from "../layout/adminlayout";
 import Main from "../Admin/main";
+import BlogUpload from "../Admin/blog";
+import StoryUpload from "../Admin/stories";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +65,14 @@ export const router = createBrowserRouter([
       {
         path: "main",
         element: <Main />,
+      },
+      {
+        path: "blog",
+        element: <BlogUpload />,
+      },
+      {
+        path: "stories",
+        element: <StoryUpload />,
       },
     ],
   },

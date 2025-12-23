@@ -48,9 +48,9 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       path: "/admin/newsletter",
     },
     {
-      name: "Content",
+      name: "Stories",
       icon: <BookOpen className="w-5 h-5" />,
-      path: "/admin/content",
+      path: "/admin/stories",
     },
     {
       name: "Settings",
