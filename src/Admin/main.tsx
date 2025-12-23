@@ -271,7 +271,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Newsletter Stats */}
-        <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl p-6 shadow-sm text-white">
+        <div className="bg-linear-to-br from-amber-600 to-orange-600 rounded-xl p-6 shadow-sm text-white">
           <div className="flex items-center gap-2 mb-4">
             <Mail className="w-6 h-6" />
             <h2 className="text-lg font-bold">Newsletter</h2>
