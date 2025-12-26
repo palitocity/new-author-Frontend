@@ -41,9 +41,7 @@ export default function Login() {
       toast.success(res.data.message || "Success");
 
       // Save token if returned
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
+      localStorage.setItem("token", res.data.data.token);
       navigate("/admin/main");
     } catch (error: any) {
       const message = error?.response?.data?.message || "Something went wrong";
