@@ -15,6 +15,9 @@ import Main from "../Admin/main";
 import BlogUpload from "../Admin/blog";
 import StoryUpload from "../Admin/stories";
 import AllBlogs from "../Admin/viewblogs";
+import Users from "../Admin/users";
+import Orders from "../Admin/orders";
+import Newsletter from "../Admin/newsletter";
 
 export const router = createBrowserRouter([
   {
@@ -78,6 +81,18 @@ export const router = createBrowserRouter([
       {
         path: "view-blogs",
         element: <AllBlogs />,
+      },
+      {
+        path: "users",
+        element: <Users />,
+      },
+      {
+        path: "orders",
+        element: <Orders />,
+      },
+      {
+        path: "newsletter",
+        element: <Newsletter />,
       },
     ],
   },
