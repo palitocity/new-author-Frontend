@@ -18,6 +18,7 @@ import AllBlogs from "../Admin/viewblogs";
 import Users from "../Admin/users";
 import Orders from "../Admin/orders";
 import Newsletter from "../Admin/newsletter";
+import Settings from "../Admin/settings";
 
 export const router = createBrowserRouter([
   {
@@ -93,6 +94,10 @@ export const router = createBrowserRouter([
       {
         path: "newsletter",
         element: <Newsletter />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
     ],
   },
