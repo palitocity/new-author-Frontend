@@ -1,4 +1,6 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import {
   Users,
   ShoppingBag,
@@ -11,112 +13,60 @@ import {
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import axios from "../config/axiosconfiq";
 
 const AdminDashboard = () => {
   const [timeRange, setTimeRange] = useState("week");
 
-  // Stats data
-  const stats = [
-    {
-      title: "Total Users",
-      value: "2,847",
-      change: "+12.5%",
-      trend: "up",
-      icon: <Users className="w-6 h-6" />,
-      color: "amber",
-    },
-    {
-      title: "Total Orders",
-      value: "1,234",
-      change: "+8.2%",
-      trend: "up",
-      icon: <ShoppingBag className="w-6 h-6" />,
-      color: "orange",
-    },
-    {
-      title: "Revenue",
-      value: "$45,678",
-      change: "+15.3%",
-      trend: "up",
-      icon: <DollarSign className="w-6 h-6" />,
-      color: "amber",
-    },
-    {
-      title: "Blog Views",
-      value: "28,492",
-      change: "-3.1%",
-      trend: "down",
-      icon: <Eye className="w-6 h-6" />,
-      color: "orange",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
 
-  // Recent orders
-  const recentOrders = [
-    {
-      id: "#ORD-1234",
-      customer: "Kwame Nkrumah",
-      item: "African History Bundle",
-      amount: "$89.99",
-      status: "completed",
-    },
-    {
-      id: "#ORD-1235",
-      customer: "Yaa Asantewaa",
-      item: "Colonial Era Collection",
-      amount: "$129.99",
-      status: "pending",
-    },
-    {
-      id: "#ORD-1236",
-      customer: "Nelson Mandela",
-      item: "Liberation Stories",
-      amount: "$59.99",
-      status: "completed",
-    },
-    {
-      id: "#ORD-1237",
-      customer: "Wangari Maathai",
-      item: "Environmental History",
-      amount: "$79.99",
-      status: "processing",
-    },
-    {
-      id: "#ORD-1238",
-      customer: "Thomas Sankara",
-      item: "Pan-African Studies",
-      amount: "$99.99",
-      status: "completed",
-    },
-  ];
+  const [dashboard, setDashboard] = useState<any>(null);
 
-  // Popular blog posts
-  const popularPosts = [
-    {
-      title: "The Great Kingdoms of West Africa",
-      views: "5,432",
-      date: "Dec 18, 2025",
-    },
-    {
-      title: "Pre-Colonial Trade Routes",
-      views: "4,821",
-      date: "Dec 15, 2025",
-    },
-    {
-      title: "Ancient Egyptian Innovations",
-      views: "4,156",
-      date: "Dec 12, 2025",
-    },
-    { title: "The Mansa Musa Legacy", views: "3,987", date: "Dec 10, 2025" },
-  ];
+  const stats = dashboard
+    ? [
+        {
+          title: "Total Users",
+          value: dashboard.stats.users.value,
+          change: dashboard.stats.users.change,
+          trend: dashboard.stats.users.change.startsWith("+") ? "up" : "down",
+          icon: <Users className="w-6 h-6" />,
+          color: "amber",
+        },
+        {
+          title: "Total Orders",
+          value: dashboard.stats.orders.value,
+          change: dashboard.stats.orders.change,
+          trend: dashboard.stats.orders.change.startsWith("+") ? "up" : "down",
+          icon: <ShoppingBag className="w-6 h-6" />,
+          color: "orange",
+        },
+        {
+          title: "Revenue",
+          value: `₦${dashboard.stats.revenue.value.toLocaleString()}`,
+          change: dashboard.stats.revenue.change,
+          trend: dashboard.stats.revenue.change.startsWith("+") ? "up" : "down",
+          icon: <DollarSign className="w-6 h-6" />,
+          color: "amber",
+        },
+        {
+          title: "Blog Views",
+          value: dashboard.stats.blogViews.value,
+          change: dashboard.stats.blogViews.change,
+          trend: dashboard.stats.blogViews.change.startsWith("+")
+            ? "up"
+            : "down",
+          icon: <Eye className="w-6 h-6" />,
+          color: "orange",
+        },
+      ]
+    : [];
+
+  const recentOrders = dashboard?.recentOrders || [];
+
+  const popularPosts = dashboard?.popularPosts || [];
 
   // Newsletter stats
-  const newsletterStats = {
-    subscribers: "12,456",
-    openRate: "42.3%",
-    clickRate: "18.7%",
-    lastSent: "2 days ago",
-  };
+  const newsletterStats = dashboard?.newsletter;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -130,6 +80,38 @@ const AdminDashboard = () => {
         return "bg-stone-100 text-stone-800";
     }
   };
+
+  const token = localStorage.getItem("token");
+
+  const getOverview = async () => {
+    try {
+      setLoading(true);
+
+      const res = await axios.get("/admin/dashboard", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setDashboard(res.data.data);
+    } catch (error) {
+      console.error("Error fetching dashboard overview:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getOverview();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-stone-600">
+        Loading dashboard...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
@@ -237,34 +219,37 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order, idx) => (
-                  <tr
-                    key={idx}
-                    className="border-b border-stone-100 hover:bg-stone-50 transition"
-                  >
-                    <td className="py-3 px-2 text-sm text-stone-800 font-medium">
-                      {order.id}
-                    </td>
-                    <td className="py-3 px-2 text-sm text-stone-700">
-                      {order.customer}
-                    </td>
-                    <td className="py-3 px-2 text-sm text-stone-600">
-                      {order.item}
-                    </td>
-                    <td className="py-3 px-2 text-sm text-stone-800 font-semibold">
-                      {order.amount}
-                    </td>
-                    <td className="py-3 px-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {order.status}
-                      </span>
+                {recentOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-stone-500">
+                      No recent orders
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  recentOrders.map((order: any, idx: number) => (
+                    <tr key={idx} className="border-b border-stone-100">
+                      <td className="py-3 px-2 font-medium">
+                        {order.orderNumber}
+                      </td>
+                      <td className="py-3 px-2">{order.customerName}</td>
+                      <td className="py-3 px-2">
+                        {order.items?.[0]?.name || "—"}
+                      </td>
+                      <td className="py-3 px-2 font-semibold">
+                        ₦{order.totalAmount?.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
+                            order.status
+                          )}`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -280,7 +265,7 @@ const AdminDashboard = () => {
             <div>
               <p className="text-amber-100 text-sm mb-1">Total Subscribers</p>
               <p className="text-3xl font-bold">
-                {newsletterStats.subscribers}
+                {newsletterStats?.subscribers ?? 0}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -319,25 +304,28 @@ const AdminDashboard = () => {
             </button>
           </div>
           <div className="space-y-3">
-            {popularPosts.map((post, idx) => (
-              <div
-                key={idx}
-                className="flex items-start justify-between p-3 rounded-lg hover:bg-stone-50 transition"
-              >
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-stone-800 mb-1">
-                    {post.title}
-                  </h3>
-                  <p className="text-xs text-stone-500">
-                    Published {post.date}
-                  </p>
+            {popularPosts.length === 0 ? (
+              <p className="text-sm text-stone-500">No blog data yet</p>
+            ) : (
+              popularPosts.map((post: any) => (
+                <div
+                  key={post._id}
+                  className="flex items-start justify-between p-3 rounded-lg hover:bg-stone-50"
+                >
+                  <div>
+                    <h3 className="text-sm font-semibold">{post.title}</h3>
+                    <p className="text-xs text-stone-500">
+                      Published{" "}
+                      {new Date(post.publishDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 text-stone-600">
+                    <Eye className="w-4 h-4" />
+                    <span>{post.views || 0}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-stone-600">
-                  <Eye className="w-4 h-4" />
-                  <span className="text-sm font-medium">{post.views}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
