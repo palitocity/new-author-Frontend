@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import {
   FileText,
   Upload,
   X,
-  Eye,
   Save,
   Calendar,
   Tag,
   User,
   AlignLeft,
 } from "lucide-react";
+import axios from "../config/axiosconfiq";
+import toast from "react-hot-toast";
+import { isAxiosError } from "axios";
 
 const BlogUpload = () => {
   const [blogData, setBlogData] = useState({
@@ -22,10 +25,14 @@ const BlogUpload = () => {
     publishDate: "",
     status: "draft",
   });
+  const [featuredImage, setFeaturedImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const [featuredImage, setFeaturedImage] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+
   console.log(showPreview);
+
+  const token = localStorage.getItem("token");
 
   const categories = [
     "Ancient Civilizations",
@@ -41,11 +48,7 @@ const BlogUpload = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFeaturedImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setFeaturedImage(file);
     }
   };
 
@@ -58,10 +61,96 @@ const BlogUpload = () => {
     setBlogData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (status: string) => {
-    console.log("Submitting blog with status:", status, blogData);
-    // Handle form submission logic here
+  const initialBlogState = {
+    title: "",
+    author: "",
+    category: "",
+    tags: "",
+    excerpt: "",
+    content: "",
+    publishDate: "",
+    status: "draft",
   };
+
+  const handleSubmit = async (status: "draft" | "published" | "scheduled") => {
+    const toastloadingId = toast.loading("Please wait...");
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      formData.append("title", blogData.title);
+      formData.append("author", blogData.author);
+      formData.append("category", blogData.category);
+      formData.append("excerpt", blogData.excerpt);
+      formData.append("content", blogData.content);
+      formData.append("status", status);
+
+      if (blogData.publishDate) {
+        formData.append("publishDate", blogData.publishDate);
+      }
+
+      // convert tags string → array on backend
+      formData.append("tags", blogData.tags);
+
+      if (featuredImage) {
+        formData.append("featuredImage", featuredImage);
+      }
+
+      const res = await axios.post("/blog", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("Blog created successfully!");
+      setBlogData(initialBlogState);
+      setFeaturedImage(null);
+      setShowPreview(false);
+      console.log("Blog created:", res.data);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        const apiError = error.response?.data?.error;
+        const fallback = error.message || "An unexpected error occurred";
+
+        const errorMsg =
+          `${apiMessage || ""}${apiError ? " - " + apiError : ""}`.trim() ||
+          fallback;
+
+        toast.error(errorMsg);
+      }
+    } finally {
+      toast.dismiss(toastloadingId);
+      setLoading(false);
+    }
+  };
+
+  const BlogPreview = ({ blog, image, onClose }: any) => (
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+      <div className="bg-white max-w-3xl w-full rounded-xl p-6 overflow-y-auto max-h-[90vh]">
+        <button onClick={onClose} className="text-red-500 mb-4">
+          Close Preview
+        </button>
+
+        {image && (
+          <img
+            src={URL.createObjectURL(image)}
+            className="w-full h-64 object-cover rounded-lg mb-4"
+          />
+        )}
+
+        <h1 className="text-3xl font-bold mb-2">{blog.title}</h1>
+        <p className="text-sm text-gray-500 mb-4">
+          By {blog.author} • {blog.category}
+        </p>
+
+        <p className="italic mb-4">{blog.excerpt}</p>
+
+        <div className="whitespace-pre-wrap leading-7">{blog.content}</div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
@@ -119,11 +208,14 @@ const BlogUpload = () => {
               </label>
             ) : (
               <div className="relative">
-                <img
-                  src={featuredImage}
-                  alt="Featured"
-                  className="w-full h-64 object-cover rounded-lg"
-                />
+                {featuredImage && (
+                  <img
+                    src={URL.createObjectURL(featuredImage)}
+                    alt="Featured"
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
+                )}
+
                 <button
                   onClick={() => setFeaturedImage(null)}
                   className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
@@ -213,23 +305,25 @@ const BlogUpload = () => {
             {/* Action Buttons */}
             <div className="space-y-2">
               <button
-                onClick={() => handleSubmit("draft")}
-                className="w-full px-4 py-2 bg-stone-200 text-stone-700 rounded-lg hover:bg-stone-300 transition font-medium"
+                disabled={loading}
+                className="w-full px-4 py-2 bg-stone-200 disabled:opacity-50"
               >
-                Save as Draft
+                {loading ? "Saving..." : "Save as Draft"}
               </button>
+
               <button
                 onClick={() => setShowPreview(true)}
-                className="w-full px-4 py-2 border-2 border-amber-600 text-amber-600 rounded-lg hover:bg-amber-50 transition font-medium flex items-center justify-center gap-2"
+                className="w-full px-4 py-2 border-2 border-amber-600 text-amber-600"
               >
-                <Eye className="w-4 h-4" />
                 Preview
               </button>
+
               <button
+                disabled={loading}
                 onClick={() => handleSubmit("published")}
                 className="w-full px-4 py-2 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium"
               >
-                Publish Now
+                {loading ? "Publishing..." : "Publish Now"}
               </button>
             </div>
           </div>
@@ -324,6 +418,13 @@ const BlogUpload = () => {
           </div>
         </div>
       </div>
+      {showPreview && (
+        <BlogPreview
+          blog={blogData}
+          image={featuredImage}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 };

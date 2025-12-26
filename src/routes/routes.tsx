@@ -14,6 +14,7 @@ import Adminlayout from "../layout/adminlayout";
 import Main from "../Admin/main";
 import BlogUpload from "../Admin/blog";
 import StoryUpload from "../Admin/stories";
+import AllBlogs from "../Admin/viewblogs";
 
 export const router = createBrowserRouter([
   {
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
       {
         path: "stories",
         element: <StoryUpload />,
+      },
+      {
+        path: "view-blogs",
+        element: <AllBlogs />,
       },
     ],
   },
