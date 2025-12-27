@@ -20,6 +20,7 @@ import Orders from "../Admin/orders";
 import Newsletter from "../Admin/newsletter";
 import Settings from "../Admin/settings";
 import ViewStories from "../Admin/viewstories";
+import Picturgallary from "../Page/Picturgallary";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "blog",
         element: <Blog />,
+      },
+      {
+        path: "TERRÆ & ETHEREA Altar",
+        element: <Picturgallary />,
       },
       {
         path: "marketplace",

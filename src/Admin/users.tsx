@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Edit, Search, Trash2, Mail, UserPlus, Download } from "lucide-react";
 import axios from "../config/axiosconfiq";
+import toast from "react-hot-toast";
 
 type User = {
   id: string;
@@ -17,6 +19,8 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
 
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [users, setusers] = useState<User[]>([]);
   const [stats, setstats] = useState({
     totalUsers: 0,
@@ -27,23 +31,44 @@ const Users = () => {
 
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    const getAllUsers = async () => {
-      try {
-        const res = await axios.get("/admin/users", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setusers(res.data.data);
-        setstats(res.data.stats);
-      } catch (error) {
-        console.log("Error fetching users:", error);
-      }
-    };
+  const getAllUsers = async () => {
+    try {
+      const res = await axios.get("/admin/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setusers(res.data.data);
+      setstats(res.data.stats);
+    } catch (error) {
+      console.log("Error fetching users:", error);
+    }
+  };
 
+  useEffect(() => {
     getAllUsers();
   }, []);
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    setDeleting(true);
+    try {
+      await axios.delete(`/admin/users/${userToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("User deleted successfully");
+      setUserToDelete(null);
+      getAllUsers();
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to delete user");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // const users = [
   //   {
@@ -244,7 +269,10 @@ const Users = () => {
                       <button className="p-2 hover:bg-orange-50 rounded-lg transition text-orange-600">
                         <Mail className="w-4 h-4" />
                       </button>
-                      <button className="p-2 hover:bg-red-50 rounded-lg transition text-red-600">
+                      <button
+                        onClick={() => setUserToDelete(user)}
+                        className="p-2 hover:bg-red-50 rounded-lg transition text-red-600"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -279,6 +307,45 @@ const Users = () => {
           </div>
         </div>
       </div>
+      {userToDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-600" />
+              </div>
+
+              <h3 className="text-xl font-bold text-stone-800 mb-2">
+                Delete User?
+              </h3>
+
+              <p className="text-stone-600">
+                Are you sure you want to delete{" "}
+                <span className="font-semibold">{userToDelete.name}</span>? This
+                action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setUserToDelete(null)}
+                disabled={deleting}
+                className="flex-1 px-6 py-3 border-2 border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition font-medium"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={confirmDeleteUser}
+                disabled={deleting}
+                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

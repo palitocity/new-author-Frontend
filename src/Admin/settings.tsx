@@ -1,4 +1,7 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { useState, useEffect } from "react";
 import {
   Settings as SettingsIcon,
   User,
@@ -8,10 +11,31 @@ import {
   Globe,
   Mail as MailIcon,
   Shield,
+  Camera,
 } from "lucide-react";
+import axios from "../config/axiosconfiq";
+import toast from "react-hot-toast";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("general");
+  const [loading, setLoading] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+  console.log(profileData);
+
+  const [profileForm, setProfileForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    bio: "",
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const token = localStorage.getItem("token");
 
   const tabs = [
     {
@@ -33,6 +57,138 @@ const Settings = () => {
     },
   ];
 
+  // Fetch profile data
+  const getProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("/admin/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = res.data.data;
+      setProfileData(data);
+      setProfileForm({
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        email: data.email || "",
+        bio: data.bio || "",
+      });
+      if (data.profileImage) {
+        setProfileImage(data.profileImage);
+      }
+      toast.success("Profile loaded successfully");
+    } catch (error: any) {
+      console.error(
+        "Error fetching profile:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  // Handle profile form input changes
+  const handleProfileInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle password form input changes
+  const handlePasswordInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle profile image upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profileImage", file);
+
+    try {
+      const res = await axios.put("/admin/profile/image", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setProfileImage(res.data.data.profileImage);
+      toast.success("Profile image updated successfully");
+    } catch (error: any) {
+      console.error(
+        "Image upload error:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to upload image");
+    }
+  };
+
+  // Update profile
+  const updateProfile = async () => {
+    try {
+      await axios.put("/admin/profile", profileForm, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success("Profile updated successfully");
+      getProfile();
+    } catch (error: any) {
+      console.error(
+        "Profile update error:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to update profile");
+    }
+  };
+
+  // Change password
+  const changePassword = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      await axios.put(
+        "/admin/password",
+        {
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Password updated successfully");
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error: any) {
+      console.error(
+        "Password change error:",
+        error.response?.data || error.message
+      );
+      toast.error(error.response?.data?.message || "Failed to update password");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
       {/* Header */}
@@ -42,6 +198,8 @@ const Settings = () => {
           Manage your account and application preferences
         </p>
       </div>
+
+      {loading && <p className="text-stone-600">Loading profile...</p>}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar Tabs */}
@@ -131,8 +289,9 @@ const Settings = () => {
                     </label>
                     <input
                       type="email"
-                      defaultValue="admin@sankofaseek.com"
-                      className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-orange-600 focus:outline-none transition"
+                      value={profileForm.email}
+                      readOnly
+                      className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg bg-stone-50 text-stone-600"
                     />
                   </div>
                   <div>
@@ -162,12 +321,36 @@ const Settings = () => {
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-24 h-24 bg-linear-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                    A
+                  <div className="relative">
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full object-cover border-4 border-amber-100"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 bg-linear-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                        {profileForm.firstName?.charAt(0) || "A"}
+                      </div>
+                    )}
+                    <label className="absolute bottom-0 right-0 p-2 bg-amber-600 text-white rounded-full cursor-pointer hover:bg-amber-700 transition">
+                      <Camera className="w-4 h-4" />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </label>
                   </div>
-                  <button className="px-4 py-2 border-2 border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition">
-                    Change Photo
-                  </button>
+                  <div>
+                    <p className="font-semibold text-stone-800">
+                      {profileForm.firstName} {profileForm.lastName}
+                    </p>
+                    <p className="text-sm text-stone-500">
+                      {profileForm.email}
+                    </p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -176,7 +359,9 @@ const Settings = () => {
                     </label>
                     <input
                       type="text"
-                      defaultValue="Admin"
+                      name="firstName"
+                      value={profileForm.firstName}
+                      onChange={handleProfileInputChange}
                       className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                     />
                   </div>
@@ -186,7 +371,9 @@ const Settings = () => {
                     </label>
                     <input
                       type="text"
-                      defaultValue="User"
+                      name="lastName"
+                      value={profileForm.lastName}
+                      onChange={handleProfileInputChange}
                       className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                     />
                   </div>
@@ -197,21 +384,32 @@ const Settings = () => {
                   </label>
                   <input
                     type="email"
-                    defaultValue="admin@sankofaseek.com"
-                    className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
+                    name="email"
+                    value={profileForm.email}
+                    readOnly
+                    className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg bg-stone-50 text-stone-600"
                   />
+                  <p className="text-xs text-stone-500 mt-1">
+                    Email cannot be changed
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-2">
                     Bio
                   </label>
                   <textarea
+                    name="bio"
+                    value={profileForm.bio}
+                    onChange={handleProfileInputChange}
                     rows={4}
                     placeholder="Tell us about yourself..."
                     className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition resize-none"
                   />
                 </div>
-                <button className="px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium">
+                <button
+                  onClick={updateProfile}
+                  className="px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium"
+                >
                   Update Profile
                 </button>
               </div>
@@ -285,6 +483,9 @@ const Settings = () => {
                     </label>
                     <input
                       type="password"
+                      name="currentPassword"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordInputChange}
                       className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                     />
                   </div>
@@ -294,6 +495,9 @@ const Settings = () => {
                     </label>
                     <input
                       type="password"
+                      name="newPassword"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordInputChange}
                       className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                     />
                   </div>
@@ -303,10 +507,16 @@ const Settings = () => {
                     </label>
                     <input
                       type="password"
+                      name="confirmPassword"
+                      value={passwordForm.confirmPassword}
+                      onChange={handlePasswordInputChange}
                       className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                     />
                   </div>
-                  <button className="px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium">
+                  <button
+                    onClick={changePassword}
+                    className="px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium"
+                  >
                     Update Password
                   </button>
                 </div>
