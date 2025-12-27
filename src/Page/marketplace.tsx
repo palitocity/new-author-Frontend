@@ -1,33 +1,57 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect } from "react";
 import StoryCard from "../components/Storycard";
-
-const storyCards = [
-  {
-    image:
-      "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&q=80",
-    title: "Tales from the Savanna",
-    summary:
-      "An intimate collection of stories passed down through generations, capturing the essence of life on the African plains.",
-    price: "$56.67",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=800&q=80",
-    title: "Wisdom of the Elders",
-    summary:
-      "Timeless proverbs and folklore that offer guidance, inspiration, and insight into traditional ways of living.",
-    price: "$42.50",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80",
-    title: "Journey to the Highlands",
-    summary:
-      "Adventure narratives from explorers who traversed rugged terrain to document rare cultural practices.",
-    price: "$68.90",
-  },
-];
+import axios from "../config/axiosconfiq";
+import toast from "react-hot-toast";
 
 export default function Marketplace() {
+  const [stories, setStories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch all published stories
+  const getStories = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("/book"); // Adjust endpoint if needed
+      setStories(res.data.data || []);
+    } catch (error: any) {
+      console.error(
+        "Error fetching stories:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to load stories");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Download a story (free only)
+  const downloadStory = async (id: string) => {
+    try {
+      const res = await axios.get(`/book/${id}/download`);
+      if (res.data.success) {
+        const { title, content } = res.data.data;
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${title}.txt`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        toast.success("Download started!");
+      } else {
+        toast.error(res.data.message || "Cannot download this book");
+      }
+    } catch (error: any) {
+      console.error("Download error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Failed to download story");
+    }
+  };
+
+  useEffect(() => {
+    getStories();
+  }, []);
+
   return (
     <section className="container mx-auto px-6 py-16 bg-stone-200/30 rounded-3xl">
       <div className="text-center mb-12">
@@ -37,9 +61,20 @@ export default function Marketplace() {
         <div className="w-24 h-1 bg-amber-600 mx-auto rounded-full"></div>
       </div>
 
+      {loading && (
+        <p className="text-center text-stone-600">Loading stories...</p>
+      )}
+
       <div className="grid md:grid-cols-3 gap-8">
-        {storyCards.map((card, index) => (
-          <StoryCard key={index} {...card} />
+        {stories.map((story) => (
+          <StoryCard
+            key={story._id}
+            image={story.coverImage}
+            title={story.title}
+            summary={story.summary}
+            price={story.price > 0 ? `₦${story.price}` : "Free"}
+            onDownload={() => downloadStory(story._id)}
+          />
         ))}
       </div>
     </section>

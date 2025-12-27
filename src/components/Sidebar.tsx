@@ -62,6 +62,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       icon: <BookOpen className="w-5 h-5" />,
       path: "view-blogs",
     },
+    {
+      path: "view-stories",
+      name: "View Stories",
+      icon: <FileText className="w-5 h-5" />,
+    },
   ];
 
   const handleLogout = () => {

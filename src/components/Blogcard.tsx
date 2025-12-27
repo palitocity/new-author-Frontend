@@ -1,13 +1,32 @@
 // BlogCard Component
+type BlogCardProps = {
+  image: string;
+  title: string;
+  excerpt: string;
+  author: string;
+  date: string;
+  category: string;
+  readTime: string;
+};
+
 function BlogCard({
-  image = "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80",
-  title = "The Ancient Trails of East Africa",
-  excerpt = "Journey through centuries of history as we explore the rich cultural heritage and untold stories that have shaped the landscapes we know today.",
-  author = "Sarah Johnson",
-  date = "Nov 27, 2024",
-  category = "Heritage",
-  readTime = "8 min read",
-}) {
+  image,
+  title,
+  excerpt,
+  author,
+  date,
+  category,
+  readTime,
+}: BlogCardProps) {
+  console.log("BlogCard props:", {
+    image,
+    title,
+    excerpt,
+    author,
+    date,
+    category,
+    readTime,
+  });
   return (
     <article className="group bg-amber-50 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-full border-2 border-amber-200/50 hover:border-amber-400/60 hover:-translate-y-2">
       {/* Image Container */}
@@ -61,7 +80,7 @@ function BlogCard({
         <div className="flex items-center justify-between mt-auto pt-4 border-t-2 border-amber-200/60">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-600 to-amber-800 flex items-center justify-center text-amber-50 font-semibold text-sm shadow-md">
-              {author.charAt(0).toUpperCase()}
+              {author}
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-stone-800">
