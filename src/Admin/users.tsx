@@ -1,57 +1,97 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 import { Edit, Search, Trash2, Mail, UserPlus, Download } from "lucide-react";
+import axios from "../config/axiosconfiq";
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: "Admin" | "Editor" | "User";
+  status: "Active" | "Inactive";
+  orders: number;
+  joined: string;
+};
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
 
-  const users = [
-    {
-      id: 1,
-      name: "Kwame Mensah",
-      email: "kwame@example.com",
-      role: "Admin",
-      status: "Active",
-      joined: "Jan 15, 2025",
-      orders: 12,
-    },
-    {
-      id: 2,
-      name: "Ama Kofi",
-      email: "ama@example.com",
-      role: "User",
-      status: "Active",
-      joined: "Feb 20, 2025",
-      orders: 5,
-    },
-    {
-      id: 3,
-      name: "Kofi Annan",
-      email: "kofi@example.com",
-      role: "User",
-      status: "Active",
-      joined: "Mar 10, 2025",
-      orders: 8,
-    },
-    {
-      id: 4,
-      name: "Yaa Asantewaa",
-      email: "yaa@example.com",
-      role: "Editor",
-      status: "Active",
-      joined: "Apr 5, 2025",
-      orders: 3,
-    },
-    {
-      id: 5,
-      name: "Nkrumah Adu",
-      email: "nkrumah@example.com",
-      role: "User",
-      status: "Inactive",
-      joined: "May 12, 2025",
-      orders: 0,
-    },
-  ];
+  const [users, setusers] = useState<User[]>([]);
+  const [stats, setstats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    newThisMonth: 0,
+    admins: 0,
+  });
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const getAllUsers = async () => {
+      try {
+        const res = await axios.get("/admin/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setusers(res.data.data);
+        setstats(res.data.stats);
+      } catch (error) {
+        console.log("Error fetching users:", error);
+      }
+    };
+
+    getAllUsers();
+  }, []);
+
+  // const users = [
+  //   {
+  //     id: 1,
+  //     name: "Kwame Mensah",
+  //     email: "kwame@example.com",
+  //     role: "Admin",
+  //     status: "Active",
+  //     joined: "Jan 15, 2025",
+  //     orders: 12,
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Ama Kofi",
+  //     email: "ama@example.com",
+  //     role: "User",
+  //     status: "Active",
+  //     joined: "Feb 20, 2025",
+  //     orders: 5,
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Kofi Annan",
+  //     email: "kofi@example.com",
+  //     role: "User",
+  //     status: "Active",
+  //     joined: "Mar 10, 2025",
+  //     orders: 8,
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Yaa Asantewaa",
+  //     email: "yaa@example.com",
+  //     role: "Editor",
+  //     status: "Active",
+  //     joined: "Apr 5, 2025",
+  //     orders: 3,
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Nkrumah Adu",
+  //     email: "nkrumah@example.com",
+  //     role: "User",
+  //     status: "Inactive",
+  //     joined: "May 12, 2025",
+  //     orders: 0,
+  //   },
+  // ];
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
@@ -69,19 +109,25 @@ const Users = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-stone-600 text-sm mb-1">Total Users</p>
-          <p className="text-3xl font-bold text-stone-800">2,847</p>
+          <p className="text-3xl font-bold text-stone-800">
+            {stats.totalUsers}
+          </p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-stone-600 text-sm mb-1">Active Users</p>
-          <p className="text-3xl font-bold text-green-600">2,634</p>
+          <p className="text-3xl font-bold text-green-600">
+            {stats.activeUsers}
+          </p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-stone-600 text-sm mb-1">New This Month</p>
-          <p className="text-3xl font-bold text-amber-600">142</p>
+          <p className="text-3xl font-bold text-amber-600">
+            {stats.newThisMonth}
+          </p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-stone-600 text-sm mb-1">Admins</p>
-          <p className="text-3xl font-bold text-orange-600">8</p>
+          <p className="text-3xl font-bold text-orange-600">{stats.admins}</p>
         </div>
       </div>
 

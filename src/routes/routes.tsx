@@ -19,6 +19,7 @@ import Users from "../Admin/users";
 import Orders from "../Admin/orders";
 import Newsletter from "../Admin/newsletter";
 import Settings from "../Admin/settings";
+import ViewStories from "../Admin/viewstories";
 
 export const router = createBrowserRouter([
   {
@@ -98,6 +99,10 @@ export const router = createBrowserRouter([
       {
         path: "settings",
         element: <Settings />,
+      },
+      {
+        path: "view-stories",
+        element: <ViewStories />,
       },
     ],
   },

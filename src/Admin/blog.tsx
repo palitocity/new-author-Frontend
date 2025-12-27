@@ -30,8 +30,6 @@ const BlogUpload = () => {
 
   const [showPreview, setShowPreview] = useState(false);
 
-  console.log(showPreview);
-
   const token = localStorage.getItem("token");
 
   const categories = [

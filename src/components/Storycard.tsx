@@ -1,9 +1,12 @@
-const StoryCard = ({
-  image = "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&q=80",
-  title = "Tales from the Savanna",
-  summary = "An intimate collection of stories passed down through generations, capturing the essence of life on the African plains.",
-  price = "$56.67",
-}) => {
+type StoryCardProps = {
+  image: string;
+  title: string;
+  summary: string;
+  price: string | number;
+  onDownload: () => void;
+};
+
+const StoryCard = ({ image, title, summary, price }: StoryCardProps) => {
   return (
     <div className="bg-stone-50 border-2 border-stone-300/60 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden group hover:-translate-y-2">
       <div className="relative h-48 overflow-hidden">
