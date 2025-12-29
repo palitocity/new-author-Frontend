@@ -21,6 +21,7 @@ import Newsletter from "../Admin/newsletter";
 import Settings from "../Admin/settings";
 import ViewStories from "../Admin/viewstories";
 import Picturgallary from "../Page/Picturgallary";
+import UploadGallery from "../Admin/uploadgallary";
 
 export const router = createBrowserRouter([
   {
@@ -108,6 +109,10 @@ export const router = createBrowserRouter([
       {
         path: "view-stories",
         element: <ViewStories />,
+      },
+      {
+        path: "upload",
+        element: <UploadGallery />,
       },
     ],
   },
