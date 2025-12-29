@@ -74,6 +74,7 @@ export default function Marketplace() {
             summary={story.summary}
             price={story.price > 0 ? `₦${story.price}` : "Free"}
             onDownload={() => downloadStory(story._id)}
+            _id={story._id}
           />
         ))}
       </div>

@@ -4,9 +4,10 @@ type StoryCardProps = {
   summary: string;
   price: string | number;
   onDownload: () => void;
+  _id: string;
 };
 
-const StoryCard = ({ image, title, summary, price }: StoryCardProps) => {
+const StoryCard = ({ image, title, summary, price, _id }: StoryCardProps) => {
   return (
     <div className="bg-stone-50 border-2 border-stone-300/60 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden group hover:-translate-y-2">
       <div className="relative h-48 overflow-hidden">
@@ -45,7 +46,7 @@ const StoryCard = ({ image, title, summary, price }: StoryCardProps) => {
           </div>
 
           <a
-            href={`/marketplace/${title.toLowerCase().replace(/\s+/g, "-")}`}
+            href={`/story/${_id}`}
             className="px-4 py-2 bg-amber-600 text-amber-50 text-sm font-semibold rounded-full hover:bg-amber-700 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105"
           >
             Read More
