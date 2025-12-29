@@ -9,6 +9,7 @@ import {
   Mail,
   ShoppingBag,
   FileText,
+  ImageUp,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -66,6 +67,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       path: "view-stories",
       name: "View Stories",
       icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      path: "upload",
+      name: "Upload Gallery",
+      icon: <ImageUp className="w-5 h-5" />,
     },
   ];
 
