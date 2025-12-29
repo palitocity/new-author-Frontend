@@ -22,6 +22,7 @@ import Settings from "../Admin/settings";
 import ViewStories from "../Admin/viewstories";
 import Picturgallary from "../Page/Picturgallary";
 import UploadGallery from "../Admin/uploadgallary";
+import StorybyId from "../Page/StorybyId";
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: "contact",
         element: <Contact />,
+      },
+      {
+        path: "story/:id",
+        element: <StorybyId />,
       },
     ],
   },
