@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 // BlogCard Component
 type BlogCardProps = {
   image: string;
@@ -7,6 +9,7 @@ type BlogCardProps = {
   date: string;
   category: string;
   readTime: string;
+  _id: string;
 };
 
 function BlogCard({
@@ -17,7 +20,14 @@ function BlogCard({
   date,
   category,
   readTime,
+  _id,
 }: BlogCardProps) {
+  const navigate = useNavigate();
+
+  const handleViewMore = () => {
+    navigate(`/blog/${_id}`);
+  };
+
   console.log("BlogCard props:", {
     image,
     title,
@@ -26,11 +36,16 @@ function BlogCard({
     date,
     category,
     readTime,
+    _id,
   });
+
   return (
     <article className="group bg-amber-50 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-full border-2 border-amber-200/50 hover:border-amber-400/60 hover:-translate-y-2">
       {/* Image Container */}
-      <div className="relative h-56 overflow-hidden">
+      <div
+        className="relative h-56 overflow-hidden cursor-pointer"
+        onClick={handleViewMore}
+      >
         <img
           src={image}
           alt={title}
@@ -68,7 +83,10 @@ function BlogCard({
 
       {/* Content */}
       <div className="flex-1 p-6 flex flex-col">
-        <h2 className="text-xl font-bold text-stone-800 mb-3 line-clamp-2 group-hover:text-amber-700 transition-colors duration-300">
+        <h2
+          className="text-xl font-bold text-stone-800 mb-3 line-clamp-2 group-hover:text-amber-700 transition-colors duration-300 cursor-pointer"
+          onClick={handleViewMore}
+        >
           {title}
         </h2>
 
@@ -76,11 +94,32 @@ function BlogCard({
           {excerpt}
         </p>
 
+        {/* View More Button */}
+        <button
+          onClick={handleViewMore}
+          className="mb-4 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-amber-50 font-semibold text-sm rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+        >
+          View More
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M13 7l5 5m0 0l-5 5m5-5H6"
+            />
+          </svg>
+        </button>
+
         {/* Author Section */}
         <div className="flex items-center justify-between mt-auto pt-4 border-t-2 border-amber-200/60">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-600 to-amber-800 flex items-center justify-center text-amber-50 font-semibold text-sm shadow-md">
-              {author}
+              {author.charAt(0).toUpperCase()}
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-stone-800">
@@ -90,7 +129,10 @@ function BlogCard({
             </div>
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center group-hover:bg-amber-600 transition-all duration-300 group-hover:scale-110">
+          <div
+            className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center group-hover:bg-amber-600 transition-all duration-300 group-hover:scale-110 cursor-pointer"
+            onClick={handleViewMore}
+          >
             <svg
               className="w-4 h-4 text-amber-700 group-hover:text-amber-50 transition-colors duration-300"
               fill="none"

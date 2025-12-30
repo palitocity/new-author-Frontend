@@ -23,6 +23,7 @@ import ViewStories from "../Admin/viewstories";
 import Picturgallary from "../Page/Picturgallary";
 import UploadGallery from "../Admin/uploadgallary";
 import StorybyId from "../Page/StorybyId";
+import BlogbyId from "../Page/BlogbyId";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
       {
         path: "contact",
         element: <Contact />,
+      },
+      {
+        path: "blog/:id",
+        element: <BlogbyId />,
       },
       {
         path: "story/:id",
