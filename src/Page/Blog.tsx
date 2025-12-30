@@ -56,6 +56,7 @@ export default function Blog() {
             date={new Date(blog.createdAt).toLocaleDateString()}
             category={blog.category}
             readTime={blog.readingTime ? `${blog.readingTime} min read` : "—"}
+            _id={blog._id}
           />
         ))}
       </div>
