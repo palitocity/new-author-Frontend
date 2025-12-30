@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
@@ -32,13 +33,18 @@ const UploadGallery = () => {
       const res = await axios.get("/uploads", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setImages(res.data.data || []);
-      toast.success("Images loaded successfully");
-    } catch (error: any) {
-      console.error(
-        "Error fetching images:",
-        error.response?.data || error.message
+
+      // 🔥 FLATTEN uploads → images
+      const flattenedImages = res.data.data.flatMap((upload: any) =>
+        upload.images.map((img: any) => ({
+          ...img,
+          uploadId: upload._id,
+          createdAt: upload.createdAt,
+        }))
       );
+
+      setImages(flattenedImages);
+    } catch (error: any) {
       toast.error("Failed to load images");
     } finally {
       setLoading(false);
@@ -51,21 +57,20 @@ const UploadGallery = () => {
 
   // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (files.length < 2 || files.length > 3) {
-      toast.error("Please select 2-3 images");
+    if (selectedImages.length >= 3) {
+      toast.error("You can only upload a maximum of 3 images");
       return;
     }
 
-    setSelectedImages(files);
+    setSelectedImages((prev) => [...prev, file]);
+    setImagePreviews((prev) => [...prev, URL.createObjectURL(file)]);
+    setdescription((prev) => [...prev, ""]);
 
-    // Generate previews
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews(previews);
-
-    // Initialize description array
-    setdescription(Array(files.length).fill(""));
+    // Reset input so same file can be selected again if needed
+    e.target.value = "";
   };
 
   // Handle description change
@@ -106,11 +111,10 @@ const UploadGallery = () => {
     setUploading(true);
     const formData = new FormData();
 
-    selectedImages.forEach((file) => {
+    selectedImages.forEach((file, index) => {
       formData.append("images", file);
+      formData.append("descriptions", description[index]); // <-- plural!
     });
-
-    formData.append("description0", JSON.stringify(description));
 
     try {
       await axios.post("/uploads", formData, {
@@ -198,28 +202,22 @@ const UploadGallery = () => {
         </h2>
 
         {selectedImages.length === 0 ? (
-          <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-stone-300 rounded-lg cursor-pointer hover:border-amber-600 hover:bg-amber-50 transition group">
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <Upload className="w-12 h-12 text-stone-400 group-hover:text-amber-600 mb-3" />
-              <p className="mb-2 text-sm text-stone-600 font-medium">
-                <span className="text-amber-600">Click to upload</span> or drag
-                and drop
-              </p>
-              <p className="text-xs text-stone-500">
-                Select 2-3 images (PNG, JPG up to 10MB each)
-              </p>
+          /* FIRST IMAGE PICKER */
+          <label className="flex items-center justify-center h-48 border-2 border-dashed border-stone-300 rounded-lg cursor-pointer hover:border-amber-600 hover:bg-amber-50 transition">
+            <div className="text-center">
+              <Plus className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+              <p className="text-sm text-stone-600 font-medium">Add image</p>
             </div>
             <input
               type="file"
               className="hidden"
               accept="image/*"
-              multiple
               onChange={handleFileSelect}
             />
           </label>
         ) : (
           <div className="space-y-6">
-            {/* Image Previews with description */}
+            {/* Image Previews */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {imagePreviews.map((preview, index) => (
                 <div key={index} className="space-y-3">
@@ -236,43 +234,58 @@ const UploadGallery = () => {
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-stone-700 mb-2">
-                      Description *
-                    </label>
-                    <textarea
-                      value={description[index]}
-                      onChange={(e) =>
-                        handleDescriptionChange(index, e.target.value)
-                      }
-                      placeholder="Enter image description..."
-                      rows={3}
-                      className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition resize-none"
-                    />
-                  </div>
+
+                  <textarea
+                    value={description[index]}
+                    onChange={(e) =>
+                      handleDescriptionChange(index, e.target.value)
+                    }
+                    placeholder="Enter image description..."
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none"
+                  />
                 </div>
               ))}
+
+              {/* ADD MORE IMAGES (one by one) */}
+              {selectedImages.length < 3 && (
+                <label className="flex items-center justify-center h-48 border-2 border-dashed border-stone-300 rounded-lg cursor-pointer hover:border-amber-600 hover:bg-amber-50 transition">
+                  <div className="text-center">
+                    <Plus className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                    <p className="text-sm text-stone-600 font-medium">
+                      Add another image
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                  />
+                </label>
+              )}
             </div>
 
-            {/* Action Buttons */}
+            {/* ACTION BUTTONS */}
             <div className="flex gap-3">
               <button
                 onClick={() => {
                   setSelectedImages([]);
                   setImagePreviews([]);
-                  setdescription(["", "", ""]);
+                  setdescription([]);
                 }}
-                className="flex-1 px-6 py-3 border-2 border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition font-medium"
+                className="flex-1 px-6 py-3 border-2 border-stone-200 rounded-lg"
               >
                 Cancel
               </button>
+
               <button
                 onClick={uploadImages}
                 disabled={uploading}
-                className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg disabled:opacity-50"
               >
-                <Save className="w-4 h-4" />
-                {uploading ? "Uploading..." : "Upload Images"}
+                <Save className="w-4 h-4 inline mr-2" />
+                Upload Images
               </button>
             </div>
           </div>
