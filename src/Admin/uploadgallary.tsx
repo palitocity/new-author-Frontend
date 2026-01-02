@@ -143,7 +143,7 @@ const UploadGallery = () => {
   // Delete image
   const confirmDeleteImage = async () => {
     try {
-      await axios.delete(`/uploads/${deleteImage._id}`, {
+      await axios.delete(`/uploads/images/${deleteImage._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Image deleted successfully");
