@@ -14,6 +14,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [timeRange, setTimeRange] = useState("week");
@@ -21,6 +22,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   const [dashboard, setDashboard] = useState<any>(null);
+
+  const nav = useNavigate();
 
   const stats = dashboard
     ? [
@@ -66,7 +69,7 @@ const AdminDashboard = () => {
   const popularPosts = dashboard?.popularPosts || [];
 
   // Newsletter stats
-  const newsletterStats = dashboard?.newsletter;
+  // const newsletterStats = dashboard?.newsletter;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -256,7 +259,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Newsletter Stats */}
-        <div className="bg-linear-to-br from-amber-600 to-orange-600 rounded-xl p-6 shadow-sm text-white">
+        {/* <div className="bg-linear-to-br from-amber-600 to-orange-600 rounded-xl p-6 shadow-sm text-white">
           <div className="flex items-center gap-2 mb-4">
             <Mail className="w-6 h-6" />
             <h2 className="text-lg font-bold">Newsletter</h2>
@@ -287,7 +290,7 @@ const AdminDashboard = () => {
               Send Newsletter
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Popular Blog Posts & Quick Actions */}
@@ -299,7 +302,10 @@ const AdminDashboard = () => {
               <FileText className="w-5 h-5 text-amber-600" />
               Popular Blog Posts
             </h2>
-            <button className="text-sm text-amber-600 hover:text-amber-700 font-medium">
+            <button
+              onClick={() => nav("/admin/view-blogs")}
+              className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+            >
               View All
             </button>
           </div>
@@ -336,28 +342,40 @@ const AdminDashboard = () => {
             Quick Actions
           </h2>
           <div className="grid grid-cols-2 gap-3">
-            <button className="p-4 border-2 border-stone-200 rounded-lg hover:border-amber-600 hover:bg-amber-50 transition group">
+            <button
+              onClick={() => nav("/admin/blog")}
+              className="p-4 border-2 border-stone-200 rounded-lg hover:border-amber-600 hover:bg-amber-50 transition group"
+            >
               <FileText className="w-8 h-8 text-stone-600 group-hover:text-amber-600 mb-2" />
               <p className="text-sm font-medium text-stone-700 group-hover:text-amber-600">
                 New Blog Post
               </p>
             </button>
-            <button className="p-4 border-2 border-stone-200 rounded-lg hover:border-orange-600 hover:bg-orange-50 transition group">
+            <button
+              onClick={() => nav("/admin/newsletter")}
+              className="p-4 border-2 border-stone-200 rounded-lg hover:border-orange-600 hover:bg-orange-50 transition group"
+            >
               <Mail className="w-8 h-8 text-stone-600 group-hover:text-orange-600 mb-2" />
               <p className="text-sm font-medium text-stone-700 group-hover:text-orange-600">
                 Send Newsletter
               </p>
             </button>
-            <button className="p-4 border-2 border-stone-200 rounded-lg hover:border-amber-600 hover:bg-amber-50 transition group">
+            <button
+              onClick={() => nav("/admin/users")}
+              className="p-4 border-2 border-stone-200 rounded-lg hover:border-amber-600 hover:bg-amber-50 transition group"
+            >
               <Users className="w-8 h-8 text-stone-600 group-hover:text-amber-600 mb-2" />
               <p className="text-sm font-medium text-stone-700 group-hover:text-amber-600">
                 Manage Users
               </p>
             </button>
-            <button className="p-4 border-2 border-stone-200 rounded-lg hover:border-orange-600 hover:bg-orange-50 transition group">
+            <button
+              onClick={() => nav("/admin/stories")}
+              className="p-4 border-2 border-stone-200 rounded-lg hover:border-orange-600 hover:bg-orange-50 transition group"
+            >
               <BookOpen className="w-8 h-8 text-stone-600 group-hover:text-orange-600 mb-2" />
               <p className="text-sm font-medium text-stone-700 group-hover:text-orange-600">
-                Add Content
+                Add Stories
               </p>
             </button>
           </div>
