@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axios from "../config/axiosconfiq";
@@ -12,10 +13,24 @@ const AllBlogs = () => {
 
   const token = localStorage.getItem("token");
 
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case "published":
+        return "bg-green-100 text-green-700";
+      case "scheduled":
+        return "bg-blue-100 text-blue-700";
+      case "draft":
+      default:
+        return "bg-gray-200 text-gray-700";
+    }
+  };
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axios.get("/blog");
+        const res = await axios.get("/blog/admin/all", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setBlogs(res.data.data);
       } catch (err) {
         console.error(err);
@@ -76,7 +91,17 @@ const AllBlogs = () => {
             />
 
             <div className="p-4">
-              <h2 className="font-bold text-lg">{blog.title}</h2>
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="font-bold text-lg">{blog.title}</h2>
+
+                <span
+                  className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusStyles(
+                    blog.status
+                  )}`}
+                >
+                  {blog.status}
+                </span>
+              </div>
               <p className="text-sm text-gray-500 mb-2">{blog.category}</p>
               <p className="text-sm line-clamp-3">{blog.excerpt}</p>
 
