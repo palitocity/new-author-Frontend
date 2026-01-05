@@ -76,6 +76,13 @@ const BlogUpload = () => {
       setLoading(true);
       const formData = new FormData();
 
+      if (status === "scheduled" && !blogData.publishDate) {
+        toast.dismiss(toastloadingId);
+        toast.error("Please select a publish date for scheduled posts");
+        setLoading(false);
+        return;
+      }
+
       formData.append("title", blogData.title);
       formData.append("author", blogData.author);
       formData.append("category", blogData.category);
@@ -304,6 +311,7 @@ const BlogUpload = () => {
             <div className="space-y-2">
               <button
                 disabled={loading}
+                onClick={() => handleSubmit("draft")}
                 className="w-full px-4 py-2 bg-stone-200 disabled:opacity-50"
               >
                 {loading ? "Saving..." : "Save as Draft"}

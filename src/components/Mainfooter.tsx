@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import logo from "../assets/sankofaseek.png";
 
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Instagram, Twitter, Youtube } from "lucide-react";
 
 // Enhanced Footer Component
 export default function Footer() {
@@ -63,11 +63,11 @@ export default function Footer() {
                   href: "https://www.instagram.com/sankofaseekarts?igsh=MXhpd284dXUydTBybg==",
                   label: "Instagram",
                 },
-                {
-                  Icon: Facebook,
-                  href: "https://www.facebook.com/share/14RnpXX4r1u/",
-                  label: "Facebook",
-                },
+                // {
+                //   Icon: Facebook,
+                //   href: "https://www.facebook.com/share/14RnpXX4r1u/",
+                //   label: "Facebook",
+                // },
                 {
                   Icon: Twitter,
                   href: "https://x.com/Sankofaseekart?t=JAj0W5pnj3FF3kVqV4WTuQ&s=09",
