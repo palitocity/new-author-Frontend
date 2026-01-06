@@ -1,22 +1,43 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 
 import logo from "../assets/sankofaseek.png";
 
 import { Instagram, Twitter, Youtube } from "lucide-react";
+import axios from "../config/axiosconfiq";
 
 // Enhanced Footer Component
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubscribe = (e: { preventDefault: () => void }) => {
+  const handleSubscribe = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    if (email) {
+    setError("");
+
+    if (!email) return;
+
+    try {
+      setLoading(true);
+
+      await axios.post("/subscribers/subscribe", {
+        email,
+      });
+
       setSubscribed(true);
+      setEmail("");
+
       setTimeout(() => {
         setSubscribed(false);
-        setEmail("");
       }, 3000);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message || "Subscription failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,12 +184,23 @@ export default function Footer() {
                   className="w-full px-4 py-3 rounded-lg text-gray-800 bg-white/95 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 />
               </div>
+              {error && (
+                <p className="text-red-300 text-sm bg-red-900/30 px-3 py-2 rounded-md">
+                  {error}
+                </p>
+              )}
               <button
                 type="submit"
-                disabled={subscribed}
-                className="bg-amber-500 px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                disabled={loading || subscribed}
+                className="bg-amber-500 px-6 py-3 rounded-lg font-semibold 
+  hover:bg-amber-600 transition-all duration-300 
+  hover:shadow-lg hover:scale-105 active:scale-95 
+  disabled:opacity-50 disabled:cursor-not-allowed 
+  flex items-center justify-center"
               >
-                {subscribed ? (
+                {loading ? (
+                  "Submitting..."
+                ) : subscribed ? (
                   <>
                     <svg
                       className="w-5 h-5 mr-2"
