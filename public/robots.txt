@@ -1,0 +1,8 @@
+User-agent: *
+Disallow:
+
+# Allow everything (no blocked pages)
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.sankofaseek.com/sitemap.xml
