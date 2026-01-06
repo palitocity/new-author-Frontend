@@ -10,17 +10,24 @@ type BlogType = {
   author: string;
   createdAt: string;
   category: string;
-  readingTime?: number;
 };
 
 export default function Blog() {
   const [blogs, setBlogs] = useState<BlogType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const BLOGS_PER_PAGE = 6;
+
+  const totalPages = Math.ceil(blogs.length / BLOGS_PER_PAGE);
+  const startIndex = (currentPage - 1) * BLOGS_PER_PAGE;
+  const endIndex = startIndex + BLOGS_PER_PAGE;
+  const paginatedBlogs = blogs.slice(startIndex, endIndex);
 
   useEffect(() => {
     const getAllBlogs = async () => {
       try {
-        const res = await axios.get("/blog"); // Adjust the endpoint if needed
+        const res = await axios.get("/blog");
         setBlogs(res.data.data);
       } catch (error) {
         console.error("Failed to fetch blogs:", error);
@@ -32,9 +39,14 @@ export default function Blog() {
     getAllBlogs();
   }, []);
 
+  const changePage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" }); // 🔥 UX polish
+  };
+
   if (loading) {
     return (
-      <div className="text-center py-32 text-stone-600">Loading stories...</div>
+      <div className="text-center py-32 text-stone-600">Loading Blogs...</div>
     );
   }
 
@@ -45,8 +57,9 @@ export default function Blog() {
         <div className="w-24 h-1 bg-amber-600 mx-auto rounded-full"></div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8 mb-20">
-        {blogs.map((blog) => (
+      {/* Blog Grid */}
+      <div className="grid md:grid-cols-3 gap-8 mb-16">
+        {paginatedBlogs.map((blog) => (
           <BlogCard
             key={blog._id}
             image={blog.featuredImage}
@@ -55,11 +68,54 @@ export default function Blog() {
             author={blog.author}
             date={new Date(blog.createdAt).toLocaleDateString()}
             category={blog.category}
-            readTime={blog.readingTime ? `${blog.readingTime} min read` : "—"}
+            createdAt={
+              blog.createdAt
+                ? new Date(blog.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "—"
+            }
             _id={blog._id}
           />
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => changePage(currentPage - 1)}
+            className="px-4 py-2 border rounded-md text-sm disabled:opacity-40"
+          >
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => changePage(i + 1)}
+              className={`px-4 py-2 rounded-md text-sm ${
+                currentPage === i + 1
+                  ? "bg-stone-900 text-white"
+                  : "border text-stone-700"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => changePage(currentPage + 1)}
+            className="px-4 py-2 border rounded-md text-sm disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 }
