@@ -46,6 +46,59 @@ const PictureGallery = () => {
 
   return (
     <div className="min-h-screen bg-stone-50 py-12 px-4">
+      <section className="max-w-4xl mx-auto text-center mb-16 px-4">
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-stone-900 mb-6">
+          Living Archive
+        </h1>
+
+        <div className="text-stone-700 text-base md:text-lg leading-relaxed space-y-4">
+          <p>
+            <span className="font-medium">Gallery Introduction</span>
+          </p>
+
+          <p>
+            This gallery is a living archive—an intentional convergence of
+            earth, spirit, and movement. Within these works, Terraë, Etherea,
+            and Diaspora 77 operate not as separate collections, but as
+            interoperable systems.
+          </p>
+
+          <p>
+            Each form, line, and symbol is designed as a functional artifact:
+            grounded in ancestral intelligence, articulated through contemporary
+            craft, and oriented toward future continuity.
+          </p>
+
+          <p>
+            <span className="font-medium">Terraë</span> holds the material
+            memory—altars, vessels, and grounded forms shaped by earth, labor,
+            and inherited knowledge.
+            <span className="font-medium"> Etherea</span> carries the
+            immaterial—line spirits, luminaries, and cosmological diagrams that
+            translate breath, thought, and resonance into visible order.
+          </p>
+
+          <p>
+            <span className="font-medium">Diaspora 77</span> maps
+            movement—routes, threads, and return paths through which culture
+            travels, fractures, adapts, and remembers itself.
+          </p>
+
+          <p>
+            Nothing here is decorative by accident. Each piece is coded, named,
+            and indexed to preserve meaning, resist distortion, and remain
+            teachable across time.
+          </p>
+
+          <p>
+            This gallery does not ask to be consumed quickly. It asks to be
+            entered, read, and returned to. What you see is not a conclusion,
+            but a framework—a shared language between past wisdom and future
+            possibility.
+          </p>
+        </div>
+      </section>
+
       {/* Gallery Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {galleryImages.map((image, index) => (
