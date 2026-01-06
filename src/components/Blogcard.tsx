@@ -8,7 +8,7 @@ type BlogCardProps = {
   author: string;
   date: string;
   category: string;
-  readTime: string;
+  createdAt: string;
   _id: string;
 };
 
@@ -19,7 +19,7 @@ function BlogCard({
   author,
   date,
   category,
-  readTime,
+  createdAt,
   _id,
 }: BlogCardProps) {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ function BlogCard({
     author,
     date,
     category,
-    readTime,
+    createdAt,
     _id,
   });
 
@@ -76,7 +76,7 @@ function BlogCard({
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            {readTime}
+            {createdAt}
           </span>
         </div>
       </div>

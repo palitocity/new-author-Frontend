@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 import {
   Mail,
   Send,
@@ -8,42 +9,115 @@ import {
   Calendar,
   Eye,
 } from "lucide-react";
+import axios from "../config/axiosconfiq";
+
+interface SendResults {
+  summary: {
+    total: number;
+    sent: number;
+    failed: number;
+    status: string;
+  };
+  results?: {
+    email: string;
+    success: boolean;
+    error?: string;
+  }[];
+}
+
+// Subscribers
+interface Subscriber {
+  _id: string;
+  email: string;
+  isActive: boolean;
+  isVerified: boolean;
+  subscribedAt: string;
+}
 
 const Newsletter = () => {
+  const token = localStorage.getItem("token");
+
+  // Newsletter form
   const [newsletterData, setNewsletterData] = useState({
     subject: "",
-    previewText: "",
     content: "",
   });
 
-  console.log(newsletterData, setNewsletterData);
+  // Sending state
+  const [dryRun, setDryRun] = useState(true);
+  const [sending, setSending] = useState(false);
 
-  const campaigns = [
-    {
-      id: 1,
-      name: "African History Week",
-      sent: "Dec 15, 2025",
-      recipients: 12456,
-      opened: "42.3%",
-      clicked: "18.7%",
-    },
-    {
-      id: 2,
-      name: "New Stories Alert",
-      sent: "Dec 10, 2025",
-      recipients: 12440,
-      opened: "38.5%",
-      clicked: "15.2%",
-    },
-    {
-      id: 3,
-      name: "Monthly Newsletter",
-      sent: "Dec 1, 2025",
-      recipients: 12401,
-      opened: "45.1%",
-      clicked: "21.3%",
-    },
-  ];
+  const [sendResults, setSendResults] = useState<SendResults | null>(null);
+
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [loadingSubscribers, setLoadingSubscribers] = useState(true);
+
+  // Fetch subscribers
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const res = await axios.get("/subscribers/all", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSubscribers(res.data.data);
+      } catch (err) {
+        console.error("Failed to load subscribers", err);
+      } finally {
+        setLoadingSubscribers(false);
+      }
+    };
+    fetchSubscribers();
+  }, []);
+
+  // Form handlers
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setNewsletterData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Create newsletter API
+  const createNewsletter = async () => {
+    try {
+      const res = await axios.post(
+        "/newsletter",
+        { ...newsletterData },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data.data._id;
+    } catch (err) {
+      console.error("Failed to create newsletter", err);
+      alert("Failed to create newsletter");
+    }
+  };
+
+  // Send newsletter API
+  const sendNewsletter = async (newsletterId: string) => {
+    try {
+      setSending(true);
+      const res = await axios.post(
+        `/newsletter/${newsletterId}/send`,
+        { dryRun, batchSize: 50, maxConcurrency: 5 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSendResults(res.data);
+      alert(
+        `Newsletter sent: ${res.data.summary.sent} / ${res.data.summary.total}`
+      );
+    } catch (err) {
+      console.error("Failed to send newsletter", err);
+      alert("Failed to send newsletter");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // Send button click
+  const handleSendNow = async () => {
+    const newsletterId = await createNewsletter();
+    if (newsletterId) await sendNewsletter(newsletterId);
+  };
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
@@ -62,7 +136,9 @@ const Newsletter = () => {
             <p className="text-stone-600 text-sm">Subscribers</p>
             <UsersIcon className="w-5 h-5 text-amber-600" />
           </div>
-          <p className="text-3xl font-bold text-stone-800">12,456</p>
+          <p className="text-3xl font-bold text-stone-800">
+            {subscribers.length.toLocaleString()}
+          </p>
           <p className="text-sm text-green-600 mt-1">+234 this month</p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -71,7 +147,6 @@ const Newsletter = () => {
             <Eye className="w-5 h-5 text-green-600" />
           </div>
           <p className="text-3xl font-bold text-stone-800">42.3%</p>
-          <p className="text-sm text-green-600 mt-1">+3.2% from last month</p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-2">
@@ -79,7 +154,6 @@ const Newsletter = () => {
             <TrendingUp className="w-5 h-5 text-orange-600" />
           </div>
           <p className="text-3xl font-bold text-stone-800">18.7%</p>
-          <p className="text-sm text-green-600 mt-1">+1.8% from last month</p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-2">
@@ -87,12 +161,11 @@ const Newsletter = () => {
             <Mail className="w-5 h-5 text-amber-600" />
           </div>
           <p className="text-3xl font-bold text-stone-800">24</p>
-          <p className="text-sm text-stone-500 mt-1">This year</p>
         </div>
       </div>
 
+      {/* Newsletter Form */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Create Newsletter */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <h2 className="text-xl font-bold text-stone-800 mb-4 flex items-center gap-2">
@@ -107,18 +180,10 @@ const Newsletter = () => {
                 </label>
                 <input
                   type="text"
+                  name="subject"
+                  value={newsletterData.subject}
+                  onChange={handleChange}
                   placeholder="Enter email subject..."
-                  className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-stone-700 mb-2">
-                  Preview Text
-                </label>
-                <input
-                  type="text"
-                  placeholder="This appears below the subject in inboxes..."
                   className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                 />
               </div>
@@ -128,40 +193,64 @@ const Newsletter = () => {
                   Email Content *
                 </label>
                 <textarea
+                  name="content"
                   rows={12}
+                  value={newsletterData.content}
+                  onChange={handleChange}
                   placeholder="Write your newsletter content here..."
                   className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition resize-none"
                 />
               </div>
 
-              <div className="flex gap-3">
-                <button className="flex-1 px-6 py-3 border-2 border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition font-medium">
-                  Save Draft
-                </button>
-                <button className="flex-1 px-6 py-3 border-2 border-amber-600 text-amber-600 rounded-lg hover:bg-amber-50 transition font-medium">
-                  Preview
-                </button>
-                <button className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium flex items-center justify-center gap-2">
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 text-stone-700">
+                  <input
+                    type="checkbox"
+                    checked={dryRun}
+                    onChange={() => setDryRun(!dryRun)}
+                  />
+                  Dry Run
+                </label>
+
+                <button
+                  onClick={handleSendNow}
+                  disabled={sending}
+                  className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium flex items-center justify-center gap-2"
+                >
                   <Send className="w-4 h-4" />
-                  Send Now
+                  {sending ? "Sending..." : "Send Now"}
                 </button>
               </div>
+
+              {sendResults && (
+                <div className="mt-4 bg-white rounded-lg p-4 shadow-sm border border-stone-200">
+                  <h4 className="font-bold text-stone-800 mb-2">
+                    Send Summary
+                  </h4>
+                  <p>Total Recipients: {sendResults.summary.total}</p>
+                  <p>Sent: {sendResults.summary.sent}</p>
+                  <p>Failed: {sendResults.summary.failed}</p>
+                  <p>Status: {sendResults.summary.status}</p>
+                  {sendResults.results && sendResults.results.length > 0 && (
+                    <details className="mt-2 text-sm text-stone-600">
+                      <summary>View per-recipient results</summary>
+                      <ul className="mt-1 max-h-40 overflow-y-auto">
+                        {sendResults.results.map((r) => (
+                          <li key={r.email}>
+                            {r.email}: {r.success ? "✅" : `❌ ${r.error}`}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Tips Sidebar */}
         <div className="space-y-6">
-          <div className="bg-linear-to-br from-amber-600 to-orange-600 rounded-xl p-6 shadow-sm text-white">
-            <h3 className="text-lg font-bold mb-4">Quick Send</h3>
-            <p className="text-amber-100 text-sm mb-4">
-              Send to all subscribers
-            </p>
-            <button className="w-full bg-white text-orange-600 py-2 rounded-lg font-medium hover:bg-stone-50 transition">
-              Send to 12,456 subscribers
-            </button>
-          </div>
-
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <h3 className="text-lg font-bold text-stone-800 mb-4">Tips</h3>
             <ul className="space-y-3 text-sm text-stone-700">
@@ -186,56 +275,66 @@ const Newsletter = () => {
         </div>
       </div>
 
-      {/* Previous Campaigns */}
+      {/* Subscribers Table */}
       <div className="mt-6 bg-white rounded-xl shadow-sm">
         <div className="p-6 border-b border-stone-200">
           <h2 className="text-xl font-bold text-stone-800 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-orange-600" />
-            Previous Campaigns
+            Subscribers List
           </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-stone-50">
               <tr>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-stone-700">
-                  Campaign Name
-                </th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-stone-700">
-                  Sent Date
-                </th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-stone-700">
-                  Recipients
-                </th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-stone-700">
-                  Opened
-                </th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-stone-700">
-                  Clicked
-                </th>
+                <th className="py-4 px-6 text-left">Email</th>
+                <th className="py-4 px-6 text-left">Status</th>
+                <th className="py-4 px-6 text-left">Verified</th>
+                <th className="py-4 px-6 text-left">Subscribed At</th>
               </tr>
             </thead>
             <tbody>
-              {campaigns.map((campaign) => (
-                <tr
-                  key={campaign.id}
-                  className="border-t border-stone-100 hover:bg-stone-50 transition"
-                >
-                  <td className="py-4 px-6 font-semibold text-stone-800">
-                    {campaign.name}
-                  </td>
-                  <td className="py-4 px-6 text-stone-600">{campaign.sent}</td>
-                  <td className="py-4 px-6 text-stone-700">
-                    {campaign.recipients.toLocaleString()}
-                  </td>
-                  <td className="py-4 px-6 text-green-600 font-semibold">
-                    {campaign.opened}
-                  </td>
-                  <td className="py-4 px-6 text-amber-600 font-semibold">
-                    {campaign.clicked}
+              {loadingSubscribers ? (
+                <tr>
+                  <td colSpan={4} className="py-6 text-center text-stone-500">
+                    Loading subscribers...
                   </td>
                 </tr>
-              ))}
+              ) : subscribers.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-6 text-center text-stone-500">
+                    No subscribers found
+                  </td>
+                </tr>
+              ) : (
+                subscribers.map((sub) => (
+                  <tr
+                    key={sub._id}
+                    className="border-t border-stone-100 hover:bg-stone-50 transition"
+                  >
+                    <td className="py-4 px-6 font-medium text-stone-800">
+                      {sub.email}
+                    </td>
+                    <td className="py-4 px-6">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          sub.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {sub.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      {sub.isVerified ? "✅ Verified" : "⏳ Pending"}
+                    </td>
+                    <td className="py-4 px-6 text-stone-600">
+                      {new Date(sub.subscribedAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
