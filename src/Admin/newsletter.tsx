@@ -10,6 +10,7 @@ import {
   Eye,
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
+import toast from "react-hot-toast";
 
 interface SendResults {
   summary: {
@@ -77,7 +78,6 @@ const Newsletter = () => {
     setNewsletterData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Create newsletter API
   const createNewsletter = async () => {
     try {
       const res = await axios.post(
@@ -88,7 +88,7 @@ const Newsletter = () => {
       return res.data.data._id;
     } catch (err) {
       console.error("Failed to create newsletter", err);
-      alert("Failed to create newsletter");
+      toast.error("Failed to create newsletter");
     }
   };
 
@@ -102,17 +102,20 @@ const Newsletter = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSendResults(res.data);
-      alert(
+
+      toast.success(
         `Newsletter sent: ${res.data.summary.sent} / ${res.data.summary.total}`
       );
+
+      // Clear newsletter form after sending
+      setNewsletterData({ subject: "", content: "" });
     } catch (err) {
       console.error("Failed to send newsletter", err);
-      alert("Failed to send newsletter");
+      toast.error("Failed to send newsletter");
     } finally {
       setSending(false);
     }
   };
-
   // Send button click
   const handleSendNow = async () => {
     const newsletterId = await createNewsletter();
