@@ -49,6 +49,8 @@ const Newsletter = () => {
   const [sending, setSending] = useState(false);
 
   const [sendResults, setSendResults] = useState<SendResults | null>(null);
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
 
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loadingSubscribers, setLoadingSubscribers] = useState(true);
@@ -120,6 +122,30 @@ const Newsletter = () => {
   const handleSendNow = async () => {
     const newsletterId = await createNewsletter();
     if (newsletterId) await sendNewsletter(newsletterId);
+
+    if (scheduleEnabled) {
+      await scheduleNewsletter(newsletterId);
+    } else {
+      await sendNewsletter(newsletterId);
+    }
+  };
+
+  const scheduleNewsletter = async (newsletterId: string) => {
+    try {
+      await axios.post(
+        `/newsletter/${newsletterId}/schedule`,
+        { scheduledAt },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success("Newsletter scheduled successfully");
+      setNewsletterData({ subject: "", content: "" });
+      setScheduledAt("");
+      setScheduleEnabled(false);
+    } catch (err) {
+      console.error("Failed to schedule", err);
+      toast.error("Failed to schedule newsletter");
+    }
   };
 
   return (
@@ -204,6 +230,30 @@ const Newsletter = () => {
                   className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition resize-none"
                 />
               </div>
+              <div className="flex flex-col gap-3">
+                <label className="flex items-center gap-2 text-stone-700">
+                  <input
+                    type="checkbox"
+                    checked={scheduleEnabled}
+                    onChange={() => setScheduleEnabled(!scheduleEnabled)}
+                  />
+                  Schedule for later
+                </label>
+
+                {scheduleEnabled && (
+                  <div>
+                    <label className="block text-sm font-semibold text-stone-700 mb-1">
+                      Schedule Date & Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={scheduledAt}
+                      onChange={(e) => setScheduledAt(e.target.value)}
+                      className="w-full px-4 py-2 border-2 border-stone-200 rounded-lg focus:border-amber-600"
+                    />
+                  </div>
+                )}
+              </div>
 
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-2 text-stone-700">
@@ -217,11 +267,15 @@ const Newsletter = () => {
 
                 <button
                   onClick={handleSendNow}
-                  disabled={sending}
-                  className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition font-medium flex items-center justify-center gap-2"
+                  disabled={sending || (scheduleEnabled && !scheduledAt)}
+                  className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg font-medium flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  {sending ? "Sending..." : "Send Now"}
+                  {sending
+                    ? "Processing..."
+                    : scheduleEnabled
+                    ? "Schedule Newsletter"
+                    : "Send Now"}
                 </button>
               </div>
 

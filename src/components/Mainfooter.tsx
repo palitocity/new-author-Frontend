@@ -81,7 +81,7 @@ export default function Footer() {
               {[
                 {
                   Icon: Instagram,
-                  href: "https://www.instagram.com/sankofaseekarts?igsh=MXhpd284dXUydTBybg==",
+                  href: "https://www.instagram.com/sankofaseekhub?igsh=MXhpd284dXUydTBybg==",
                   label: "Instagram",
                 },
                 // {
@@ -91,12 +91,12 @@ export default function Footer() {
                 // },
                 {
                   Icon: Twitter,
-                  href: "https://x.com/Sankofaseekart?t=JAj0W5pnj3FF3kVqV4WTuQ&s=09",
+                  href: "https://x.com/SankofaseekHub",
                   label: "Twitter / X",
                 },
                 {
                   Icon: Youtube,
-                  href: "https://youtube.com/@sankofaseekarts?si=HWE9qgmfCbOsVEv6",
+                  href: "https://www.youtube.com/@sankofaseekartHub",
                   label: "YouTube",
                 },
               ].map(({ Icon, href, label }) => (

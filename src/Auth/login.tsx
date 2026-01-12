@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "../config/axiosconfiq";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +40,6 @@ export default function Login() {
 
       toast.success(res.data.message || "Success");
 
-      // Save token if returned
       localStorage.setItem("token", res.data.data.token);
       navigate("/admin/main");
     } catch (error: any) {
@@ -53,8 +52,19 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-bold text-center text-stone-800">Login</h2>
+      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 relative">
+        {/* Go Home */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute left-4 top-4 flex items-center gap-1 text-sm text-stone-500 hover:text-stone-800 transition"
+        >
+          <ArrowLeft size={16} />
+          Go Home
+        </button>
+
+        <h2 className="text-2xl font-bold text-center text-stone-800 mt-4">
+          Login
+        </h2>
         <p className="text-center text-stone-500 mb-6">Welcome back</p>
 
         {/* Email */}
@@ -104,16 +114,20 @@ export default function Login() {
 
         <button
           onClick={handleSubmit}
-          className="w-full bg-amber-600 hover:bg-orange-600 text-white py-2.5 rounded-lg font-medium transition"
+          disabled={Loading}
+          className="w-full bg-amber-600 hover:bg-orange-600 disabled:opacity-50 text-white py-2.5 rounded-lg font-medium transition"
         >
-          {Loading ? "Please wait...." : "Login"}
+          {Loading ? "Please wait..." : "Login"}
         </button>
 
         <p className="text-center text-sm text-stone-600 mt-4">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-amber-600 font-medium">
+          <span
+            onClick={() => navigate("/signup")}
+            className="text-amber-600 font-medium cursor-pointer"
+          >
             Sign up
-          </a>
+          </span>
         </p>
       </div>
     </div>
