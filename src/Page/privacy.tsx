@@ -128,8 +128,8 @@ const Privacy = () => {
       </ul>
       <p className="mt-3">
         Contact us at{" "}
-        <strong className="text-amber-700">privacy@sankofaseekhub.com</strong>{" "}
-        to exercise these rights.
+        <strong className="text-amber-700">privacy@sankofaseek.com</strong> to
+        exercise these rights.
       </p>
 
       {/* Section 8 */}
@@ -159,7 +159,7 @@ const Privacy = () => {
       <p className="mt-2">
         For questions or requests:
         <br />
-        <strong>Email:</strong> privacy@sankofaseekhub.com
+        <strong>Email:</strong> privacy@sankofaseek.com
         <br />
         <strong>Address:</strong> SANKOFASEEK ARTS & INNOVATION HUB, [Your
         Physical Address]

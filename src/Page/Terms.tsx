@@ -8,7 +8,7 @@ export const TermsAndConditions = () => {
         </h1>
 
         <p className="text-sm text-stone-500 mb-8">
-          Last Updated: [Insert Date]
+          Last Updated: [2026/01/02]
         </p>
 
         <p>
