@@ -161,8 +161,8 @@ const Privacy = () => {
         <br />
         <strong>Email:</strong> privacy@sankofaseek.com
         <br />
-        <strong>Address:</strong> SANKOFASEEK ARTS & INNOVATION HUB, [Your
-        Physical Address]
+        <strong>Address:</strong> SANKOFASEEK ARTS & INNOVATION HUB, [419 old
+        osuke rd, Itele Rd, itele, Ota 112101, Ogun State]
       </p>
     </div>
   );
