@@ -375,18 +375,17 @@ export default function About() {
                 Connect With Us
               </button>
               
+
 <SubscribeModal
-        open={open}
-        onClose={() => setOpen(false)}
-        endpoint="https://sanfossa-backend.onrender.com/api/subscribers/subscribe"
-        onSuccess={() => {
-          // optional: close after success
-          // setTimeout(() => setOpen(false), 1500);
-        }}
-        extraHeaders={{
-         
-        }}
-      />
+  open={open}
+  onClose={() => setOpen(false)}
+  endpoint="https://sanfossa-backend.onrender.com/api/subscribers/subscribe"
+  brandColor="emerald"
+  onSuccess={() => {
+    // toast.success("Subscribed!");
+  }}
+/>
+
 
             </div>
           </div>

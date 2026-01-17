@@ -8,23 +8,17 @@ type SubscribePayload = {
 };
 
 type SubscribeModalProps = {
-  /** Controls whether the modal is visible */
   open: boolean;
-  /** Called when the user closes the modal (X button, overlay click, or ESC) */
   onClose: () => void;
-  /** Endpoint to submit subscriptions (default: `/subscribers/all`) */
   endpoint?: string;
-  /** Optional callback when subscription succeeds */
   onSuccess?: (data: any) => void;
-  /** Optional extra headers if your backend expects more (e.g., tenant-id) */
   extraHeaders?: Record<string, string>;
-  /** Optional: Pre-fill email if already known */
   defaultEmail?: string;
+  /** Optional brand color (Tailwind color classes suffix), e.g. 'indigo', 'violet', 'emerald' */
+  brandColor?: "indigo" | "violet" | "blue" | "emerald" | "rose" | "amber";
 };
 
-const EMAIL_REGEX =
-  // basic RFC5322-ish, practical client-side check
-  /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   open,
@@ -33,8 +27,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   onSuccess,
   extraHeaders,
   defaultEmail = "",
+  brandColor = "indigo",
 }) => {
-  const dialogRef = useRef<HTMLDivElement | null>(null);
   const firstInputRef = useRef<HTMLInputElement | null>(null);
 
   const [form, setForm] = useState<SubscribePayload>({
@@ -48,12 +42,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Focus the first input when opened
+  // Focus first input when opened, reset when closed
   useEffect(() => {
     if (open) {
-      setTimeout(() => firstInputRef.current?.focus(), 50);
+      setTimeout(() => firstInputRef.current?.focus(), 80);
     } else {
-      // reset state when closing
       setForm({ firstName: "", lastName: "", email: defaultEmail });
       setErrors({});
       setServerError(null);
@@ -62,7 +55,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     }
   }, [open, defaultEmail]);
 
-  // ESC key to close
+  // ESC to close
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -72,7 +65,6 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
 
-  // Simple client-side validation
   const validate = (payload: SubscribePayload) => {
     const newErrors: Partial<Record<keyof SubscribePayload, string>> = {};
     if (!payload.firstName?.trim()) newErrors.firstName = "First name is required";
@@ -105,14 +97,13 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       email: form.email.trim().toLowerCase(),
     };
 
-    const ok = validate(payload);
-    if (!ok) return;
-const token = localStorage.getItem("token");
+    if (!validate(payload)) return;
 
+    const token = localStorage.getItem("token");
     setSubmitting(true);
+
     try {
-      const url = `${endpoint}`;
-      const res = await fetch(url, {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,127 +134,249 @@ const token = localStorage.getItem("token");
 
   if (!open) return null;
 
+  // Small helpers for dynamic brand color
+  const brandBg = {
+    indigo: "from-indigo-500/90 to-violet-500/90",
+    violet: "from-violet-500/90 to-fuchsia-500/90",
+    blue: "from-sky-500/90 to-blue-600/90",
+    emerald: "from-emerald-500/90 to-teal-500/90",
+    rose: "from-rose-500/90 to-pink-500/90",
+    amber: "from-amber-500/90 to-orange-500/90",
+  }[brandColor];
+
+  const brandRing = {
+    indigo: "focus:ring-indigo-200",
+    violet: "focus:ring-violet-200",
+    blue: "focus:ring-sky-200",
+    emerald: "focus:ring-emerald-200",
+    rose: "focus:ring-rose-200",
+    amber: "focus:ring-amber-200",
+  }[brandColor];
+
+  const brandBtn = {
+    indigo: "bg-indigo-600 hover:bg-indigo-700",
+    violet: "bg-violet-600 hover:bg-violet-700",
+    blue: "bg-blue-600 hover:bg-blue-700",
+    emerald: "bg-emerald-600 hover:bg-emerald-700",
+    rose: "bg-rose-600 hover:bg-rose-700",
+    amber: "bg-amber-600 hover:bg-amber-700",
+  }[brandColor];
+
+  const brandBadge = {
+    indigo: "bg-indigo-600/20 text-indigo-100 ring-indigo-400/30",
+    violet: "bg-violet-600/20 text-violet-100 ring-violet-400/30",
+    blue: "bg-blue-600/20 text-blue-100 ring-blue-400/30",
+    emerald: "bg-emerald-600/20 text-emerald-100 ring-emerald-400/30",
+    rose: "bg-rose-600/20 text-rose-100 ring-rose-400/30",
+    amber: "bg-amber-600/20 text-amber-100 ring-amber-400/30",
+  }[brandColor];
+
   return (
     <div
-      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="subscribe-title"
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8"
     >
-      {/* Overlay */}
+      {/* Gradient Glass Overlay */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/40 to-black/60 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Panel */}
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute right-3 top-3 rounded-full p-2 text-gray-500 hover:bg-gray-100"
-          aria-label="Close subscribe modal"
-        >
-          ✕
-        </button>
+      <div
+        className="relative z-10 w-full max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-white/70 shadow-2xl backdrop-blur-xl transition-all duration-200 dark:bg-neutral-900/70"
+      >
+        {/* Decorative header */}
+        <div className={`relative h-32 w-full bg-gradient-to-tr ${brandBg}`}>
+          {/* Abstract glow circles */}
+          <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute -right-10 -bottom-14 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
 
-        <h2 id="subscribe-title" className="mb-1 text-xl font-semibold text-gray-900">
-          Subscribe to our updates
-        </h2>
-        <p className="mb-4 text-sm text-gray-600">
-          Get the latest news and product updates straight to your inbox.
-        </p>
+          {/* Badge */}
+          <div className="absolute left-6 top-6 flex items-center gap-3">
+            <div
+              className={`flex h-12 w-12 items-center justify-center rounded-2xl ring-1 ${brandBadge} shadow-md`}
+              aria-hidden="true"
+            >
+              {/* Envelope emoji as icon placeholder; replace with <svg> if you prefer */}
+              <span className="text-2xl">✉️</span>
+            </div>
+            <div className="text-white">
+              <h2 id="subscribe-title" className="text-lg font-semibold leading-tight">
+                Subscribe to updates
+              </h2>
+              <p className="text-xs/5 opacity-90">
+                Product news • Tips • Occasional offers
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              First name
-            </label>
-            <input
-              ref={firstInputRef}
-              type="text"
-              value={form.firstName}
-              onChange={handleChange("firstName")}
-              className={`w-full rounded-lg border p-2 outline-none focus:ring-2 ${
-                errors.firstName ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-200"
+        {/* Form section */}
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+          {/* Helper alert / success */}
+          {(serverError || successMsg) && (
+            <div
+              className={`mb-4 rounded-xl border p-3 text-sm ${
+                serverError
+                  ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200"
+                  : "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-200"
               }`}
-              placeholder="Jane"
-              autoComplete="given-name"
-              disabled={submitting}
-            />
-            {errors.firstName && (
-              <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>
-            )}
+            >
+              {serverError || successMsg}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* First name */}
+            <div className="relative">
+              <label
+                htmlFor="first-name"
+                className="pointer-events-none absolute left-11 top-1.5 z-10 select-none text-xs font-medium text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs dark:text-gray-400"
+              >
+                First name
+              </label>
+              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg">👤</div>
+              <input
+                id="first-name"
+                ref={firstInputRef}
+                type="text"
+                value={form.firstName}
+                onChange={handleChange("firstName")}
+                placeholder=" "
+                autoComplete="given-name"
+                disabled={submitting}
+                className={`peer w-full rounded-2xl border bg-white/70 px-10 py-3 text-sm text-gray-900 outline-none transition-all placeholder-transparent focus:bg-white focus:ring-2 dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-100 ${errors.firstName ? "border-red-400 focus:ring-red-200" : `border-gray-200 ${brandRing}`}`}
+              />
+              {errors.firstName && (
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.firstName}</p>
+              )}
+            </div>
+
+            {/* Last name */}
+            <div className="relative">
+              <label
+                htmlFor="last-name"
+                className="pointer-events-none absolute left-11 top-1.5 z-10 select-none text-xs font-medium text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs dark:text-gray-400"
+              >
+                Last name
+              </label>
+              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg">🧾</div>
+              <input
+                id="last-name"
+                type="text"
+                value={form.lastName}
+                onChange={handleChange("lastName")}
+                placeholder=" "
+                autoComplete="family-name"
+                disabled={submitting}
+                className={`peer w-full rounded-2xl border bg-white/70 px-10 py-3 text-sm text-gray-900 outline-none transition-all placeholder-transparent focus:bg-white focus:ring-2 dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-100 ${errors.lastName ? "border-red-400 focus:ring-red-200" : `border-gray-200 ${brandRing}`}`}
+              />
+              {errors.lastName && (
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.lastName}</p>
+              )}
+            </div>
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Last name
+          {/* Email */}
+          <div className="relative mt-4">
+            <label
+              htmlFor="email"
+              className="pointer-events-none absolute left-11 top-1.5 z-10 select-none text-xs font-medium text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs dark:text-gray-400"
+            >
+              Email address
             </label>
+            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg">📧</div>
             <input
-              type="text"
-              value={form.lastName}
-              onChange={handleChange("lastName")}
-              className={`w-full rounded-lg border p-2 outline-none focus:ring-2 ${
-                errors.lastName ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-200"
-              }`}
-              placeholder="Doe"
-              autoComplete="family-name"
-              disabled={submitting}
-            />
-            {errors.lastName && (
-              <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
+              id="email"
               type="email"
               value={form.email}
               onChange={handleChange("email")}
-              className={`w-full rounded-lg border p-2 outline-none focus:ring-2 ${
-                errors.email ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-200"
-              }`}
-              placeholder="jane.doe@example.com"
+              placeholder=" "
               autoComplete="email"
               inputMode="email"
               disabled={submitting}
+              className={`peer w-full rounded-2xl border bg-white/70 px-10 py-3 text-sm text-gray-900 outline-none transition-all placeholder-transparent focus:bg-white focus:ring-2 dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-100 ${errors.email ? "border-red-400 focus:ring-red-200" : `border-gray-200 ${brandRing}`}`}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</p>
             )}
           </div>
 
-          {serverError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-              {serverError}
-            </div>
-          )}
-
-          {successMsg && (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-2 text-sm text-green-700">
-              {successMsg}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-2 w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? "Subscribing..." : "Subscribe"}
-          </button>
-
-          <p className="text-center text-xs text-gray-500">
-            By subscribing, you agree to our terms and privacy policy.
+          {/* Terms note */}
+          <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+            By subscribing, you agree to our{" "}
+            <a href="#" className="underline underline-offset-2 hover:opacity-80">
+              terms
+            </a>{" "}
+            and{" "}
+            <a href="#" className="underline underline-offset-2 hover:opacity-80">
+              privacy policy
+            </a>
+            .
           </p>
+
+          {/* CTA Row */}
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white/70 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-white dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-200"
+            >
+              <span>Cancel</span>
+            </button>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all ${brandBtn} disabled:cursor-not-allowed disabled:opacity-70`}
+            >
+              {submitting ? (
+                <>
+                  <svg
+                    className="h-4 w-4 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4A4 4 0 008 12H4z"
+                    />
+                  </svg>
+                  Subscribing…
+                </>
+              ) : (
+                <>
+                  <span>Subscribe</span> <span aria-hidden="true">→</span>
+                </>
+              )}
+            </button>
+          </div>
         </form>
+
+        {/* Close button (top-right, floating) */}
+        <button
+          onClick={onClose}
+          aria-label="Close subscribe modal"
+          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 text-gray-600 shadow-sm backdrop-blur hover:bg-white dark:bg-neutral-800/80 dark:text-neutral-300"
+        >
+          ✕
+        </button>
       </div>
     </div>
   );
 };
+``
