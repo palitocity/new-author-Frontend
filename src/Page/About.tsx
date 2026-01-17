@@ -7,8 +7,10 @@ import {
   Target,
   Globe,
 } from "lucide-react";
-
+import { SubscribeModal } from "../components/SubscribeModal";
+import { useState } from "react";
 export default function About() {
+  const [open, setOpen] = useState(false);
   const values = [
     {
       icon: Heart,
@@ -369,13 +371,30 @@ export default function About() {
               <button className="px-8 py-4 bg-white text-amber-700 font-bold rounded-full hover:bg-amber-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg">
                 Start Exploring
               </button>
-              <button className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-full hover:bg-white/20 transition-all duration-300 border-2 border-white/30 text-lg">
+              <button  onClick={() => setOpen(true)} className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-full hover:bg-white/20 transition-all duration-300 border-2 border-white/30 text-lg">
                 Connect With Us
               </button>
+              
+<SubscribeModal
+        open={open}
+        onClose={() => setOpen(false)}
+        authKey={import.meta.env.VITE_SUBSCRIPTION_AUTH_KEY as string}
+        baseUrl={import.meta.env.VITE_API_BASE_URL as string} // e.g., "https://api.yourdomain.com"
+        endpoint="/subscribers/all"
+        onSuccess={() => {
+          // optional: close after success
+          // setTimeout(() => setOpen(false), 1500);
+        }}
+        extraHeaders={{
+         
+        }}
+      />
+
             </div>
           </div>
         </div>
       </div>
+
     </section>
   );
 }
