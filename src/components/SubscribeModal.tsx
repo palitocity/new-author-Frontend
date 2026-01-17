@@ -29,7 +29,7 @@ const EMAIL_REGEX =
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   open,
   onClose,
-  endpoint = "/subscribe",
+  endpoint = "/subscribers/subscribe",
   onSuccess,
   extraHeaders,
   defaultEmail = "",

@@ -378,7 +378,7 @@ export default function About() {
 <SubscribeModal
         open={open}
         onClose={() => setOpen(false)}
-        endpoint="/subscribe"
+        endpoint="/subscribers/subscribe"
         onSuccess={() => {
           // optional: close after success
           // setTimeout(() => setOpen(false), 1500);
