@@ -12,14 +12,10 @@ type SubscribeModalProps = {
   open: boolean;
   /** Called when the user closes the modal (X button, overlay click, or ESC) */
   onClose: () => void;
-  /** Authorization key for header: `Authorization: key <authKey>` */
-  authKey: string;
   /** Endpoint to submit subscriptions (default: `/subscribers/all`) */
   endpoint?: string;
   /** Optional callback when subscription succeeds */
   onSuccess?: (data: any) => void;
-  /** Optional base URL (e.g., https://api.example.com). If not provided, uses relative path. */
-  baseUrl?: string;
   /** Optional extra headers if your backend expects more (e.g., tenant-id) */
   extraHeaders?: Record<string, string>;
   /** Optional: Pre-fill email if already known */
@@ -33,10 +29,8 @@ const EMAIL_REGEX =
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   open,
   onClose,
-  authKey,
   endpoint = "/subscribers/all",
   onSuccess,
-  baseUrl,
   extraHeaders,
   defaultEmail = "",
 }) => {

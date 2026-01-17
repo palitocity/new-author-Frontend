@@ -378,8 +378,6 @@ export default function About() {
 <SubscribeModal
         open={open}
         onClose={() => setOpen(false)}
-        authKey={import.meta.env.VITE_SUBSCRIPTION_AUTH_KEY as string}
-        baseUrl={import.meta.env.VITE_API_BASE_URL as string} // e.g., "https://api.yourdomain.com"
         endpoint="/subscribers/all"
         onSuccess={() => {
           // optional: close after success
