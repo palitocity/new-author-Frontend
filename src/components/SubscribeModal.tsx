@@ -20,7 +20,7 @@ type SubscribeModalProps = {
    * Optional: override how we build the update URL for saving { mailerId } to your local subscriber.
    * By default we derive origin from `endpoint` and call PATCH `${origin}/api/subscribers/:id`.
    */
-  buildUpdateUrl?: (localId: string, origin: string) => string;
+  // buildUpdateUrl?: (localId: string, origin: string) => string;
 };
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -33,15 +33,15 @@ const MAILERLITE_TOKEN =
  * Try to derive the API origin from the `endpoint` (works if endpoint is absolute).
  * If it's relative (e.g., "/api/..."), we'll fall back to `window.location.origin`.
  */
-function getApiOrigin(endpoint?: string) {
-  try {
-    if (!endpoint) return window.location.origin;
-    const u = new URL(endpoint, window.location.origin);
-    return u.origin;
-  } catch {
-    return window.location.origin;
-  }
-}
+// function getApiOrigin(endpoint?: string) {
+//   try {
+//     if (!endpoint) return window.location.origin;
+//     const u = new URL(endpoint, window.location.origin);
+//     return u.origin;
+//   } catch {
+//     return window.location.origin;
+//   }
+// }
 
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   open,
@@ -51,7 +51,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   extraHeaders,
   defaultEmail = "",
   brandColor = "indigo",
-  buildUpdateUrl,
+
 }) => {
   const firstInputRef = useRef<HTMLInputElement | null>(null);
 
