@@ -133,6 +133,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(MAILERLITE_TOKEN ? { "x-mailerlite-token": MAILERLITE_TOKEN } : {}),
           ...(extraHeaders ?? {}),
         },
         body: JSON.stringify(payload),
