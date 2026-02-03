@@ -7,10 +7,10 @@ import {
   Target,
   Globe,
 } from "lucide-react";
-import { SubscribeModal } from "../components/SubscribeModal";
-import { useState } from "react";
+// import { SubscribeModal } from "../components/SubscribeModal";
+// import { useState } from "react";
 export default function About() {
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const values = [
     {
       icon: Heart,
@@ -357,7 +357,7 @@ export default function About() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <div className="inline-block bg-linear-to-r from-amber-600 via-orange-600 to-amber-700 rounded-3xl shadow-2xl p-10 md:p-14 max-w-4xl">
             <Heart className="w-16 h-16 text-amber-100 mx-auto mb-6" />
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -389,9 +389,14 @@ export default function About() {
 
             </div>
           </div>
-        </div>
-      </div>
+        </div> */}
 
+        {/* <div className="text-center mt-12">
+          <button className="px-10 py-4 bg-linear-to-r from-amber-600 via-orange-600 to-amber-700 text-white font-bold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg">
+            Join Our Community
+          </button>
+        </div> */}
+      </div>
     </section>
   );
 }
