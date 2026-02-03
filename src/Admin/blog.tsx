@@ -9,6 +9,8 @@ import {
   Tag,
   User,
   AlignLeft,
+  Copy,
+  Link as LinkIcon,
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
@@ -156,6 +158,78 @@ const BlogUpload = () => {
       </div>
     </div>
   );
+
+  const RssCard = () => {
+    const [limit, setLimit] = useState<number>(20);
+    const origin = import.meta.env.VITE_DEVE_URL
+      ? (() => {
+          try {
+            return new URL(import.meta.env.VITE_DEVE_URL).origin;
+          } catch {
+            return window.location.origin;
+          }
+        })()
+      : window.location.origin;
+
+    const base = `${origin.replace(/\/$/, "")}/api/blog/rss`;
+    const url = limit ? `${base}?limit=${limit}` : base;
+
+    const copy = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success("RSS link copied to clipboard");
+      } catch (err) {
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          toast.success("RSS link copied to clipboard");
+        } catch {
+          toast.error("Copy failed");
+        }
+        document.body.removeChild(ta);
+      }
+    };
+
+    const openPreview = () => {
+      window.open(url, "_blank");
+    };
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={1}
+            max={200}
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value || 0))}
+            className="w-24 px-3 py-2 border rounded-lg"
+          />
+          <span className="text-sm text-stone-600">items</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            readOnly
+            value={url}
+            className="flex-1 px-3 py-2 border rounded-lg text-xs"
+          />
+          <button onClick={copy} className="px-3 py-2 bg-stone-100 rounded-lg">
+            <Copy className="w-4 h-4" />
+          </button>
+          <button onClick={openPreview} className="px-3 py-2 bg-amber-600 text-white rounded-lg">
+            <LinkIcon className="w-4 h-4" />
+          </button>
+        </div>
+
+        <p className="text-xs text-stone-500">Preview will open in a new tab.</p>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
@@ -421,6 +495,18 @@ const BlogUpload = () => {
                 <span>Break content into digestible sections</span>
               </li>
             </ul>
+          </div>
+
+          {/* RSS Feed Card */}
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-stone-800 mb-3 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-amber-600" />
+              RSS Feed
+            </h3>
+
+            <p className="text-sm text-stone-600 mb-3">Public RSS feed for published posts. Share this link with readers or feed readers.</p>
+
+            <RssCard />
           </div>
         </div>
       </div>

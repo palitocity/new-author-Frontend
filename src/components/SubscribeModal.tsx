@@ -25,9 +25,7 @@ type SubscribeModalProps = {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
-// ⚠️ For local testing only. Move this to server (recommended).
-const MAILERLITE_TOKEN =
-  import.meta.env.VITE_MAILERLITE_TOKEN;
+// MailerLite token should be kept on the server (do not expose in the client)
 
 /**
  * Try to derive the API origin from the `endpoint` (works if endpoint is absolute).
@@ -133,7 +131,6 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(MAILERLITE_TOKEN ? { "x-mailerlite-token": MAILERLITE_TOKEN } : {}),
           ...(extraHeaders ?? {}),
         },
         body: JSON.stringify(payload),
@@ -157,93 +154,8 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
       setSuccessMsg("You're subscribed! 🎉");
 
-      // 2) Create subscriber on MailerLite
-      //    ⚠️ Use a backend proxy in production. Direct client call is for testing only.
-      const mlBody = {
-        email: payload.email,
-        fields: {
-          name: payload.firstName,
-          last_name: payload.lastName,
-        },
-      };
-
-      let mailerId: string | undefined;
-
-      try {
-        const mlRes = await fetch("https://connect.mailerlite.com/api/subscribers", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${MAILERLITE_TOKEN}`,
-          },
-          body: JSON.stringify(mlBody),
-        });
-
-        const mlIsJson = mlRes.headers.get("content-type")?.includes("application/json");
-        const mlData = mlIsJson ? await mlRes.json() : await mlRes.text();
-
-        if (!mlRes.ok) {
-          // Don't fail the whole flow; surface a soft warning
-          const msg =
-            (mlIsJson && (mlData?.error || mlData?.message)) ||
-            (typeof mlData === "string" ? mlData : "MailerLite sync failed");
-          console.warn("MailerLite sync failed:", mlData);
-          setServerError(`Subscribed locally, but MailerLite sync failed: ${msg}`);
-        } else {
-          mailerId = typeof mlData === "object" ? mlData?.data?.id : undefined;
-        }
-      } catch (mlErr: any) {
-        console.warn("MailerLite call error:", mlErr);
-        setServerError(
-          `Subscribed locally, but MailerLite call failed: ${mlErr?.message || "Network error"}`
-        );
-      }
-
-      // 3) Update local subscriber with { mailerId } if both available
-      try {
-        if (mailerId && localId) {
-          // const origin = getApiOrigin(endpoint);
-          const updateUrl = 'https://sanfossa-backend.onrender.com/api/subscribers/subscribe';
-
-          const updateRes = await fetch(updateUrl, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              ...(extraHeaders ?? {}),
-            },
-            body: JSON.stringify({ mailerId }),
-          });
-
-          if (!updateRes.ok) {
-            const uIsJson = updateRes.headers.get("content-type")?.includes("application/json");
-            const uData = uIsJson ? await updateRes.json() : await updateRes.text();
-            console.warn("Failed to update local subscriber with mailerId:", uData);
-            setServerError(
-              "Subscribed & synced to MailerLite, but failed to update mailerId in your system."
-            );
-          }
-        } else if (!localId) {
-          console.warn("Local subscriber id not found in response:", localData);
-          setServerError(
-            "Subscribed & synced to MailerLite, but could not determine local record id."
-          );
-        }
-      } catch (uErr: any) {
-        console.warn("Local update error:", uErr);
-        setServerError(
-          `Subscribed & synced to MailerLite, but local update failed: ${
-            uErr?.message || "Unknown error"
-          }`
-        );
-      }
-
-      // Final success callback (include mailerId if present)
-      onSuccess?.({
-        ...(typeof localData === "object" ? localData : { raw: localData }),
-        mailerId: undefined, // optionally include if you want to expose it to parents
-      });
+      // Backend handles MailerLite syncing and will return mailerId when available.
+      onSuccess?.({ ...(typeof localData === "object" ? localData : { raw: localData }) });
     } catch (err: any) {
       setServerError(err?.message || "An unexpected error occurred.");
     } finally {
