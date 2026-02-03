@@ -146,12 +146,6 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
         throw new Error(message);
       }
 
-      // Extract local id as robustly as possible
-      const localId =
-        typeof localData === "object"
-          ? localData?.data?.id ?? localData?.id ?? localData?._id
-          : undefined;
-
       setSuccessMsg("You're subscribed! 🎉");
 
       // Backend handles MailerLite syncing and will return mailerId when available.
