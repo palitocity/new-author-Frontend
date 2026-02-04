@@ -36,7 +36,7 @@ const ViewStories = () => {
     } catch (error: any) {
       console.error(
         "Error fetching stories:",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       toast.error("Failed to load stories");
     } finally {
@@ -72,7 +72,7 @@ const ViewStories = () => {
   const handleEditInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setEditFormData((prev: any) => ({ ...prev, [name]: value }));
@@ -212,7 +212,7 @@ const ViewStories = () => {
                 <div className="absolute top-2 right-2 flex gap-2">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      story.status
+                      story.status,
                     )}`}
                   >
                     {story.status}
@@ -266,12 +266,25 @@ const ViewStories = () => {
                   >
                     <Eye className="w-4 h-4" /> View
                   </button>
+
+                  {story.pdfFile && (
+                    <a
+                      href={story.pdfFile}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 px-3 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <BookOpen className="w-4 h-4" /> PDF
+                    </a>
+                  )}
+
                   <button
                     onClick={() => openEditModal(story)}
                     className="flex-1 px-3 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition text-sm font-medium flex items-center justify-center gap-1"
                   >
                     <Edit className="w-4 h-4" /> Edit
                   </button>
+
                   <button
                     onClick={() => setDeleteStory(story)}
                     className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
@@ -360,6 +373,30 @@ const ViewStories = () => {
                 </div>
               </div>
 
+              {selectedStory.pdfFile && (
+                <div className="mb-6">
+                  <p className="text-sm font-semibold text-stone-700 mb-2">
+                    Story PDF
+                  </p>
+
+                  <div className="rounded-lg overflow-hidden border border-stone-200">
+                    <iframe
+                      src={selectedStory.pdfFile}
+                      className="w-full h-[500px]"
+                      title="Story PDF"
+                    />
+                  </div>
+
+                  <a
+                    href={selectedStory.pdfFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-3 text-amber-600 hover:text-amber-700 font-medium text-sm"
+                  >
+                    Open PDF in new tab →
+                  </a>
+                </div>
+              )}
               <div className="flex gap-3">
                 <button
                   onClick={() => {
@@ -400,6 +437,20 @@ const ViewStories = () => {
                 <X className="w-5 h-5 text-stone-600" />
               </button>
             </div>
+
+            {editingStory?.pdfFile && (
+              <div className="bg-stone-50 rounded-lg p-3 mb-4">
+                <p className="text-sm text-stone-600 mb-1">Current PDF</p>
+                <a
+                  href={editingStory.pdfFile}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-600 font-medium text-sm"
+                >
+                  View uploaded PDF →
+                </a>
+              </div>
+            )}
             <div className="p-6">
               <div className="space-y-4">
                 <div>

@@ -40,7 +40,7 @@ const StorybyId = () => {
     } catch (error: any) {
       console.error(
         "Failed to fetch story",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
     } finally {
       setLoading(false);
@@ -64,8 +64,12 @@ const StorybyId = () => {
 
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">{story.title}</h1>
-        <span className="text-lg font-semibold text-amber-600">
-          {formatPrice(story.price)}
+        <span
+          className={`text-lg font-semibold ${
+            story.price === 0 ? "text-emerald-600" : "text-amber-600"
+          }`}
+        >
+          {story.price === 0 ? "FREE" : formatPrice(story.price)}
         </span>
       </div>
 
