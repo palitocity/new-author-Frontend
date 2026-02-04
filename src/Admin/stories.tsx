@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
+import { FileText } from "lucide-react";
 
 const StoryUpload = () => {
   const [storyData, setStoryData] = useState({
@@ -35,6 +36,7 @@ const StoryUpload = () => {
     price: 0,
   });
 
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -71,6 +73,13 @@ const StoryUpload = () => {
     }
   };
 
+  const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPdfFile(file);
+    }
+  };
+
   const handleStoryImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setStoryImages((prev) => [...prev, ...files]); // store as File[]
@@ -97,7 +106,7 @@ const StoryUpload = () => {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setStoryData((prev) => ({ ...prev, [name]: value }));
@@ -125,6 +134,7 @@ const StoryUpload = () => {
       if (coverImage) formData.append("coverImage", coverImage); // File object
       if (audioFile) formData.append("audioFile", audioFile);
       if (videoFile) formData.append("videoFile", videoFile);
+      if (pdfFile) formData.append("pdfFile", pdfFile);
 
       const token = localStorage.getItem("token");
 
@@ -159,6 +169,7 @@ const StoryUpload = () => {
       setAudioFile(null);
       setVideoFile(null);
       setStoryImages([]);
+      setPdfFile(null);
     } catch (error: any) {
       console.error("Error submitting story:", error);
       toast.error(error.response?.data?.message || "Failed to submit story");
@@ -294,6 +305,47 @@ const StoryUpload = () => {
               <span>{storyData.storyText.length} characters</span>
               <span>Recommended: 1500-5000 characters</span>
             </div>
+          </div>
+
+          {/* PDF Upload */}
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <label className="flex text-sm font-semibold text-stone-700 mb-3  items-center gap-2">
+              <FileText className="w-4 h-4 text-amber-600" />
+              Story PDF (Optional)
+            </label>
+
+            {!pdfFile ? (
+              <label className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-stone-300 rounded-lg cursor-pointer hover:border-amber-600 hover:bg-amber-50 transition">
+                <div className="text-center">
+                  <FileText className="w-8 h-8 text-stone-400 mx-auto mb-2" />
+                  <p className="text-sm text-stone-600">Upload story as PDF</p>
+                  <p className="text-xs text-stone-500 mt-1">
+                    PDF only • Max 20MB
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="application/pdf"
+                  onChange={handlePdfUpload}
+                />
+              </label>
+            ) : (
+              <div className="flex items-center justify-between p-4 bg-stone-100 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-amber-600" />
+                  <span className="text-sm text-stone-700 font-medium">
+                    {pdfFile.name}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setPdfFile(null)}
+                  className="p-2 hover:bg-stone-200 rounded-full transition"
+                >
+                  <X className="w-4 h-4 text-stone-600" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Summary */}
