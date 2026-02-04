@@ -24,6 +24,7 @@ import Picturgallary from "../Page/Picturgallary";
 import UploadGallery from "../Admin/uploadgallary";
 import StorybyId from "../Page/StorybyId";
 import BlogbyId from "../Page/BlogbyId";
+import OrderPage from "../Page/Orderpage";
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
       {
         path: "story/:id",
         element: <StorybyId />,
+      },
+      {
+        path: "order/:id",
+        element: <OrderPage />,
       },
     ],
   },
