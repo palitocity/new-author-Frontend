@@ -1,3 +1,5 @@
+import { Sparkles } from "lucide-react";
+
 interface StoryCardProps {
   image: string;
   title: string;
@@ -7,7 +9,7 @@ interface StoryCardProps {
   onAction: () => void;
 }
 
-export default function StoryCard({
+export function StoryCard({
   image,
   title,
   summary,
@@ -16,37 +18,54 @@ export default function StoryCard({
   onAction,
 }: StoryCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <img src={image} alt={title} className="h-48 w-full object-cover" />
+    <div className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 border border-stone-200 hover:border-amber-300 hover:-translate-y-2">
+      <div className="relative overflow-hidden h-56">
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg font-bold text-stone-800">{title}</h3>
-
-          {isFree && (
-            <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold">
+        {isFree && (
+          <div className="absolute top-4 right-4">
+            <span className="px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
               FREE
             </span>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        <p className="text-sm text-stone-600 mb-4 line-clamp-3">{summary}</p>
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-stone-900 mb-3 line-clamp-2 group-hover:text-amber-700 transition-colors">
+          {title}
+        </h3>
 
-        <div className="flex items-center justify-between">
-          <p className="font-bold text-amber-600">
-            {isFree ? "Free" : `₦${price.toLocaleString()}`}
-          </p>
+        <p className="text-sm text-stone-600 mb-5 line-clamp-3 leading-relaxed">
+          {summary}
+        </p>
+
+        <div className="flex items-center justify-between pt-4 border-t border-stone-100">
+          <div className="flex flex-col">
+            <span className="text-xs text-stone-500 font-medium mb-1">
+              Price
+            </span>
+            <p className="text-2xl font-bold text-amber-600">
+              {isFree ? "Free" : `₦${price.toLocaleString()}`}
+            </p>
+          </div>
 
           <button
             onClick={onAction}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
+            className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105
               ${
                 isFree
-                  ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                  : "bg-amber-600 text-white hover:bg-amber-700"
+                  ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700"
+                  : "bg-linear-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700"
               }`}
           >
-            {isFree ? "Read More" : "Buy Story"}
+            {isFree ? "Read Free" : "Purchase"}
           </button>
         </div>
       </div>

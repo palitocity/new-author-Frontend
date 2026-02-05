@@ -7,10 +7,8 @@ import {
   Target,
   Globe,
 } from "lucide-react";
-// import { SubscribeModal } from "../components/SubscribeModal";
-// import { useState } from "react";
-export default function About() {
-  // const [open, setOpen] = useState(false);
+
+export default function AboutUs() {
   const values = [
     {
       icon: Heart,
@@ -201,7 +199,7 @@ export default function About() {
               {milestones.map((milestone, index) => (
                 <div key={index} className="relative pl-0 md:pl-20">
                   {/* Timeline Dot */}
-                  <div className="absolute left-0 top-0 w-16 h-16 bg-linear-to-br from-amber-600 to-orange-600 rounded-full  items-center justify-center text-white font-bold shadow-xl hidden md:flex">
+                  <div className="absolute left-0 top-0 w-16 h-16 bg-linear-to-br from-amber-600 to-orange-600 rounded-full items-center justify-center text-white font-bold shadow-xl hidden md:flex">
                     {index + 1}
                   </div>
 
@@ -355,47 +353,6 @@ export default function About() {
             </div>
           </div>
         </div>
-
-        {/* Bottom CTA */}
-        {/* <div className="text-center">
-          <div className="inline-block bg-linear-to-r from-amber-600 via-orange-600 to-amber-700 rounded-3xl shadow-2xl p-10 md:p-14 max-w-4xl">
-            <Heart className="w-16 h-16 text-amber-100 mx-auto mb-6" />
-            <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Join Our Journey
-            </h3>
-            <p className="text-amber-50 mb-8 text-xl leading-relaxed max-w-2xl mx-auto">
-              Be part of a global community dedicated to preserving heritage,
-              celebrating culture, and building bridges between past and future.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-4 bg-white text-amber-700 font-bold rounded-full hover:bg-amber-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg">
-                Start Exploring
-              </button>
-              <button  onClick={() => setOpen(true)} className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-full hover:bg-white/20 transition-all duration-300 border-2 border-white/30 text-lg">
-                Connect With Us
-              </button>
-              
-
-<SubscribeModal
-  open={open}
-  onClose={() => setOpen(false)}
-  endpoint="https://sanfossa-backend.onrender.com/api/subscribers/subscribe"
-  brandColor="emerald"
-  onSuccess={() => {
-    // toast.success("Subscribed!");
-  }}
-/>
-
-
-            </div>
-          </div>
-        </div> */}
-
-        {/* <div className="text-center mt-12">
-          <button className="px-10 py-4 bg-linear-to-r from-amber-600 via-orange-600 to-amber-700 text-white font-bold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg">
-            Join Our Community
-          </button>
-        </div> */}
       </div>
     </section>
   );

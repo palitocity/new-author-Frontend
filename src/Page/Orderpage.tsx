@@ -112,10 +112,10 @@ export default function OrderPage() {
                     {new Date(story.createdAt).toDateString()}
                   </p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-stone-500">Story ID</p>
                   <p className="font-medium">#{story._id}</p>
-                </div>
+                </div> */}
               </div>
 
               <div className="mb-6">
