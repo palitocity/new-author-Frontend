@@ -10,12 +10,6 @@ interface OrderModalProps {
   storyTitle: string;
   totalPrice: number;
   quantity: number;
-  onPaymentSuccess: (userInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  }) => void;
 }
 
 export default function OrderModal({
@@ -25,7 +19,6 @@ export default function OrderModal({
   storyTitle,
   totalPrice,
   quantity,
-  onPaymentSuccess,
 }: OrderModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,28 +35,41 @@ export default function OrderModal({
     setLoading(true);
 
     try {
-      // POST order to backend
-      const res = await axios.post("/order", {
+      // 1️⃣ CREATE ORDER
+      const orderRes = await axios.post("/order", {
         items: [
           {
-            book: storyId, // must be valid _id of the story
-            quantity, // > 0
-            priceAtPurchase: totalPrice,
+            book: storyId,
+            quantity,
+            priceAtPurchase: totalPrice, // ✅ unit price not total
           },
         ],
         userInfo: { name, email, phone, address },
       });
 
-      if (res.data.success) {
-        onPaymentSuccess({ name, email, phone, address });
-        onClose();
-      } else {
-        toast.error("Order failed: " + (res.data.error || "Unknown error"));
+      if (!orderRes.data.success) {
+        toast.error(orderRes.data.error || "Failed to create order");
+        return;
       }
+
+      const orderId = orderRes.data.data._id;
+
+      // 2️⃣ INITIALIZE TRANSACTION
+      const transactionRes = await axios.post("/transactions/initialize", {
+        orderId,
+      });
+
+      if (!transactionRes.data.success) {
+        toast.error("Failed to initialize payment");
+        return;
+      }
+
+      const { authorization_url } = transactionRes.data.data;
+
+      // 3️⃣ Redirect to Paystack
+      window.location.href = authorization_url;
     } catch (err: any) {
-      toast.error(
-        "Error creating order: " + (err.response?.data?.error || err.message),
-      );
+      toast.error(err.response?.data?.error || "Payment failed");
     } finally {
       setLoading(false);
     }
@@ -124,7 +130,7 @@ export default function OrderModal({
             loading ? "bg-stone-400" : "bg-amber-600 hover:bg-amber-700"
           }`}
         >
-          {loading ? "Processing Order..." : "Pay Now"}
+          {loading ? "Processing..." : "Proceed to Payment"}
         </button>
       </div>
     </div>
