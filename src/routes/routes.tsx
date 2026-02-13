@@ -77,7 +77,7 @@ export const router = createBrowserRouter([
         element: <OrderPage />,
       },
       {
-        path: "verify/:reference",
+        path: "verify",
         element: <VerifyPayment />,
       },
     ],
