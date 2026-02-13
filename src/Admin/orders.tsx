@@ -231,7 +231,7 @@ const Orders = () => {
                       <StatusBadge status={order.status} />
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      {new Date(order.orderedAt).toDateString()}
+                      {new Date(order.createdAt).toDateString()}
                     </td>
                     <td className="px-6 py-4">
                       <button
