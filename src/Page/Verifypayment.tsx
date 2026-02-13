@@ -20,7 +20,7 @@ export default function VerifyPayment() {
     const verifyPayment = async () => {
       try {
         const res = await axios.get(`/transactions/verify/${reference}`);
-        if (res.data.success && res.data.data.status === "success") {
+        if (res.data.success) {
           setStatus("Payment successful! Order confirmed.");
           setTimeout(() => navigate("/library"), 3000);
         } else {
