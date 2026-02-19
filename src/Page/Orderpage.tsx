@@ -54,12 +54,12 @@ export default function OrderPage() {
     }
   };
 
-  const handlePaymentSuccess = (userInfo: any) => {
-    console.log("User info for admin:", userInfo);
-    setOrderConfirmed(true);
-    setTimeout(() => setOrderConfirmed(false), 3000);
-    // Here you can also trigger API to record the order + user info
-  };
+  // const handlePaymentSuccess = (userInfo: any) => {
+  //   console.log("User info for admin:", userInfo);
+  //   setOrderConfirmed(true);
+  //   setTimeout(() => setOrderConfirmed(false), 3000);
+  //   // Here you can also trigger API to record the order + user info
+  // };
 
   return (
     <div className="min-h-screen bg-stone-50 py-8 px-4">
@@ -181,7 +181,7 @@ export default function OrderPage() {
         onClose={() => setIsModalOpen(false)}
         storyTitle={story.title}
         totalPrice={totalPrice}
-        onPaymentSuccess={handlePaymentSuccess}
+        // onPaymentSuccess={handlePaymentSuccess}
         storyId={story._id} // ✅ actual book ID
         quantity={quantity} // ✅ actual quantity
       />

@@ -25,6 +25,7 @@ import UploadGallery from "../Admin/uploadgallary";
 import StorybyId from "../Page/StorybyId";
 import BlogbyId from "../Page/BlogbyId";
 import OrderPage from "../Page/Orderpage";
+import VerifyPayment from "../Page/Verifypayment";
 
 export const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ export const router = createBrowserRouter([
       {
         path: "order/:id",
         element: <OrderPage />,
+      },
+      {
+        path: "verify",
+        element: <VerifyPayment />,
       },
     ],
   },
