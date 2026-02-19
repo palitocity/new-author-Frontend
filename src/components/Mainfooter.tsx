@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import logo from "../assets/sankofaseek.png";
 
-import { Instagram, Twitter, Youtube, X } from "lucide-react";
+import { Instagram, Twitter, Youtube, X, Facebook } from "lucide-react";
 import axios from "../config/axiosconfiq";
 
 // Enhanced Footer Component
@@ -121,6 +121,11 @@ export default function Footer() {
                     href: "https://www.youtube.com/@sankofaseekartHub",
                     label: "YouTube",
                   },
+                  {
+                     Icon: Facebook,
+                    href: "https://www.facebook.com/share/18BLhZmMtY/",
+                    label: "Facebook",
+                  }
                 ].map(({ Icon, href, label }) => (
                   <a
                     key={label}
