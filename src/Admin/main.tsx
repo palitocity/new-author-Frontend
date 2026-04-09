@@ -12,6 +12,7 @@ import {
   Eye,
   BookOpen,
   BarChart3,
+  List,
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import { useNavigate } from "react-router-dom";
@@ -376,6 +377,15 @@ const AdminDashboard = () => {
               <BookOpen className="w-8 h-8 text-stone-600 group-hover:text-orange-600 mb-2" />
               <p className="text-sm font-medium text-stone-700 group-hover:text-orange-600">
                 Add Stories
+              </p>
+            </button>
+            <button
+              onClick={() => nav("/admin/watchlist")}
+              className="p-4 border-2 border-stone-200 rounded-lg hover:border-amber-600 hover:bg-amber-50 transition group"
+            >
+              <List className="w-8 h-8 text-stone-600 group-hover:text-amber-600 mb-2" />
+              <p className="text-sm font-medium text-stone-700 group-hover:text-amber-600">
+                Watchlist
               </p>
             </button>
           </div>

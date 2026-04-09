@@ -10,6 +10,7 @@ import {
   ShoppingBag,
   FileText,
   ImageUp,
+  List,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -37,6 +38,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       name: "Orders",
       icon: <ShoppingBag className="w-5 h-5" />,
       path: "/admin/orders",
+    },
+    {
+      name: "Watchlist",
+      icon: <List className="w-5 h-5" />,
+      path: "/admin/watchlist",
     },
     {
       name: "Blog",

@@ -26,6 +26,7 @@ import StorybyId from "../Page/StorybyId";
 import BlogbyId from "../Page/BlogbyId";
 import OrderPage from "../Page/Orderpage";
 import VerifyPayment from "../Page/Verifypayment";
+import Watchlist from "../Admin/waitlist";
 
 export const router = createBrowserRouter([
   {
@@ -121,6 +122,14 @@ export const router = createBrowserRouter([
       {
         path: "newsletter",
         element: <Newsletter />,
+      },
+      {
+        path: "watchlist",
+        element: <Watchlist />,
+      },
+      {
+        path: "waitlist",
+        element: <Watchlist />,
       },
       {
         path: "settings",
