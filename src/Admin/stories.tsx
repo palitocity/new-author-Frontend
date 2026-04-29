@@ -172,7 +172,15 @@ const StoryUpload = () => {
       setPdfFile(null);
     } catch (error: any) {
       console.error("Error submitting story:", error);
-      toast.error(error.response?.data?.message || "Failed to submit story");
+
+      let errMsg = "Failed to submit story";
+
+      if (error.response?.data) {
+        errMsg =
+          error.response.data.message || error.response.data.error || errMsg;
+      }
+
+      toast.error(errMsg);
     } finally {
       toast.dismiss(toastLoading);
     }
