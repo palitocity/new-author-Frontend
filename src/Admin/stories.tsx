@@ -299,7 +299,7 @@ const StoryUpload = () => {
           {/* Story Text */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <label className="block text-sm font-semibold text-stone-700 mb-2">
-              Story Content *
+              Story Content (optional if PDF provided)
             </label>
             <textarea
               name="storyText"
