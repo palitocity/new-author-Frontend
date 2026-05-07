@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import logo from "../assets/sankofaseek.png";
 
-import { Instagram, Twitter, Youtube, X, Facebook } from "lucide-react";
+import { Instagram, Twitter, Youtube, X, Facebook, Apple, Music } from "lucide-react";
 import axios from "../config/axiosconfiq";
 
 // Enhanced Footer Component
@@ -110,6 +110,16 @@ export default function Footer() {
                     Icon: Instagram,
                     href: "https://www.instagram.com/sankofaseekhub?igsh=MXhpd284dXUydTBybg==",
                     label: "Instagram",
+                  },
+                  {
+                      Icon: Apple,
+                      href: "https://music.apple.com/us/artist/sankofaseek/1891273794",
+                      label: "Apple Podcasts",
+                  },
+                  {
+                    Icon: Music,
+                    href: "https://open.spotify.com/artist/3scVWnR14UNTP8Z2dKpa8c?si=TND8NYpUTEuSht8TPXhDnw",
+                    label: "Spotify",
                   },
                   {
                     Icon: Twitter,
@@ -334,8 +344,7 @@ export default function Footer() {
                         className="w-5 h-5 text-red-600 shrink-0 mt-0.5"
                         fill="none"
                         stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                        viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"

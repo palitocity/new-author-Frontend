@@ -21,7 +21,8 @@ export default function Navbar() {
     "Home",
     "About",
     "Blog",
-    "TERRÆ & ETHEREA Altar",
+    "Academy",
+    "Gallery Altar",
     "Marketplace",
   ];
 
@@ -48,7 +49,7 @@ export default function Navbar() {
           {menuItems.map((item) => (
             <li key={item}>
               <NavLink
-                to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                to={item === "Home" ? "/" : item=== "Academy"? "https://academy.sankofaseek.com" : `/${item.toLowerCase()}`}
                 className={({ isActive }) =>
                   isActive
                     ? "border-b-2 border-accent"
