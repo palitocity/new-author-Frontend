@@ -62,16 +62,6 @@ const AdminDashboard = () => {
           icon: <Eye className="w-6 h-6" />,
           color: "orange",
         },
-        {
-          title: "Story Views",
-          value: dashboard.stats.bookViews.value,
-          change: dashboard.stats.bookViews.change,
-          trend: dashboard.stats.bookViews.change.startsWith("+")
-            ? "up"
-            : "down",
-          icon: <BookOpen className="w-6 h-6" />,
-          color: "orange",
-        },
       ]
     : [];
 
@@ -255,7 +245,7 @@ const AdminDashboard = () => {
                       <td className="py-3 px-2">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
-                            order.status,
+                            order.status
                           )}`}
                         >
                           {order.status}

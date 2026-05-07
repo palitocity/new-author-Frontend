@@ -64,7 +64,7 @@ const Users = () => {
       setUserToDelete(null);
       getAllUsers();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete user");
+      toast.error(error.response?.data?.error || "Failed to delete user");
     } finally {
       setDeleting(false);
     }
@@ -239,8 +239,8 @@ const Users = () => {
                         user.role === "Admin"
                           ? "bg-orange-100 text-orange-800"
                           : user.role === "Editor"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-stone-100 text-stone-800"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-stone-100 text-stone-800"
                       }`}
                     >
                       {user.role}
