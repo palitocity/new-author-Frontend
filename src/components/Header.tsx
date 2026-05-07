@@ -77,7 +77,7 @@ export default function Navbar() {
           {menuItems.map((item) => (
             <li key={item}>
               <NavLink
-                to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+               to={item === "Home" ? "/" : item=== "Academy"? "https://academy.sankofaseek.com" : `/${ item === "Gallery Altar" ? "TERRÆ & ETHEREA Altar" : item.toLowerCase() }`}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   isActive
