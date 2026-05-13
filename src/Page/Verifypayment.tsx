@@ -26,7 +26,7 @@ export default function VerifyPayment() {
         console.log("🔥 VERIFY DATA:", res.data);
         if (res.data.success) {
           setStatus("Payment successful! Order confirmed.");
-          setTimeout(() => navigate("/library"), 3000);
+          // setTimeout(() => navigate("/library"), 3000);
         } else {
           setStatus("Payment failed or pending.");
         }
