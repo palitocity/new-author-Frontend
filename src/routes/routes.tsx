@@ -27,6 +27,7 @@ import BlogbyId from "../Page/BlogbyId";
 import OrderPage from "../Page/Orderpage";
 import VerifyPayment from "../Page/Verifypayment";
 import Watchlist from "../Admin/waitlist";
+import Library from "../Page/Library";
 
 export const router = createBrowserRouter([
   {
@@ -80,6 +81,10 @@ export const router = createBrowserRouter([
       {
         path: "verify",
         element: <VerifyPayment />,
+      },
+      {
+        path: "library",
+        element: <Library />,
       },
     ],
   },

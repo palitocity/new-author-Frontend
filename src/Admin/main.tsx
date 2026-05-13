@@ -245,7 +245,7 @@ const AdminDashboard = () => {
                       <td className="py-3 px-2">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
-                            order.status
+                            order.status,
                           )}`}
                         >
                           {order.status}

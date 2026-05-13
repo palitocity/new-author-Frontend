@@ -34,6 +34,8 @@ export default function OrderModal({
 
     setLoading(true);
 
+    localStorage.setItem("userEmail", email);
+
     try {
       // 1️⃣ CREATE ORDER
       const orderRes = await axios.post("/order", {
