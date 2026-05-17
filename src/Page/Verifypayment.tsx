@@ -11,7 +11,7 @@ export default function VerifyPayment() {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const reference = queryParams.get("reference"); // get from query
+    const reference = queryParams.get("reference") || queryParams.get("trxref");
 
     if (!reference) {
       setStatus("No payment reference found.");
@@ -22,18 +22,13 @@ export default function VerifyPayment() {
       try {
         const res = await axios.get(`/transactions/verify/${reference}`);
 
-        console.log("🔥 VERIFY RESPONSE:", res);
-        console.log("🔥 VERIFY DATA:", res.data);
         if (res.data.success) {
-          setStatus("Payment successful! Order confirmed.");
-          // setTimeout(() => navigate("/library"), 3000);
+          setStatus("Payment successful! Your library is ready.");
+          setTimeout(() => navigate("/library"), 1500);
         } else {
           setStatus("Payment failed or pending.");
         }
       } catch (err: any) {
-        console.log("❌ VERIFY ERROR:", err);
-        console.log("❌ ERROR RESPONSE:", err?.response?.data);
-
         setStatus(
           err?.response?.data?.error ||
             err.message ||
@@ -46,8 +41,13 @@ export default function VerifyPayment() {
   }, [location.search, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-center text-xl">{status}</p>
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 px-4">
+      <div className="rounded-lg border border-stone-200 bg-white px-6 py-5 text-center shadow-sm">
+        <p className="text-xl font-semibold text-stone-900">{status}</p>
+        <p className="mt-2 text-sm text-stone-500">
+          Please keep this page open while we confirm your purchase.
+        </p>
+      </div>
     </div>
   );
 }
