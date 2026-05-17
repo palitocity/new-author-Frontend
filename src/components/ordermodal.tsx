@@ -34,7 +34,8 @@ export default function OrderModal({
 
     setLoading(true);
 
-    localStorage.setItem("userEmail", email);
+    const normalizedEmail = email.trim().toLowerCase();
+    localStorage.setItem("userEmail", normalizedEmail);
 
     try {
       // 1️⃣ CREATE ORDER
@@ -43,10 +44,10 @@ export default function OrderModal({
           {
             book: storyId,
             quantity,
-            priceAtPurchase: totalPrice, // ✅ unit price not total
+            priceAtPurchase: totalPrice / quantity,
           },
         ],
-        userInfo: { name, email, phone, address },
+        userInfo: { name, email: normalizedEmail, phone, address },
       });
 
       if (!orderRes.data.success) {
