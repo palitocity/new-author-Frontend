@@ -5,6 +5,7 @@ interface StoryCardProps {
   title: string;
   summary: string;
   price: number;
+  views: number;
   isFree: boolean;
   onAction: () => void;
 }
@@ -14,6 +15,7 @@ export function StoryCard({
   title,
   summary,
   price,
+  views,
   isFree,
   onAction,
 }: StoryCardProps) {
@@ -54,6 +56,7 @@ export function StoryCard({
             <p className="text-2xl font-bold text-amber-600">
               {isFree ? "Free" : `₦${price.toLocaleString()}`}
             </p>
+            <p>{views}</p>
           </div>
 
           <button
