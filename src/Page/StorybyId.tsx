@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
@@ -46,6 +47,27 @@ const StorybyId = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const key = `viewed_${id}`;
+
+    const trackView = async () => {
+      if (!id) return;
+
+      const alreadyViewed = localStorage.getItem(key);
+
+      if (alreadyViewed) return;
+
+      try {
+        await axios.post(`/books/${id}/view`);
+        localStorage.setItem(key, "true");
+      } catch (err) {
+        console.log("view failed");
+      }
+    };
+
+    trackView();
+  }, [id]);
 
   useEffect(() => {
     if (id) getStoryById();

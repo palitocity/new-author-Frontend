@@ -218,6 +218,7 @@ export default function Marketplace() {
                 title={story.title}
                 summary={story.summary}
                 price={story.price}
+                views={story.views}
                 isFree={story.price === 0}
                 onAction={() => {
                   if (story.price > 0) {
