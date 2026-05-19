@@ -62,6 +62,16 @@ const AdminDashboard = () => {
           icon: <Eye className="w-6 h-6" />,
           color: "orange",
         },
+        {
+          title: "Story Views",
+          value: dashboard.stats.bookViews.value,
+          change: dashboard.stats.bookViews.change,
+          trend: dashboard.stats.bookViews.change.startsWith("+")
+            ? "up"
+            : "down",
+          icon: <BookOpen className="w-6 h-6" />,
+          color: "amber",
+        },
       ]
     : [];
 

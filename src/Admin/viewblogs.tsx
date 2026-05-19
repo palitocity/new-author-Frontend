@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import axios from "../config/axiosconfiq";
+import { Eye } from "lucide-react";
 
 const AllBlogs = () => {
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -104,6 +105,11 @@ const AllBlogs = () => {
               </div>
               <p className="text-sm text-gray-500 mb-2">{blog.category}</p>
               <p className="text-sm line-clamp-3">{blog.excerpt}</p>
+
+              <div className="mt-3 flex items-center gap-2 text-sm text-stone-500">
+                <Eye className="h-4 w-4 text-amber-600" />
+                <span>{(blog.views || 0).toLocaleString()} views</span>
+              </div>
 
               <div className="flex justify-between items-center mt-4">
                 <a

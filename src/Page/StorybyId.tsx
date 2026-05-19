@@ -59,9 +59,11 @@ const StorybyId = () => {
       if (alreadyViewed) return;
 
       try {
-        await axios.post(`/books/${id}/view`);
+        localStorage.setItem(key, "pending");
+        await axios.post(`/book/books/${id}/track-view`);
         localStorage.setItem(key, "true");
       } catch (err) {
+        localStorage.removeItem(key);
         console.log("view failed");
       }
     };

@@ -39,6 +39,29 @@ const BlogbyId = () => {
     if (id) getBlogById();
   }, [id]);
 
+  useEffect(() => {
+    if (!id) return;
+
+    const key = `viewed_blog_${id}`;
+
+    const trackView = async () => {
+      const alreadyViewed = localStorage.getItem(key);
+
+      if (alreadyViewed) return;
+
+      try {
+        localStorage.setItem(key, "pending");
+        await axios.post(`/blog/${id}/track-view`);
+        localStorage.setItem(key, "true");
+      } catch (err) {
+        localStorage.removeItem(key);
+        console.error("Blog view tracking failed", err);
+      }
+    };
+
+    trackView();
+  }, [id]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-stone-50">

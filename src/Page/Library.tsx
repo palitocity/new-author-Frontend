@@ -49,8 +49,46 @@ export default function Library() {
   const [books, setBooks] = useState<LibraryBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const email = localStorage.getItem("userEmail");
+
+  const handleDownload = async (bookId: string) => {
+    if (!email) {
+      setError("No purchase email found on this device.");
+      return;
+    }
+
+    try {
+      setDownloadingId(bookId);
+      const res = await axios.post(`/book/${bookId}/download-purchased`, {
+        email,
+      });
+
+      const pdfFile = res.data?.data?.pdfFile;
+
+      if (!pdfFile) {
+        throw new Error("File unavailable. Please contact support.");
+      }
+
+      const link = document.createElement("a");
+      link.href = pdfFile;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err.message ||
+          "Unable to download this story.",
+      );
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchLibrary = async () => {
@@ -138,15 +176,17 @@ export default function Library() {
                     </p>
                   )}
 
-                  {book.pdfFile ? (
-                    <a
-                      href={book.pdfFile}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-4 inline-flex w-full justify-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+                  {id ? (
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(String(id))}
+                      disabled={downloadingId === String(id)}
+                      className="mt-4 inline-flex w-full justify-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      Read / Download
-                    </a>
+                      {downloadingId === String(id)
+                        ? "Preparing file..."
+                        : "Read / Download"}
+                    </button>
                   ) : (
                     <p className="mt-4 text-sm text-stone-500">
                       File unavailable. Please contact support.
