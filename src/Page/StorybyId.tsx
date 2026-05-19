@@ -60,7 +60,7 @@ const StorybyId = () => {
 
       try {
         localStorage.setItem(key, "pending");
-        await axios.post(`/book/books/${id}/track-view`);
+        await axios.post(`/book/${id}/track-view`);
         localStorage.setItem(key, "true");
       } catch (err) {
         localStorage.removeItem(key);

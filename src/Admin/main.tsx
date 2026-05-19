@@ -83,7 +83,7 @@ const AdminDashboard = () => {
   // const newsletterStats = dashboard?.newsletter;
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "completed":
         return "bg-green-100 text-green-800";
       case "pending":
@@ -157,7 +157,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {stats.map((stat, idx) => (
           <div
             key={idx}
@@ -207,7 +207,10 @@ const AdminDashboard = () => {
               <ShoppingBag className="w-5 h-5 text-orange-600" />
               Recent Orders
             </h2>
-            <button className="text-sm text-orange-600 hover:text-orange-700 font-medium">
+            <button
+              onClick={() => nav("/admin/orders")}
+              className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+            >
               View All
             </button>
           </div>
