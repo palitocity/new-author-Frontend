@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../config/axiosconfiq";
 
@@ -33,6 +33,7 @@ const StorybyId = () => {
   const { id } = useParams();
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasTrackedView = useRef(false);
 
   const getStoryById = async () => {
     try {
@@ -49,21 +50,15 @@ const StorybyId = () => {
   };
 
   useEffect(() => {
-    const key = `viewed_${id}`;
+    if (!id || hasTrackedView.current) return;
+
+    hasTrackedView.current = true;
 
     const trackView = async () => {
-      if (!id) return;
-
-      const alreadyViewed = localStorage.getItem(key);
-
-      if (alreadyViewed) return;
-
       try {
-        localStorage.setItem(key, "pending");
         await axios.post(`/book/${id}/track-view`);
-        localStorage.setItem(key, "true");
       } catch (err) {
-        localStorage.removeItem(key);
+        hasTrackedView.current = false;
         console.log("view failed");
       }
     };

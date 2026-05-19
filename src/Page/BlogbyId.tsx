@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "../config/axiosconfiq";
 import { useParams } from "react-router-dom";
 
@@ -21,6 +21,7 @@ const BlogbyId = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasTrackedView = useRef(false);
 
   const getBlogById = async () => {
     try {
@@ -40,21 +41,15 @@ const BlogbyId = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || hasTrackedView.current) return;
 
-    const key = `viewed_blog_${id}`;
+    hasTrackedView.current = true;
 
     const trackView = async () => {
-      const alreadyViewed = localStorage.getItem(key);
-
-      if (alreadyViewed) return;
-
       try {
-        localStorage.setItem(key, "pending");
         await axios.post(`/blog/${id}/track-view`);
-        localStorage.setItem(key, "true");
       } catch (err) {
-        localStorage.removeItem(key);
+        hasTrackedView.current = false;
         console.error("Blog view tracking failed", err);
       }
     };
