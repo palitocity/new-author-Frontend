@@ -46,7 +46,7 @@ const AdminDashboard = () => {
         },
         {
           title: "Revenue",
-          value: `₦${dashboard.stats.revenue.value.toLocaleString()}`,
+          value: `₦${(dashboard.stats.revenue.value || 0).toLocaleString()}`,
           change: dashboard.stats.revenue.change,
           trend: dashboard.stats.revenue.change.startsWith("+") ? "up" : "down",
           icon: <DollarSign className="w-6 h-6" />,
@@ -90,6 +90,8 @@ const AdminDashboard = () => {
         return "bg-yellow-100 text-yellow-800";
       case "processing":
         return "bg-blue-100 text-blue-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-stone-100 text-stone-800";
     }
@@ -250,7 +252,13 @@ const AdminDashboard = () => {
                       </td>
                       <td className="py-3 px-2">{order.customerName}</td>
                       <td className="py-3 px-2">
-                        {order.items?.[0]?.name || "—"}
+                        {order.items?.length
+                          ? `${order.items[0].name || "Story"}${
+                              order.items.length > 1
+                                ? ` +${order.items.length - 1} more`
+                                : ""
+                            }`
+                          : "—"}
                       </td>
                       <td className="py-3 px-2 font-semibold">
                         ₦{order.totalAmount?.toLocaleString()}
@@ -336,7 +344,9 @@ const AdminDashboard = () => {
                     <h3 className="text-sm font-semibold">{post.title}</h3>
                     <p className="text-xs text-stone-500">
                       Published{" "}
-                      {new Date(post.publishDate).toLocaleDateString()}
+                      {post.publishDate
+                        ? new Date(post.publishDate).toLocaleDateString()
+                        : "Unscheduled"}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-stone-600">
