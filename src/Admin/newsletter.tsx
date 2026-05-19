@@ -45,7 +45,7 @@ const Newsletter = () => {
   });
 
   // Sending state
-  const [dryRun, setDryRun] = useState(true);
+  const [dryRun, setDryRun] = useState(false);
   const [sending, setSending] = useState(false);
 
   const [sendResults, setSendResults] = useState<SendResults | null>(null);
@@ -121,13 +121,14 @@ const Newsletter = () => {
   // Send button click
   const handleSendNow = async () => {
     const newsletterId = await createNewsletter();
-    if (newsletterId) await sendNewsletter(newsletterId);
+    if (!newsletterId) return;
 
     if (scheduleEnabled) {
       await scheduleNewsletter(newsletterId);
-    } else {
-      await sendNewsletter(newsletterId);
+      return;
     }
+
+    await sendNewsletter(newsletterId);
   };
 
   const scheduleNewsletter = async (newsletterId: string) => {

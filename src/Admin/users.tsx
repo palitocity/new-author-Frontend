@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Edit, Search, Trash2, Mail, UserPlus, Download } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
@@ -16,8 +16,10 @@ type User = {
 };
 
 const Users = () => {
+  const PAGE_SIZE = 10;
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
+  const [page, setPage] = useState(1);
 
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -48,6 +50,65 @@ const Users = () => {
   useEffect(() => {
     getAllUsers();
   }, []);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesRole =
+        filterRole === "all" || user.role.toLowerCase() === filterRole;
+
+      const matchesSearch =
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return matchesRole && matchesSearch;
+    });
+  }, [filterRole, searchTerm, users]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
+
+  const paginatedUsers = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filteredUsers.slice(start, start + PAGE_SIZE);
+  }, [filteredUsers, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filterRole, searchTerm]);
+
+  const exportUsers = () => {
+    if (!filteredUsers.length) {
+      toast.error("No users to export");
+      return;
+    }
+
+    const rows = [
+      ["Name", "Email", "Role", "Status", "Orders", "Joined"],
+      ...filteredUsers.map((user) => [
+        user.name,
+        user.email,
+        user.role,
+        user.status,
+        String(user.orders),
+        user.joined,
+      ]),
+    ];
+
+    const csv = rows
+      .map((row) =>
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "users-export.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
@@ -183,11 +244,19 @@ const Users = () => {
             </select>
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 border-2 border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition flex items-center gap-2">
+            <button
+              onClick={exportUsers}
+              className="px-4 py-2 border-2 border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition flex items-center gap-2"
+            >
               <Download className="w-4 h-4" />
               Export
             </button>
-            <button className="px-4 py-2 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition flex items-center gap-2">
+            <button
+              onClick={() =>
+                toast("User creation is not implemented in this workspace yet.")
+              }
+              className="px-4 py-2 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition flex items-center gap-2"
+            >
               <UserPlus className="w-4 h-4" />
               Add User
             </button>
@@ -220,7 +289,7 @@ const Users = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {paginatedUsers.map((user) => (
                 <tr
                   key={user.id}
                   className="border-t border-stone-100 hover:bg-stone-50 transition"
@@ -286,22 +355,27 @@ const Users = () => {
         {/* Pagination */}
         <div className="p-4 border-t border-stone-200 flex items-center justify-between">
           <p className="text-sm text-stone-600">
-            Showing 1 to 5 of 2,847 users
+            Showing{" "}
+            {filteredUsers.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1} to{" "}
+            {Math.min(page * PAGE_SIZE, filteredUsers.length)} of{" "}
+            {filteredUsers.length} users
           </p>
           <div className="flex gap-2">
-            <button className="px-4 py-2 border-2 border-stone-200 rounded-lg hover:bg-stone-50 transition">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              className="px-4 py-2 border-2 border-stone-200 rounded-lg hover:bg-stone-50 transition disabled:opacity-50"
+            >
               Previous
             </button>
             <button className="px-4 py-2 bg-amber-600 text-white rounded-lg">
-              1
+              {page}
             </button>
-            <button className="px-4 py-2 border-2 border-stone-200 rounded-lg hover:bg-stone-50 transition">
-              2
-            </button>
-            <button className="px-4 py-2 border-2 border-stone-200 rounded-lg hover:bg-stone-50 transition">
-              3
-            </button>
-            <button className="px-4 py-2 border-2 border-stone-200 rounded-lg hover:bg-stone-50 transition">
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              className="px-4 py-2 border-2 border-stone-200 rounded-lg hover:bg-stone-50 transition disabled:opacity-50"
+            >
               Next
             </button>
           </div>
