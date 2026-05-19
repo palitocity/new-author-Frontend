@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../config/axiosconfiq";
 import { useParams } from "react-router-dom";
 
@@ -21,7 +21,6 @@ const BlogbyId = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const hasTrackedView = useRef(false);
 
   const getBlogById = async () => {
     try {
@@ -38,23 +37,6 @@ const BlogbyId = () => {
 
   useEffect(() => {
     if (id) getBlogById();
-  }, [id]);
-
-  useEffect(() => {
-    if (!id || hasTrackedView.current) return;
-
-    hasTrackedView.current = true;
-
-    const trackView = async () => {
-      try {
-        await axios.post(`/blog/${id}/track-view`);
-      } catch (err) {
-        hasTrackedView.current = false;
-        console.error("Blog view tracking failed", err);
-      }
-    };
-
-    trackView();
   }, [id]);
 
   if (loading) {
