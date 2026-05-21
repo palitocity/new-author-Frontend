@@ -2,10 +2,23 @@ import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/sankofaseek.png";
 import { useEffect, useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
+import { getUserIp } from "../utils/getip";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const [ip, setIp] = useState("");
+
+  useEffect(() => {
+    const fetchIp = async () => {
+      const userIp = await getUserIp();
+
+      setIp(userIp || "Unable to fetch IP");
+    };
+
+    fetchIp();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +47,9 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-center mt-4">
+          Welcome to StoryVerse — your IP is: {ip}
+        </h1>
         {/* Logo */}
         <Link to="/" className="flex items-center font-heading font-bold">
           <img
@@ -42,13 +58,18 @@ export default function Navbar() {
             className="h-10 w-auto object-contain mr-3"
           />
         </Link>
-
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-6 font-body">
           {menuItems.map((item) => (
             <li key={item}>
               <NavLink
-                to={item === "Home" ? "/" : item=== "Academy"? "https://academy.sankofaseek.com" : `/${ item === "Gallery Altar" ? "TERRÆ & ETHEREA Altar" : item.toLowerCase() }`}
+                to={
+                  item === "Home"
+                    ? "/"
+                    : item === "Academy"
+                      ? "https://academy.sankofaseek.com"
+                      : `/${item === "Gallery Altar" ? "TERRÆ & ETHEREA Altar" : item.toLowerCase()}`
+                }
                 className={({ isActive }) =>
                   isActive
                     ? "border-b-2 border-accent"
@@ -60,7 +81,6 @@ export default function Navbar() {
             </li>
           ))}
         </ul>
-
         {/* Mobile Hamburger */}
         <button className="md:hidden text-3xl" onClick={() => setOpen(!open)}>
           {open ? <HiX /> : <HiMenu />}
@@ -77,7 +97,13 @@ export default function Navbar() {
           {menuItems.map((item) => (
             <li key={item}>
               <NavLink
-               to={item === "Home" ? "/" : item=== "Academy"? "https://academy.sankofaseek.com" : `/${ item === "Gallery Altar" ? "TERRÆ & ETHEREA Altar" : item.toLowerCase() }`}
+                to={
+                  item === "Home"
+                    ? "/"
+                    : item === "Academy"
+                      ? "https://academy.sankofaseek.com"
+                      : `/${item === "Gallery Altar" ? "TERRÆ & ETHEREA Altar" : item.toLowerCase()}`
+                }
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   isActive
