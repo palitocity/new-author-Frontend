@@ -9,6 +9,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   const [ip, setIp] = useState("");
+  console.log(ip);
 
   useEffect(() => {
     const fetchIp = async () => {
@@ -47,9 +48,6 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-center mt-4">
-          Welcome to StoryVerse — your IP is: {ip}
-        </h1>
         {/* Logo */}
         <Link to="/" className="flex items-center font-heading font-bold">
           <img
