@@ -15,7 +15,6 @@ export function StoryCard({
   title,
   summary,
   price,
-
   isFree,
   onAction,
 }: StoryCardProps) {
