@@ -28,6 +28,8 @@ import OrderPage from "../Page/Orderpage";
 import VerifyPayment from "../Page/Verifypayment";
 import Watchlist from "../Admin/waitlist";
 import Library from "../Page/Library";
+import MediaPage from "../Admin/media";
+import LibraryReader from "../Page/Libraryreader";
 
 export const router = createBrowserRouter([
   {
@@ -85,6 +87,10 @@ export const router = createBrowserRouter([
       {
         path: "library",
         element: <Library />,
+      },
+      {
+        path: "library/:id",
+        element: <LibraryReader />,
       },
     ],
   },
@@ -147,6 +153,10 @@ export const router = createBrowserRouter([
       {
         path: "upload",
         element: <UploadGallery />,
+      },
+      {
+        path: "media",
+        element: <MediaPage />,
       },
     ],
   },

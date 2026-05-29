@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "../config/axiosconfiq";
 
 type LibraryBook = {
@@ -18,6 +19,8 @@ type LibraryBook = {
     category?: string;
     coverImage?: string;
     pdfFile?: string;
+    audioFile?: string;
+    videoFile?: string;
     price?: number;
     tags?: string[];
   };
@@ -27,6 +30,8 @@ type LibraryBook = {
     author?: string;
     coverImage?: string;
     pdfFile?: string;
+    audioFile?: string;
+    videoFile?: string;
   };
 };
 
@@ -134,19 +139,18 @@ export default function Library() {
                   )}
                   {item.purchasedAt && (
                     <p className="mt-2 text-xs text-stone-400">
-                      Purchased {new Date(item.purchasedAt).toLocaleDateString()}
+                      Purchased{" "}
+                      {new Date(item.purchasedAt).toLocaleDateString()}
                     </p>
                   )}
 
-                  {book.pdfFile ? (
-                    <a
-                      href={book.pdfFile}
-                      target="_blank"
-                      rel="noreferrer"
+                  {id ? (
+                    <Link
+                      to={`/library/${id}`}
                       className="mt-4 inline-flex w-full justify-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
                     >
-                      Read / Download
-                    </a>
+                      Open in app
+                    </Link>
                   ) : (
                     <p className="mt-4 text-sm text-stone-500">
                       File unavailable. Please contact support.
