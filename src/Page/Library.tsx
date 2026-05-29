@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
 
+import { useEffect, useMemo, useState } from "react";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import {
@@ -16,7 +16,6 @@ import axios from "../config/axiosconfiq";
 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
-import { useMemo, useState } from "react";
 
 const pdfWorkerUrl =
   "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
@@ -68,6 +67,7 @@ const normalizeLibraryBooks = (payload: any): LibraryBook[] => {
   if (Array.isArray(data)) {
     return data.flatMap((item: any) => {
       if (Array.isArray(item?.books)) return item.books;
+
       return [item];
     });
   }
