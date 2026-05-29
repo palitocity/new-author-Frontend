@@ -60,6 +60,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       path: "/admin/stories",
     },
     {
+      name: "Media",
+      icon: <ImageUp className="w-5 h-5" />,
+      path: "/admin/media",
+    },
+    {
       name: "Settings",
       icon: <Settings className="w-5 h-5" />,
       path: "/admin/settings",

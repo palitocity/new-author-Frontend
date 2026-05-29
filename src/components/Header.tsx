@@ -2,24 +2,24 @@ import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/sankofaseek.png";
 import { useEffect, useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
-import { getUserIp } from "../utils/getip";
+// import { getUserIp } from "../utils/getip";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [ip, setIp] = useState("");
-  console.log(ip);
+  // const [ip, setIp] = useState("");
+  // console.log(ip);
 
-  useEffect(() => {
-    const fetchIp = async () => {
-      const userIp = await getUserIp();
+  // useEffect(() => {
+  //   const fetchIp = async () => {
+  //     const userIp = await getUserIp();
 
-      setIp(userIp || "Unable to fetch IP");
-    };
+  //     setIp(userIp || "Unable to fetch IP");
+  //   };
 
-    fetchIp();
-  }, []);
+  //   fetchIp();
+  // }, []);
 
   useEffect(() => {
     const handleScroll = () => {
