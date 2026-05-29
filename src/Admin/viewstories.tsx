@@ -379,12 +379,10 @@ const ViewStories = () => {
                     Story PDF
                   </p>
 
-                  <div className="rounded-lg overflow-hidden border border-stone-200">
-                    <iframe
-                      src={selectedStory.pdfFile}
-                      className="w-full h-[500px]"
-                      title="Story PDF"
-                    />
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                    <p className="text-sm text-stone-600">
+                      This story has an uploaded PDF attached.
+                    </p>
                   </div>
 
                   <a

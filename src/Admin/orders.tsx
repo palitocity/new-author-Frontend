@@ -76,18 +76,24 @@ const Orders = () => {
   const filteredOrders = orders.filter((order) => {
     const statusMatch =
       filterStatus === "all" ||
-      order.status.toLowerCase() === filterStatus.toLowerCase();
+      order.status?.toLowerCase() === filterStatus.toLowerCase();
 
     const searchMatch =
-      order.userInfo?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order._id.toLowerCase().includes(searchTerm.toLowerCase());
+      order.userInfo?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.paymentReference
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
     return statusMatch && searchMatch;
   });
 
   const orderTotal = (order: any) =>
     order.items.reduce(
-      (sum: number, item: any) => sum + item.priceAtPurchase,
+      (sum: number, item: any) =>
+        sum + item.priceAtPurchase * (item.quantity || 1),
       0,
     );
 
@@ -132,8 +138,8 @@ const Orders = () => {
           icon={<DollarSign className="w-5 h-5 text-green-600" />}
         />
         <StatCard
-          title="Pending Orders"
-          value={orders.filter((o) => o.status === "Pending").length}
+          title="Processing Orders"
+          value={orders.filter((o) => o.status === "Processing").length}
           icon={<Package className="w-5 h-5 text-orange-600" />}
         />
         <StatCard
@@ -172,10 +178,9 @@ const Orders = () => {
               className="px-4 py-2 border-2 border-stone-200 rounded-lg focus:border-amber-600 outline-none"
             >
               <option value="all">All Status</option>
-              <option value="Pending">Pending</option>
               <option value="Processing">Processing</option>
-              <option value="Shipped">Shipped</option>
               <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
         </div>
@@ -220,7 +225,7 @@ const Orders = () => {
                 paginatedOrders.map((order) => (
                   <tr key={order._id} className="border-t hover:bg-stone-50">
                     <td className="px-6 py-4 font-semibold" title={order._id}>
-                      {shortOrderId(order._id)}
+                      {order.paymentReference || shortOrderId(order._id)}
                     </td>
                     <td className="px-6 py-4">{order.userInfo.name}</td>
                     <td className="px-6 py-4">{order.items.length}</td>
@@ -295,7 +300,8 @@ const Orders = () => {
             </button>
 
             <h2 className="text-2xl font-bold mb-4">
-              Order {shortOrderId(selectedOrder._id)}
+              Order{" "}
+              {selectedOrder.paymentReference || shortOrderId(selectedOrder._id)}
             </h2>
 
             <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
@@ -395,9 +401,8 @@ const StatCard = ({
 const StatusBadge = ({ status }: { status: string }) => {
   const map: any = {
     Completed: "bg-green-100 text-green-800",
-    Shipped: "bg-blue-100 text-blue-800",
     Processing: "bg-amber-100 text-amber-800",
-    Pending: "bg-orange-100 text-orange-800",
+    Cancelled: "bg-red-100 text-red-800",
   };
 
   return (

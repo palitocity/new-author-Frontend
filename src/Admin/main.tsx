@@ -46,7 +46,7 @@ const AdminDashboard = () => {
         },
         {
           title: "Revenue",
-          value: `₦${dashboard.stats.revenue.value.toLocaleString()}`,
+          value: `₦${(dashboard.stats.revenue.value || 0).toLocaleString()}`,
           change: dashboard.stats.revenue.change,
           trend: dashboard.stats.revenue.change.startsWith("+") ? "up" : "down",
           icon: <DollarSign className="w-6 h-6" />,
@@ -62,6 +62,16 @@ const AdminDashboard = () => {
           icon: <Eye className="w-6 h-6" />,
           color: "orange",
         },
+        {
+          title: "Story Views",
+          value: dashboard.stats.bookViews.value,
+          change: dashboard.stats.bookViews.change,
+          trend: dashboard.stats.bookViews.change.startsWith("+")
+            ? "up"
+            : "down",
+          icon: <BookOpen className="w-6 h-6" />,
+          color: "amber",
+        },
       ]
     : [];
 
@@ -73,13 +83,15 @@ const AdminDashboard = () => {
   // const newsletterStats = dashboard?.newsletter;
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "completed":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "processing":
         return "bg-blue-100 text-blue-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-stone-100 text-stone-800";
     }
@@ -147,7 +159,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {stats.map((stat, idx) => (
           <div
             key={idx}
@@ -197,7 +209,10 @@ const AdminDashboard = () => {
               <ShoppingBag className="w-5 h-5 text-orange-600" />
               Recent Orders
             </h2>
-            <button className="text-sm text-orange-600 hover:text-orange-700 font-medium">
+            <button
+              onClick={() => nav("/admin/orders")}
+              className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+            >
               View All
             </button>
           </div>
@@ -237,7 +252,13 @@ const AdminDashboard = () => {
                       </td>
                       <td className="py-3 px-2">{order.customerName}</td>
                       <td className="py-3 px-2">
-                        {order.items?.[0]?.name || "—"}
+                        {order.items?.length
+                          ? `${order.items[0].name || "Story"}${
+                              order.items.length > 1
+                                ? ` +${order.items.length - 1} more`
+                                : ""
+                            }`
+                          : "—"}
                       </td>
                       <td className="py-3 px-2 font-semibold">
                         ₦{order.totalAmount?.toLocaleString()}
@@ -323,7 +344,9 @@ const AdminDashboard = () => {
                     <h3 className="text-sm font-semibold">{post.title}</h3>
                     <p className="text-xs text-stone-500">
                       Published{" "}
-                      {new Date(post.publishDate).toLocaleDateString()}
+                      {post.publishDate
+                        ? new Date(post.publishDate).toLocaleDateString()
+                        : "Unscheduled"}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-stone-600">

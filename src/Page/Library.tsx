@@ -54,8 +54,46 @@ export default function Library() {
   const [books, setBooks] = useState<LibraryBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const email = localStorage.getItem("userEmail");
+
+  const handleDownload = async (bookId: string) => {
+    if (!email) {
+      setError("No purchase email found on this device.");
+      return;
+    }
+
+    try {
+      setDownloadingId(bookId);
+      const res = await axios.post(`/book/${bookId}/download-purchased`, {
+        email,
+      });
+
+      const pdfFile = res.data?.data?.pdfFile;
+
+      if (!pdfFile) {
+        throw new Error("File unavailable. Please contact support.");
+      }
+
+      const link = document.createElement("a");
+      link.href = pdfFile;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err.message ||
+          "Unable to download this story.",
+      );
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchLibrary = async () => {
