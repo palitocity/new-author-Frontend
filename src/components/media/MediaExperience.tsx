@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import type {
+  ToolbarProps,
+  ToolbarSlot,
+  TransformToolbarSlot,
+} from "@react-pdf-viewer/toolbar";
 import {
   AlertCircle,
   BookOpen,
@@ -156,7 +161,25 @@ const VideoPlayer = ({ asset, book }: { asset: MediaAsset; book: Book }) => (
 );
 
 const PdfReader = ({ asset }: { asset: MediaAsset }) => {
-  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+  // Transform the toolbar to remove Download and Print buttons
+  const transformToolbar: TransformToolbarSlot = (slot: ToolbarSlot) => ({
+    ...slot,
+    Download: () => <></>,
+    DownloadMenuItem: () => <></>,
+    Print: () => <></>,
+    PrintMenuItem: () => <></>,
+  });
+
+  const renderToolbar = (
+    Toolbar: (props: ToolbarProps) => React.ReactElement,
+  ) => <Toolbar>{renderDefaultToolbar(transformToolbar)}</Toolbar>;
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin({
+    renderToolbar,
+  });
+
+  const { renderDefaultToolbar } =
+    defaultLayoutPluginInstance.toolbarPluginInstance;
 
   const pdfUrl = useMemo(() => buildCloudinaryPdfUrl(asset.url), [asset.url]);
 
@@ -194,42 +217,6 @@ const PdfReader = ({ asset }: { asset: MediaAsset }) => {
     setLoadError(message);
     setViewerMode("browser");
   };
-
-  // =========================
-  // CHECK ACCESS
-  // =========================
-  // useEffect(() => {
-  //   const controller = new AbortController();
-
-  //   const checkPdfAccess = async () => {
-  //     if (!pdfUrl) return;
-
-  //     try {
-  //       setCheckingAccess(true);
-  //       setAccessMessage("");
-
-  //       const res = await fetch(pdfUrl, {
-  //         method: "GET",
-  //         mode: "cors",
-  //         signal: controller.signal,
-  //       });
-
-  //       if (!res.ok) {
-  //         setAccessMessage("Cloudinary PDF not accessible");
-  //         setViewerMode("browser");
-  //       }
-  //     } catch {
-  //       setAccessMessage("CORS issue detected. Switching to browser viewer.");
-  //       setViewerMode("browser");
-  //     } finally {
-  //       setCheckingAccess(false);
-  //     }
-  //   };
-
-  //   checkPdfAccess();
-
-  //   return () => controller.abort();
-  // }, [pdfUrl, retryKey]);
 
   // =========================
   // BROWSER TIMEOUT FALLBACK
