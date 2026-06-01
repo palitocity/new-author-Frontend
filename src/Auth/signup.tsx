@@ -1,187 +1,189 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import axios from "../config/axiosconfiq";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useRegisterMutation } from "../services/api";
+import { signupSchema, type SignupForm } from "./validation";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [registerUser, { isLoading }] = useRegisterMutation();
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-
-  const [formData, setFormData] = useState({
-    fullname: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "user", // 👈 added
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+  } = useForm<SignupForm>({
+    resolver: zodResolver(signupSchema),
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSignup = async () => {
-    if (!formData.fullname || !formData.email || !formData.password) {
-      return toast.error("All fields are required");
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      return toast.error("Passwords do not match");
-    }
+  const onSubmit = async (formValues: SignupForm) => {
+    const values = {
+      email: formValues.email,
+      firstName: formValues.firstName,
+      lastName: formValues.lastName,
+      password: formValues.password,
+    };
 
     try {
-      setLoading(true);
-
-      const res = await axios.post("/admin/register", {
-        fullname: formData.fullname,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role, // 👈 sent to API
-      });
-
-      toast.success(res.data.message || "Account created successfully");
-
-      setFormData({
-        fullname: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        role: "user",
-      });
+      const response = await registerUser(values).unwrap();
+      toast.success(response.message || "Account created successfully");
       navigate("/login");
-
-      // Optional redirect
-      // window.location.href = "/login";
-    } catch (error: any) {
-      const msg =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Signup failed";
-
-      toast.error(msg);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Signup failed. This email may already be registered.";
+      toast.error(message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-bold text-center text-stone-800">
-          Create Account
-        </h2>
-        <p className="text-center text-stone-500 mb-6">Join us today</p>
+    <main className="flex min-h-screen items-center justify-center bg-stone-100 px-4 py-10 dark:bg-stone-950">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full max-w-2xl rounded-lg border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-800 dark:bg-stone-900"
+      >
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Home
+        </button>
 
-        {/* Full Name */}
-        <div className="mb-4">
-          <label className="text-sm text-stone-600">Full Name</label>
-          <div className="relative">
-            <User
-              className="absolute left-3 top-3.5 text-stone-400"
-              size={18}
-            />
-            <input
-              type="text"
-              name="fullname"
-              value={formData.fullname}
-              onChange={handleChange}
-              className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
-              placeholder="John Doe"
-            />
-          </div>
+        <h1 className="text-2xl font-bold text-stone-950 dark:text-white">
+          Sign Up
+        </h1>
+        <p className="mt-1 text-sm text-stone-500">
+          Create your reader account and keep every purchase in one place.
+        </p>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <label className="block text-sm font-semibold text-stone-700 dark:text-stone-200">
+            First Name
+            <span className="relative mt-2 block">
+              <User className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+              <input
+                {...register("firstName")}
+                className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-3 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                placeholder="Ada"
+              />
+            </span>
+            {errors.firstName && (
+              <span className="mt-1 block text-sm text-red-600">
+                {errors.firstName.message}
+              </span>
+            )}
+          </label>
+
+          <label className="block text-sm font-semibold text-stone-700 dark:text-stone-200">
+            Last Name
+            <span className="relative mt-2 block">
+              <User className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+              <input
+                {...register("lastName")}
+                className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-3 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                placeholder="Okafor"
+              />
+            </span>
+            {errors.lastName && (
+              <span className="mt-1 block text-sm text-red-600">
+                {errors.lastName.message}
+              </span>
+            )}
+          </label>
         </div>
 
-        {/* Email */}
-        <div className="mb-4">
-          <label className="text-sm text-stone-600">Email</label>
-          <div className="relative">
-            <Mail
-              className="absolute left-3 top-3.5 text-stone-400"
-              size={18}
-            />
+        <label className="mt-4 block text-sm font-semibold text-stone-700 dark:text-stone-200">
+          Email
+          <span className="relative mt-2 block">
+            <Mail className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
             <input
               type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+              autoComplete="email"
+              {...register("email")}
+              className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-3 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
               placeholder="you@example.com"
             />
-          </div>
-        </div>
+          </span>
+          {errors.email && (
+            <span className="mt-1 block text-sm text-red-600">
+              {errors.email.message}
+            </span>
+          )}
+        </label>
 
-        {/* Role */}
-        <div className="mb-4">
-          <label className="text-sm text-stone-600">Role</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 border rounded-lg bg-white focus:ring-2 focus:ring-amber-500 outline-none"
-          >
-            <option value="user">User</option>
-          </select>
-        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <label className="block text-sm font-semibold text-stone-700 dark:text-stone-200">
+            Password
+            <span className="relative mt-2 block">
+              <Lock className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+              <input
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                {...register("password")}
+                className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-11 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                placeholder="Password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute right-3 top-3 text-stone-400"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </span>
+            {errors.password && (
+              <span className="mt-1 block text-sm text-red-600">
+                {errors.password.message}
+              </span>
+            )}
+          </label>
 
-        {/* Password */}
-        <div className="mb-4">
-          <label className="text-sm text-stone-600">Password</label>
-          <div className="relative">
-            <Lock
-              className="absolute left-3 top-3.5 text-stone-400"
-              size={18}
-            />
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
-              placeholder="••••••••"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-stone-400"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Confirm Password */}
-        <div className="mb-6">
-          <label className="text-sm text-stone-600">Confirm Password</label>
-          <input
-            type={showPassword ? "text" : "password"}
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
-            placeholder="••••••••"
-          />
+          <label className="block text-sm font-semibold text-stone-700 dark:text-stone-200">
+            Confirm Password
+            <span className="relative mt-2 block">
+              <Lock className="absolute left-3 top-3 h-5 w-5 text-stone-400" />
+              <input
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                {...register("confirmPassword")}
+                className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-3 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                placeholder="Confirm"
+              />
+            </span>
+            {errors.confirmPassword && (
+              <span className="mt-1 block text-sm text-red-600">
+                {errors.confirmPassword.message}
+              </span>
+            )}
+          </label>
         </div>
 
         <button
-          onClick={handleSignup}
-          disabled={loading}
-          className="w-full bg-amber-600 hover:bg-orange-600 text-white py-2.5 rounded-lg font-medium transition disabled:opacity-60"
+          type="submit"
+          disabled={isLoading}
+          className="mt-6 w-full rounded-md bg-amber-700 px-4 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Creating account..." : "Sign Up"}
+          {isLoading ? "Creating account..." : "Create Account"}
         </button>
 
-        <p className="text-center text-sm text-stone-600 mt-4">
+        <p className="mt-5 text-center text-sm text-stone-500">
           Already have an account?{" "}
-          <a href="/login" className="text-amber-600 font-medium">
+          <Link className="font-semibold text-amber-700" to="/login">
             Login
-          </a>
+          </Link>
         </p>
-      </div>
-    </div>
+      </form>
+    </main>
   );
 }

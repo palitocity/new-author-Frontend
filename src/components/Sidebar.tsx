@@ -87,8 +87,9 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    router("/login");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
+    router("/admin/login");
   };
 
   return (

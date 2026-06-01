@@ -24,7 +24,7 @@ export default function VerifyPayment() {
 
         if (res.data.success) {
           setStatus("Payment successful! Your library is ready.");
-          setTimeout(() => navigate("/library"), 1500);
+          setTimeout(() => navigate("/dashboard/library"), 1500);
         } else {
           setStatus("Payment failed or pending.");
         }

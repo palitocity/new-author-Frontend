@@ -10,6 +10,9 @@ import Privacy from "../Page/privacy";
 import Contact from "../Page/contact";
 import Login from "../Auth/login";
 import Signup from "../Auth/signup";
+import AdminLogin from "../Auth/AdminLogin";
+import ForgotPassword from "../Auth/ForgotPassword";
+import ResetPassword from "../Auth/ResetPassword";
 import Adminlayout from "../layout/adminlayout";
 import Main from "../Admin/main";
 import BlogUpload from "../Admin/blog";
@@ -30,6 +33,15 @@ import Watchlist from "../Admin/waitlist";
 import Library from "../Page/Library";
 import MediaPage from "../Admin/media";
 import LibraryReader from "../Page/Libraryreader";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import AdminProtectedRoute from "../components/auth/AdminProtectedRoute";
+import DashboardLayout from "../components/dashboard/DashboardLayout";
+import DashboardOverview from "../Page/dashboard/DashboardOverview";
+import MyLibrary from "../Page/dashboard/MyLibrary";
+import PurchaseHistory from "../Page/dashboard/PurchaseHistory";
+import SavedStories from "../Page/dashboard/SavedStories";
+import ProfileSettings from "../Page/dashboard/ProfileSettings";
+import Security from "../Page/dashboard/Security";
 
 export const router = createBrowserRouter([
   {
@@ -49,12 +61,8 @@ export const router = createBrowserRouter([
         element: <Blog />,
       },
       {
-        path: "TERRÆ & ETHEREA Altar",
+        path: "gallery",
         element: <Picturgallary />,
-      },
-      {
-        path: "marketplace",
-        element: <Marketplace />,
       },
       {
         path: "terms",
@@ -103,60 +111,116 @@ export const router = createBrowserRouter([
     element: <Signup />,
   },
   {
-    path: "admin",
-    element: <Adminlayout />,
+    path: "forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "reset-password",
+    element: <ResetPassword />,
+  },
+  {
+    path: "admin/login",
+    element: <AdminLogin />,
+  },
+  {
+    element: <ProtectedRoute />,
     children: [
       {
-        path: "main",
-        element: <Main />,
+        path: "dashboard",
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: "",
+            element: <DashboardOverview />,
+          },
+          {
+            path: "marketplace",
+            element: <Marketplace />,
+          },
+          {
+            path: "library",
+            element: <MyLibrary />,
+          },
+          {
+            path: "purchases",
+            element: <PurchaseHistory />,
+          },
+          {
+            path: "saved",
+            element: <SavedStories />,
+          },
+          {
+            path: "profile",
+            element: <ProfileSettings />,
+          },
+          {
+            path: "security",
+            element: <Security />,
+          },
+        ],
       },
+    ],
+  },
+  {
+    element: <AdminProtectedRoute />,
+    children: [
       {
-        path: "blog",
-        element: <BlogUpload />,
-      },
-      {
-        path: "stories",
-        element: <StoryUpload />,
-      },
-      {
-        path: "view-blogs",
-        element: <AllBlogs />,
-      },
-      {
-        path: "users",
-        element: <Users />,
-      },
-      {
-        path: "orders",
-        element: <Orders />,
-      },
-      {
-        path: "newsletter",
-        element: <Newsletter />,
-      },
-      {
-        path: "watchlist",
-        element: <Watchlist />,
-      },
-      {
-        path: "waitlist",
-        element: <Watchlist />,
-      },
-      {
-        path: "settings",
-        element: <Settings />,
-      },
-      {
-        path: "view-stories",
-        element: <ViewStories />,
-      },
-      {
-        path: "upload",
-        element: <UploadGallery />,
-      },
-      {
-        path: "media",
-        element: <MediaPage />,
+        path: "admin",
+        element: <Adminlayout />,
+        children: [
+          {
+            path: "main",
+            element: <Main />,
+          },
+          {
+            path: "blog",
+            element: <BlogUpload />,
+          },
+          {
+            path: "stories",
+            element: <StoryUpload />,
+          },
+          {
+            path: "view-blogs",
+            element: <AllBlogs />,
+          },
+          {
+            path: "users",
+            element: <Users />,
+          },
+          {
+            path: "orders",
+            element: <Orders />,
+          },
+          {
+            path: "newsletter",
+            element: <Newsletter />,
+          },
+          {
+            path: "watchlist",
+            element: <Watchlist />,
+          },
+          {
+            path: "waitlist",
+            element: <Watchlist />,
+          },
+          {
+            path: "settings",
+            element: <Settings />,
+          },
+          {
+            path: "view-stories",
+            element: <ViewStories />,
+          },
+          {
+            path: "upload",
+            element: <UploadGallery />,
+          },
+          {
+            path: "media",
+            element: <MediaPage />,
+          },
+        ],
       },
     ],
   },

@@ -160,7 +160,7 @@ export default function Footer() {
                 Quick Links
               </h3>
               <nav className="flex flex-col space-y-3">
-                {["Home", "About", "Blog", "Marketplace"].map((item) => (
+                {["Home", "About", "Blog", "Login"].map((item) => (
                   <a
                     key={item}
                     href={item === "Home" ? "/" : `/${item.toLowerCase()}`}

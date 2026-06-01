@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
+  Bookmark,
   BookOpen,
   CalendarDays,
   Clock,
@@ -17,6 +18,9 @@ import {
 import axios from "../config/axiosconfiq";
 import type { Book } from "../types/book";
 import { formatPrice, getMediaAssets } from "../utils/media";
+import { useAppSelector } from "../store/hooks";
+import { useLibraryQuery, useSaveStoryMutation } from "../services/api";
+import toast from "react-hot-toast";
 
 const MediaExperience = lazy(
   () => import("../components/media/MediaExperience"),
@@ -40,6 +44,9 @@ const StorybyId = () => {
   const [story, setStory] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const token = useAppSelector((state) => state.auth.token);
+  const { data: library = [] } = useLibraryQuery(undefined, { skip: !token });
+  const [saveStory] = useSaveStoryMutation();
 
   useEffect(() => {
     if (!id || !story) return;
@@ -107,7 +114,7 @@ const StorybyId = () => {
             {error || "Story not found."}
           </p>
           <Link
-            to="/marketplace"
+            to="/dashboard/marketplace"
             className="mt-5 inline-flex items-center gap-2 rounded-md bg-stone-950 px-4 py-2 text-sm font-semibold text-white"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -121,6 +128,24 @@ const StorybyId = () => {
   const mediaAssets = getMediaAssets(story);
   const price = story.price || 0;
   const tags = story.tags || [];
+  const isPremium = price > 0;
+  const hasPurchased =
+    !isPremium || library.some((item) => item.contentId === story._id);
+  const canRead = !isPremium || hasPurchased;
+
+  const handleSaveStory = async () => {
+    if (!token) {
+      toast.error("Login to save stories");
+      return;
+    }
+
+    try {
+      await saveStory(story._id).unwrap();
+      toast.success("Story saved");
+    } catch {
+      toast.error("Unable to save story");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-stone-100">
@@ -142,7 +167,7 @@ const StorybyId = () => {
 
           <div className="flex min-w-0 flex-col justify-center">
             <Link
-              to="/marketplace"
+              to="/dashboard/marketplace"
               className="mb-5 inline-flex w-fit items-center gap-2 rounded-md border border-stone-200 px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -204,6 +229,25 @@ const StorybyId = () => {
                 {story.summary}
               </p>
             )}
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={handleSaveStory}
+                className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-800 hover:bg-stone-50"
+              >
+                <Bookmark className="h-4 w-4" />
+                Save Story
+              </button>
+              {!canRead && (
+                <Link
+                  to={token ? `/order/${story._id}` : "/login"}
+                  className="inline-flex items-center gap-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-800"
+                >
+                  {token ? "Purchase to Continue" : "Login to Purchase"}
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -220,18 +264,41 @@ const StorybyId = () => {
           </div>
         </div>
 
-        <Suspense
-          fallback={
-            <div className="flex min-h-72 items-center justify-center gap-3 rounded-lg border border-stone-200 bg-white text-stone-600">
-              <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
-              <span className="text-sm font-semibold">Preparing player</span>
+        {canRead ? (
+          <Suspense
+            fallback={
+              <div className="flex min-h-72 items-center justify-center gap-3 rounded-lg border border-stone-200 bg-white text-stone-600">
+                <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
+                <span className="text-sm font-semibold">Preparing player</span>
+              </div>
+            }
+          >
+            <MediaExperience book={story} />
+          </Suspense>
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-white p-6 shadow-sm">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-widest text-amber-700">
+                Locked premium content
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-stone-950">
+                Purchase once, keep permanent access
+              </h2>
+              <p className="mt-3 text-stone-600">
+                You can preview the story details above. Complete payment to
+                unlock the reader and automatically add this item to My Library.
+              </p>
+              <Link
+                to={token ? `/order/${story._id}` : "/login"}
+                className="mt-5 inline-flex rounded-md bg-stone-950 px-4 py-2 text-sm font-semibold text-white"
+              >
+                {token ? "Purchase Button" : "Login to Purchase"}
+              </Link>
             </div>
-          }
-        >
-          <MediaExperience book={story} />
-        </Suspense>
+          </div>
+        )}
 
-        {story.content && (
+        {story.content && canRead && (
           <article className="mt-8 rounded-lg border border-stone-200 bg-white p-6 text-stone-700 shadow-sm">
             <h2 className="mb-4 text-xl font-bold text-stone-950">Notes</h2>
             <div className="prose max-w-none">{story.content}</div>
