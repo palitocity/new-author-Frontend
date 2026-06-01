@@ -53,10 +53,10 @@ export default function CultureBody() {
             Learn More
           </a>
           <a
-            href="/marketplace"
+            href="/signup"
             className="border border-accent text-accent px-6 py-3 rounded-lg font-semibold hover:bg-accent hover:text-primary transition"
           >
-            Explore Marketplace
+            Join Readers
           </a>
         </div>
       </div>

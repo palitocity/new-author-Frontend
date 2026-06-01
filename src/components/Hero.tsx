@@ -64,10 +64,10 @@ export default function Hero() {
           {slides[index].text}
         </p>
         <a
-          href="/marketplace"
+          href="/signup"
           className="mt-4 bg-accent text-white font-bold px-8 py-4 rounded-lg hover:bg-secondary transition text-lg"
         >
-          Explore Stories
+          Start Your Library
         </a>
       </div>
 
