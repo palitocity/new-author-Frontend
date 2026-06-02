@@ -4,7 +4,7 @@ import type { RootState } from "../store/store";
 import type { AuthUser, ProfileResponse } from "../features/auth/authSlice";
 
 export type ContentType = "Book" | "Story";
-export type PaymentStatus = "Successful" | "Pending" | "Failed";
+export type PaymentStatus = "Paid" | "Pending" | "Failed";
 
 export type RegisterRequest = {
   firstName: string;
@@ -25,25 +25,60 @@ export type AuthResponse = {
   user: AuthUser;
 };
 
-export type LibraryItem = {
-  id: string;
-  contentId: string;
-  title: string;
-  author: string;
-  coverImage?: string;
-  purchaseDate: string;
-  contentType: ContentType;
+export type LibraryResponse = {
+  success: boolean;
+  count: number;
+  data: {
+    userId: string;
+    books: {
+      bookId: any;
+      orderId: string;
+      transactionId: string;
+      paymentReference: string;
+      purchasedAt: string;
+      bookSnapshot?: {
+        bookId: string;
+        title: string;
+        subtitle?: string;
+        author?: string;
+        coverImage?: string;
+        pdfFile?: string;
+      };
+    }[];
+  };
 };
 
-export type Purchase = {
-  id: string;
-  transactionReference: string;
-  itemPurchased: string;
-  amount: number;
-  paymentMethod: string;
-  date: string;
-  status: PaymentStatus;
+// Replace your Purchase type with this
+export type OrderItem = {
+  book: {
+    _id: string;
+    title: string;
+    author: string;
+    coverImage?: string;
+  } | null;
+  quantity: number;
+  priceAtPurchase: number;
+  _id: string;
 };
+
+export type Order = {
+  _id: string;
+  paymentReference?: string;
+  items: OrderItem[];
+  totalAmount: number;
+  paymentStatus: string;
+  status: string;
+  createdAt: string;
+  paidAt?: string;
+};
+
+export type OrdersResponse = {
+  success: boolean;
+  count: number;
+  data: Order[];
+};
+
+// Also update PaymentStatus to match what the API actually returns
 
 export type SavedStory = {
   id: string;
@@ -62,9 +97,9 @@ export type DashboardStats = {
 };
 
 export type DashboardActivity = {
-  recentlyPurchasedBooks: LibraryItem[];
-  recentlyReadStories: LibraryItem[];
-  recentPayments: Purchase[];
+  recentlyPurchasedBooks: LibraryResponse[];
+
+  recentPayments: OrderItem[];
 };
 
 const baseUrl = import.meta.env.VITE_DEVE_URL || "/api";
@@ -107,16 +142,16 @@ export const api = createApi({
       query: () => "/auth/me",
       providesTags: ["Me"],
     }),
-    library: builder.query<LibraryItem[], void>({
+    library: builder.query<LibraryResponse, void>({
       query: () => "/library/me",
       providesTags: ["Library"],
     }),
-    libraryItem: builder.query<LibraryItem, string>({
+    libraryItem: builder.query<LibraryResponse, string>({
       query: (id) => `/library/${id}`,
       providesTags: ["Library"],
     }),
-    paymentHistory: builder.query<Purchase[], void>({
-      query: () => "/payments/history",
+    paymentHistory: builder.query<OrdersResponse, void>({
+      query: () => "/order/me",
       providesTags: ["Payments"],
     }),
     savedStories: builder.query<SavedStory[], void>({

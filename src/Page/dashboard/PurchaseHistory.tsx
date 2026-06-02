@@ -1,34 +1,47 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { usePaymentHistoryQuery, type PaymentStatus } from "../../services/api";
+import { usePaymentHistoryQuery } from "../../services/api";
 
-const statuses: Array<"All" | PaymentStatus> = [
-  "All",
-  "Successful",
-  "Pending",
-  "Failed",
-];
+type StatusFilter = "All" | "Paid" | "Pending" | "Failed";
+const statuses: StatusFilter[] = ["All", "Paid", "Pending", "Failed"];
 
 export default function PurchaseHistory() {
-  const { data = [], isLoading } = usePaymentHistoryQuery();
+  const { data, isLoading } = usePaymentHistoryQuery();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<"All" | PaymentStatus>("All");
+  const [status, setStatus] = useState<StatusFilter>("All");
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
+  // Fix: unwrap the nested data array
+  const orders = (data as any)?.data ?? data ?? [];
+
   const filtered = useMemo(() => {
-    return data.filter((payment) => {
-      const matchesStatus = status === "All" || payment.status === status;
-      const matchesQuery =
-        `${payment.transactionReference} ${payment.itemPurchased}`
-          .toLowerCase()
-          .includes(query.toLowerCase());
+    return orders.filter((order: any) => {
+      const matchesStatus = status === "All" || order.paymentStatus === status;
+
+      // Search across book titles in the order's items
+      const bookTitles = order.items
+        .map((i: any) => i.book?.title ?? "")
+        .join(" ");
+      const matchesQuery = `${order.paymentReference ?? ""} ${bookTitles}`
+        .toLowerCase()
+        .includes(query.toLowerCase());
+
       return matchesStatus && matchesQuery;
     });
-  }, [data, query, status]);
+  }, [orders, query, status]);
 
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  const statusColors: Record<string, string> = {
+    Paid: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    Pending:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    Failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  };
 
   return (
     <section>
@@ -45,25 +58,25 @@ export default function PurchaseHistory() {
             <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
             <input
               value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
+              onChange={(e) => {
+                setQuery(e.target.value);
                 setPage(1);
               }}
               className="w-full rounded-md border border-stone-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-900"
-              placeholder="Search payments"
+              placeholder="Search by title or reference"
             />
           </label>
 
           <select
             value={status}
-            onChange={(event) => {
-              setStatus(event.target.value as "All" | PaymentStatus);
+            onChange={(e) => {
+              setStatus(e.target.value as StatusFilter);
               setPage(1);
             }}
             className="rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm dark:border-stone-700 dark:bg-stone-900"
           >
-            {statuses.map((item) => (
-              <option key={item}>{item}</option>
+            {statuses.map((s) => (
+              <option key={s}>{s}</option>
             ))}
           </select>
         </div>
@@ -74,10 +87,9 @@ export default function PurchaseHistory() {
           <table className="min-w-full text-left text-sm">
             <thead className="bg-stone-100 text-xs uppercase tracking-widest text-stone-500 dark:bg-stone-950">
               <tr>
-                <th className="px-4 py-3">Transaction ID</th>
-                <th className="px-4 py-3">Item Purchased</th>
+                <th className="px-4 py-3">Order Reference</th>
+                <th className="px-4 py-3">Items Purchased</th>
                 <th className="px-4 py-3">Amount Paid</th>
-                <th className="px-4 py-3">Payment Method</th>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Status</th>
               </tr>
@@ -85,36 +97,41 @@ export default function PurchaseHistory() {
             <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
               {isLoading ? (
                 <tr>
-                  <td className="px-4 py-6 text-stone-500" colSpan={6}>
+                  <td className="px-4 py-6 text-stone-500" colSpan={5}>
                     Loading purchase history...
                   </td>
                 </tr>
               ) : rows.length ? (
-                rows.map((payment) => (
-                  <tr key={payment.id}>
-                    <td className="px-4 py-4 font-mono text-xs">
-                      {payment.transactionReference}
-                    </td>
-                    <td className="px-4 py-4 font-semibold">
-                      {payment.itemPurchased}
-                    </td>
-                    <td className="px-4 py-4">
-                      ₦{payment.amount.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-4">{payment.paymentMethod}</td>
-                    <td className="px-4 py-4">
-                      {new Date(payment.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="rounded-md bg-stone-100 px-2 py-1 text-xs font-bold dark:bg-stone-800">
-                        {payment.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                rows.map((order: any) => {
+                  const bookNames = order.items
+                    .map((i: any) => i.book?.title ?? "Deleted item")
+                    .join(", ");
+
+                  return (
+                    <tr key={order._id}>
+                      <td className="px-4 py-4 font-mono text-xs text-stone-500">
+                        {order.paymentReference ?? order._id}
+                      </td>
+                      <td className="px-4 py-4 font-semibold">{bookNames}</td>
+                      <td className="px-4 py-4">₦{order.totalAmount}</td>
+                      <td className="px-4 py-4">
+                        {new Date(
+                          order.paidAt ?? order.createdAt,
+                        ).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
+                          className={`rounded-md px-2 py-1 text-xs font-bold ${statusColors[order.paymentStatus] ?? "bg-stone-100 dark:bg-stone-800"}`}
+                        >
+                          {order.paymentStatus}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td className="px-4 py-6 text-stone-500" colSpan={6}>
+                  <td className="px-4 py-6 text-stone-500" colSpan={5}>
                     No payments match your filters.
                   </td>
                 </tr>
@@ -130,7 +147,7 @@ export default function PurchaseHistory() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
+              onClick={() => setPage((v) => Math.max(1, v - 1))}
               disabled={page === 1}
               className="rounded-md border border-stone-300 px-3 py-1.5 font-semibold disabled:opacity-40 dark:border-stone-700"
             >
@@ -138,7 +155,7 @@ export default function PurchaseHistory() {
             </button>
             <button
               type="button"
-              onClick={() => setPage((value) => Math.min(pages, value + 1))}
+              onClick={() => setPage((v) => Math.min(pages, v + 1))}
               disabled={page === pages}
               className="rounded-md border border-stone-300 px-3 py-1.5 font-semibold disabled:opacity-40 dark:border-stone-700"
             >

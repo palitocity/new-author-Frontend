@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { BookOpen, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -7,26 +9,55 @@ type Filter = "All" | ContentType;
 type Sort = "Recent" | "Oldest";
 
 export default function MyLibrary() {
-  const { data = [], isError, isLoading } = useLibraryQuery();
+  const { data, isError, isLoading } = useLibraryQuery();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("All");
   const [sort, setSort] = useState<Sort>("Recent");
 
+  // Fix: the API wraps data in a `data` key
+  const books = ((data as any)?.data?.books ?? (data as any)?.books ?? []) as any[];
+
   const items = useMemo(() => {
-    return data
-      .filter((item) => {
-        const matchesFilter = filter === "All" || item.contentType === filter;
-        const matchesQuery = `${item.title} ${item.author}`
-          .toLowerCase()
-          .includes(query.toLowerCase());
-        return matchesFilter && matchesQuery;
+    // Deduplicate by bookSnapshot.bookId — keep the most recent purchase per book
+    const seen = new Map<string, (typeof books)[number]>();
+
+    for (const item of books) {
+      const bookId = item.bookSnapshot?.bookId;
+      if (!bookId) continue;
+
+      const existing = seen.get(bookId);
+      if (
+        !existing ||
+        new Date(item.purchasedAt) > new Date(existing.purchasedAt)
+      ) {
+        seen.set(bookId, item);
+      }
+    }
+
+    return Array.from(seen.values())
+      .map((item) => {
+        const book = item.bookSnapshot;
+        return {
+          id: item.orderId,
+          contentId: book?.bookId,
+          title: book?.title ?? "Untitled",
+          author: book?.author ?? "Unknown",
+          coverImage: book?.coverImage,
+          pdfFile: book?.pdfFile,
+          purchaseDate: item.purchasedAt,
+        };
       })
+      .filter((item) =>
+        `${item.title} ${item.author}`
+          .toLowerCase()
+          .includes(query.toLowerCase()),
+      )
       .sort((a, b) => {
         const first = new Date(a.purchaseDate).getTime();
         const second = new Date(b.purchaseDate).getTime();
         return sort === "Recent" ? second - first : first - second;
       });
-  }, [data, filter, query, sort]);
+  }, [books, query, sort]);
 
   if (isLoading) {
     return <p className="text-sm text-stone-500">Loading your library...</p>;
@@ -47,7 +78,7 @@ export default function MyLibrary() {
             <Search className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
             <input
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               className="w-full rounded-md border border-stone-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-900"
               placeholder="Search library"
             />
@@ -55,7 +86,7 @@ export default function MyLibrary() {
 
           <select
             value={filter}
-            onChange={(event) => setFilter(event.target.value as Filter)}
+            onChange={(e) => setFilter(e.target.value as Filter)}
             className="rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm dark:border-stone-700 dark:bg-stone-900"
           >
             <option>All</option>
@@ -65,7 +96,7 @@ export default function MyLibrary() {
 
           <select
             value={sort}
-            onChange={(event) => setSort(event.target.value as Sort)}
+            onChange={(e) => setSort(e.target.value as Sort)}
             className="rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm dark:border-stone-700 dark:bg-stone-900"
           >
             <option>Recent</option>
@@ -102,7 +133,7 @@ export default function MyLibrary() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <article
-            key={item.id}
+            key={item.contentId}
             className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm dark:border-stone-800 dark:bg-stone-900"
           >
             <div className="aspect-4/3 bg-stone-200 dark:bg-stone-800">
@@ -119,22 +150,32 @@ export default function MyLibrary() {
               )}
             </div>
             <div className="p-4">
-              <div className="flex items-center justify-between gap-3">
-                <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900">
-                  {item.contentType}
-                </span>
-                <span className="text-xs text-stone-500">
-                  {new Date(item.purchaseDate).toLocaleDateString()}
-                </span>
-              </div>
+              <span className="text-xs text-stone-500">
+                Purchased {new Date(item.purchaseDate).toLocaleDateString()}
+              </span>
               <h2 className="mt-3 text-lg font-bold">{item.title}</h2>
               <p className="mt-1 text-sm text-stone-500">by {item.author}</p>
-              <Link
-                to={`/library/${item.contentId}`}
-                className="mt-4 inline-flex w-full justify-center rounded-md bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-800"
-              >
-                Continue Reading
-              </Link>
+
+              <div className="mt-4 flex gap-2">
+                {/* Continue Reading — opens PDF directly */}
+                {item.pdfFile ? (
+                  <a
+                    href={item.pdfFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex flex-1 justify-center rounded-md bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-800"
+                  >
+                    Continue Reading
+                  </a>
+                ) : (
+                  <Link
+                    to={`/library/${item.contentId}`}
+                    className="inline-flex flex-1 justify-center rounded-md bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-800"
+                  >
+                    Continue Reading
+                  </Link>
+                )}
+              </div>
             </div>
           </article>
         ))}
