@@ -15,6 +15,11 @@ type AuthState = {
   user: AuthUser | null;
   token: string | null;
 };
+export type ProfileResponse = {
+  success: boolean;
+  data: AuthUser;
+  message: string;
+};
 
 const storedToken = localStorage.getItem("authToken");
 const storedUser = localStorage.getItem("authUser");

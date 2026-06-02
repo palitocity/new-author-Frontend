@@ -10,6 +10,7 @@ import {
   Settings,
   ShieldCheck,
   X,
+  Book,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 const navItems = [
   { label: "Dashboard Overview", to: "/dashboard", icon: Home },
   { label: "Marketplace", to: "/dashboard/marketplace", icon: Store },
+  { label: "Stories", to: "/dashboard/story/:id", icon: Book },
   { label: "My Library", to: "/dashboard/library", icon: Library },
   { label: "Purchase History", to: "/dashboard/purchases", icon: Clock3 },
   { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },

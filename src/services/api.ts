@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../store/store";
-import type { AuthUser } from "../features/auth/authSlice";
+import type { AuthUser, ProfileResponse } from "../features/auth/authSlice";
 
 export type ContentType = "Book" | "Story";
 export type PaymentStatus = "Successful" | "Pending" | "Failed";
@@ -108,7 +108,7 @@ export const api = createApi({
       providesTags: ["Me"],
     }),
     library: builder.query<LibraryItem[], void>({
-      query: () => "/library",
+      query: () => "/library/my-library",
       providesTags: ["Library"],
     }),
     libraryItem: builder.query<LibraryItem, string>({
@@ -137,8 +137,8 @@ export const api = createApi({
       }),
       invalidatesTags: ["SavedStories"],
     }),
-    profile: builder.query<AuthUser, void>({
-      query: () => "/profile",
+    profile: builder.query<ProfileResponse, void>({
+      query: () => "/auth/profile",
       providesTags: ["Profile"],
     }),
     updateProfile: builder.mutation<AuthUser, FormData>({

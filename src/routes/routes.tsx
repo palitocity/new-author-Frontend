@@ -80,10 +80,7 @@ export const router = createBrowserRouter([
         path: "blog/:id",
         element: <BlogbyId />,
       },
-      {
-        path: "story/:id",
-        element: <StorybyId />,
-      },
+
       {
         path: "order/:id",
         element: <OrderPage />,
@@ -140,6 +137,10 @@ export const router = createBrowserRouter([
           {
             path: "library",
             element: <MyLibrary />,
+          },
+          {
+            path: "story/:id",
+            element: <StorybyId />,
           },
           {
             path: "purchases",
