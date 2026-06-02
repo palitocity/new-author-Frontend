@@ -108,7 +108,7 @@ export const api = createApi({
       providesTags: ["Me"],
     }),
     library: builder.query<LibraryItem[], void>({
-      query: () => "/library/my-library",
+      query: () => "/library/me",
       providesTags: ["Library"],
     }),
     libraryItem: builder.query<LibraryItem, string>({
