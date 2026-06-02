@@ -67,16 +67,14 @@ export default function DashboardOverview() {
         {[
           {
             title: "Recently Purchased Books",
-            items: activity?.recentlyPurchasedBooks.map((item) => item.title),
+            items: activity?.recentlyPurchasedBooks.map((item) => item?.title),
           },
-          {
-            title: "Recently Read Stories",
-            items: activity?.recentlyReadStories.map((item) => item.title),
-          },
+
           {
             title: "Recent Payments",
             items: activity?.recentPayments.map(
-              (item) => `${item.itemPurchased} - ${item.status}`,
+              (item) =>
+                `${item?.book?.title ?? "Unknown item"} - ${item?.status}`,
             ),
           },
         ].map((group) => (

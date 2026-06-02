@@ -47,6 +47,7 @@ const StorybyId = () => {
   const token = useAppSelector((state) => state.auth.token);
   const { data: library = [] } = useLibraryQuery(undefined, { skip: !token });
   const [saveStory] = useSaveStoryMutation();
+  const libraryItems = Array.isArray(library) ? library : [];
 
   useEffect(() => {
     if (!id || !story) return;
@@ -130,7 +131,10 @@ const StorybyId = () => {
   const tags = story.tags || [];
   const isPremium = price > 0;
   const hasPurchased =
-    !isPremium || library.some((item) => item.contentId === story._id);
+    !isPremium ||
+    libraryItems.some(
+      (item: { contentId: string }) => item.contentId === story._id,
+    );
   const canRead = !isPremium || hasPurchased;
 
   const handleSaveStory = async () => {

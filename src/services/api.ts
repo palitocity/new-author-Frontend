@@ -26,6 +26,7 @@ export type AuthResponse = {
 };
 
 export type LibraryResponse = {
+  title: any;
   success: boolean;
   count: number;
   data: {
@@ -50,6 +51,7 @@ export type LibraryResponse = {
 
 // Replace your Purchase type with this
 export type OrderItem = {
+  status: any;
   book: {
     _id: string;
     title: string;
