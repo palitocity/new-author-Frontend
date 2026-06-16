@@ -7,10 +7,12 @@ import {
   Lock,
   LogOut,
   Menu,
+  NotebookPen,
   Settings,
   ShieldCheck,
   X,
   Book,
+  UserRoundCog,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -21,12 +23,19 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 const navItems = [
   { label: "Dashboard Overview", to: "/dashboard", icon: Home },
   { label: "Marketplace", to: "/dashboard/marketplace", icon: Store },
-  { label: "Stories", to: "/dashboard/story/:id", icon: Book },
-  { label: "My Library", to: "/dashboard/library", icon: Library },
+  { label: "Stories", to: "/dashboard/marketplace", icon: Book },
+  { label: "My Continuity Library", to: "/dashboard/library", icon: Library },
+  {
+    label: "Reflection Notes",
+    to: "/dashboard/reflection-notes",
+    icon: NotebookPen,
+  },
+  { label: "Bookmarks", to: "/dashboard/bookmarks", icon: BookMarked },
   { label: "Purchase History", to: "/dashboard/purchases", icon: Clock3 },
   { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },
   { label: "Profile Settings", to: "/dashboard/profile", icon: Settings },
   { label: "Security", to: "/dashboard/security", icon: ShieldCheck },
+  { label: "Account", to: "/dashboard/account", icon: UserRoundCog },
 ];
 
 export default function DashboardLayout() {
@@ -42,8 +51,8 @@ export default function DashboardLayout() {
   };
 
   const sidebar = (
-    <aside className="flex h-full flex-col border-r border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950">
-      <div className="flex items-center justify-between px-5 py-5">
+    <aside className="flex h-screen flex-col overflow-hidden border-r border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950">
+      <div className="flex items-center justify-between px-5 py-5 shrink-0">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-amber-700">
             Sankofa Seek
@@ -61,28 +70,31 @@ export default function DashboardLayout() {
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3">
-        {navItems.map(({ icon: Icon, label, to }) => (
-          <NavLink
-            end={to === "/dashboard"}
-            key={to}
-            to={to}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold transition ${
-                isActive
-                  ? "bg-stone-950 text-white dark:bg-white dark:text-stone-950"
-                  : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900"
-              }`
-            }
-          >
-            <Icon className="h-5 w-5" />
-            {label}
-          </NavLink>
-        ))}
+      {/* Scrollable navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-2">
+        <div className="space-y-1">
+          {navItems.map(({ icon: Icon, label, to }) => (
+            <NavLink
+              end={to === "/dashboard"}
+              key={to}
+              to={to}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold transition ${
+                  isActive
+                    ? "bg-stone-950 text-white dark:bg-white dark:text-stone-950"
+                    : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900"
+                }`
+              }
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </NavLink>
+          ))}
+        </div>
       </nav>
 
-      <div className="border-t border-stone-200 p-3 dark:border-stone-800">
+      <div className="shrink-0 border-t border-stone-200 p-3 dark:border-stone-800">
         <button
           type="button"
           onClick={handleLogout}

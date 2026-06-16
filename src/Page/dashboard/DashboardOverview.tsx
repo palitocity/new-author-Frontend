@@ -1,104 +1,170 @@
-import { BookOpen, Bookmark, CreditCard, Library } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import {
-  useDashboardActivityQuery,
-  useDashboardStatsQuery,
-} from "../../services/api";
+  Activity,
+  BookMarked,
+  Compass,
+  Library,
+  NotebookPen,
+} from "lucide-react";
 
-const money = new Intl.NumberFormat("en-NG", {
-  style: "currency",
-  currency: "NGN",
-});
+import ContinueReadingCard from "../../components/library/ContinueReadingCard";
+import ProgressCard from "../../components/library/ProgressCard";
+
+import axios from "../../config/axiosconfiq";
+
+type DashboardOverviewData = {
+  stats?: {
+    continuityLibrary?: number;
+    reflectionNotes?: number;
+    bookmarks?: number;
+    learningPathways?: number;
+  };
+  continueReading?: Array<{ _id: string; product: any }>;
+  readingProgress?: Array<{ _id: string; product: any; percentage: number }>;
+  insights?: {
+    recentActivity?: string;
+    recommendations?: string;
+    preservedMaterials?: string;
+  };
+};
 
 export default function DashboardOverview() {
-  const { data: stats, isLoading: statsLoading } = useDashboardStatsQuery();
-  const { data: activity, isLoading: activityLoading } =
-    useDashboardActivityQuery();
+  const [dashboard, setDashboard] = useState<DashboardOverviewData | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
 
-  const cards = [
-    {
-      label: "Total Books Purchased",
-      value: stats?.totalBooksPurchased ?? 0,
-      icon: Library,
-    },
-    {
-      label: "Total Stories Purchased",
-      value: stats?.totalStoriesPurchased ?? 0,
-      icon: BookOpen,
-    },
-    {
-      label: "Total Amount Spent",
-      value: money.format(stats?.totalAmountSpent ?? 0),
-      icon: CreditCard,
-    },
-    {
-      label: "Saved Stories Count",
-      value: stats?.savedStoriesCount ?? 0,
-      icon: Bookmark,
-    },
-  ];
+  const getOverview = async () => {
+    try {
+      const res = await axios.get("/dashboard/overview");
+
+      setDashboard(res.data);
+    } catch (error) {
+      console.error("Failed to fetch dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getOverview();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-40 items-center justify-center">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  const stats = dashboard?.stats || {};
+  const continueReading = dashboard?.continueReading || [];
+  const readingProgress = dashboard?.readingProgress || [];
+  const insights = dashboard?.insights || {};
 
   return (
     <section>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold sm:text-3xl">Dashboard Overview</h1>
+        <p className="text-xs font-bold uppercase tracking-widest text-amber-700">
+          Reader Dashboard
+        </p>
+
+        <h1 className="mt-2 text-2xl font-bold text-stone-950 sm:text-3xl">
+          Learning continuity at a glance
+        </h1>
+
         <p className="mt-1 text-sm text-stone-500">
-          Your reading, purchases, and saved stories at a glance.
+          Continue Reading, Reflection Notes, bookmarks, preserved materials,
+          and learning pathways.
         </p>
       </div>
 
+      {/* Statistics */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {cards.map(({ icon: Icon, label, value }) => (
+        {[
+          {
+            label: "My Continuity Library",
+            value: stats.continuityLibrary || 0,
+            icon: Library,
+          },
+          {
+            label: "Reflection Notes",
+            value: stats.reflectionNotes || 0,
+            icon: NotebookPen,
+          },
+          {
+            label: "Bookmarks",
+            value: stats.bookmarks || 0,
+            icon: BookMarked,
+          },
+          {
+            label: "Learning Pathways",
+            value: stats.learningPathways || 0,
+            icon: Compass,
+          },
+        ].map(({ icon: Icon, label, value }) => (
           <div
             key={label}
-            className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900"
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm"
           >
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-stone-500">{label}</p>
               <Icon className="h-5 w-5 text-amber-700" />
             </div>
-            <p className="mt-4 text-2xl font-bold">
-              {statsLoading ? "..." : value}
-            </p>
+
+            <p className="mt-4 text-2xl font-bold text-stone-950">{value}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-3">
-        {[
-          {
-            title: "Recently Purchased Books",
-            items: activity?.recentlyPurchasedBooks.map((item) => item?.title),
-          },
+      {/* Continue Reading & Progress */}
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_0.8fr]">
+        <section>
+          <div className="mb-3 flex items-center gap-2">
+            <Activity className="h-5 w-5 text-amber-700" />
+            <h2 className="text-lg font-bold">Continue Reading</h2>
+          </div>
 
-          {
-            title: "Recent Payments",
-            items: activity?.recentPayments.map(
-              (item) =>
-                `${item?.book?.title ?? "Unknown item"} - ${item?.status}`,
-            ),
-          },
-        ].map((group) => (
+          <div className="grid gap-4 md:grid-cols-3">
+            {continueReading.map((item) => (
+              <ContinueReadingCard key={item._id} product={item.product} />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-bold">Reading Progress</h2>
+
+          <div className="space-y-3">
+            {readingProgress.map((item) => (
+              <ProgressCard
+                key={item._id}
+                product={{
+                  ...item.product,
+                  progress: item.percentage,
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* Insights */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {[
+          ["Recent Activity", insights.recentActivity],
+          ["Recommendations", insights.recommendations],
+          ["Preserved Materials", insights.preservedMaterials],
+        ].map(([title, text]) => (
           <div
-            key={group.title}
-            className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900"
+            key={title}
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm"
           >
-            <h2 className="font-bold">{group.title}</h2>
-            {activityLoading ? (
-              <p className="mt-4 text-sm text-stone-500">Loading...</p>
-            ) : group.items?.length ? (
-              <ul className="mt-4 space-y-3">
-                {group.items.slice(0, 5).map((item) => (
-                  <li
-                    key={item}
-                    className="rounded-md bg-stone-50 px-3 py-2 text-sm font-medium dark:bg-stone-950"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-4 text-sm text-stone-500">No activity yet.</p>
-            )}
+            <h3 className="font-bold text-stone-950">{title}</h3>
+
+            <p className="mt-2 text-sm leading-6 text-stone-600">{text}</p>
           </div>
         ))}
       </div>

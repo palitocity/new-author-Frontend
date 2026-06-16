@@ -32,7 +32,6 @@ import VerifyPayment from "../Page/Verifypayment";
 import Watchlist from "../Admin/waitlist";
 import Library from "../Page/Library";
 import MediaPage from "../Admin/media";
-import LibraryReader from "../Page/Libraryreader";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AdminProtectedRoute from "../components/auth/AdminProtectedRoute";
 import DashboardLayout from "../components/dashboard/DashboardLayout";
@@ -42,6 +41,19 @@ import PurchaseHistory from "../Page/dashboard/PurchaseHistory";
 import SavedStories from "../Page/dashboard/SavedStories";
 import ProfileSettings from "../Page/dashboard/ProfileSettings";
 import Security from "../Page/dashboard/Security";
+import ProductDetailsPage from "../Page/ProductDetailsPage";
+import ReaderPage from "../Page/ReaderPage";
+import ReflectionNotesPage from "../Page/dashboard/ReflectionNotesPage";
+import BookmarksPage from "../Page/dashboard/BookmarksPage";
+import AccountPage from "../Page/dashboard/AccountPage";
+import CheckoutPage from "../Page/checkout/CheckoutPage";
+import PaymentPendingPage from "../Page/checkout/PaymentPendingPage";
+import PaymentSuccessPage from "../Page/checkout/PaymentSuccessPage";
+import PurchaseConfirmationPage from "../Page/checkout/PurchaseConfirmationPage";
+import AccessDeniedPage from "../Page/security/AccessDeniedPage";
+import SessionExpiredPage from "../Page/security/SessionExpiredPage";
+import RestrictedContentPage from "../Page/security/RestrictedContentPage";
+import ContinuityAdminPage from "../Admin/ContinuityAdminPage";
 
 export const router = createBrowserRouter([
   {
@@ -94,10 +106,42 @@ export const router = createBrowserRouter([
         element: <Library />,
       },
       {
-        path: "library/:id",
-        element: <LibraryReader />,
+        path: "library/:productId",
+        element: <ProductDetailsPage />,
       },
     ],
+  },
+  {
+    path: "reader/:productId",
+    element: <ReaderPage />,
+  },
+  {
+    path: "checkout/:productId",
+    element: <CheckoutPage />,
+  },
+  {
+    path: "checkout/:productId/pending",
+    element: <PaymentPendingPage />,
+  },
+  {
+    path: "checkout/:productId/success",
+    element: <PaymentSuccessPage />,
+  },
+  {
+    path: "checkout/:productId/confirmation",
+    element: <PurchaseConfirmationPage />,
+  },
+  {
+    path: "access-denied",
+    element: <AccessDeniedPage />,
+  },
+  {
+    path: "session-expired",
+    element: <SessionExpiredPage />,
+  },
+  {
+    path: "restricted-content",
+    element: <RestrictedContentPage />,
   },
   {
     path: "login",
@@ -139,6 +183,14 @@ export const router = createBrowserRouter([
             element: <MyLibrary />,
           },
           {
+            path: "reflection-notes",
+            element: <ReflectionNotesPage />,
+          },
+          {
+            path: "bookmarks",
+            element: <BookmarksPage />,
+          },
+          {
             path: "story/:id",
             element: <StorybyId />,
           },
@@ -157,6 +209,10 @@ export const router = createBrowserRouter([
           {
             path: "security",
             element: <Security />,
+          },
+          {
+            path: "account",
+            element: <AccountPage />,
           },
         ],
       },
@@ -220,6 +276,26 @@ export const router = createBrowserRouter([
           {
             path: "media",
             element: <MediaPage />,
+          },
+          {
+            path: "products",
+            element: <ContinuityAdminPage section="products" />,
+          },
+          {
+            path: "purchases",
+            element: <ContinuityAdminPage section="purchases" />,
+          },
+          {
+            path: "subscriptions",
+            element: <ContinuityAdminPage section="subscriptions" />,
+          },
+          {
+            path: "access",
+            element: <ContinuityAdminPage section="access" />,
+          },
+          {
+            path: "content",
+            element: <ContinuityAdminPage section="content" />,
           },
         ],
       },

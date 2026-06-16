@@ -95,7 +95,7 @@ export default function ProfileSettings() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-800 dark:bg-stone-900">
+      <div className="rounded-xl border border-stone-200 bg-black p-6 shadow-sm dark:border-stone-800 dark:bg-stone-900">
         {!isEditing ? (
           <>
             {/* HEADER */}
