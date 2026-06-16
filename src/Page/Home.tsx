@@ -5,6 +5,7 @@ import StoryAnimation from "../components/animatedstory";
 import Blog from "./Blog";
 import { BookOpen, Library, LockKeyhole } from "lucide-react";
 import { Link } from "react-router-dom";
+import ContinuityLandingSections from "../components/landing/ContinuityLandingSections";
 
 const readerFeatures = [
   {
@@ -76,6 +77,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <ContinuityLandingSections />
 
       <section className="container mx-auto px-6 py-12 bg-primary/5">
         <div className="grid gap-6 md:grid-cols-1">
