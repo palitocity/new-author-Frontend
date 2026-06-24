@@ -23,7 +23,7 @@ const ViewStories = () => {
   const [deleteStory, setDeleteStory] = useState<any>(null);
   const [editFormData, setEditFormData] = useState<any>({});
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   // Fetch stories from API
   const getStories = async () => {

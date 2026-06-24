@@ -41,6 +41,8 @@ const Users = () => {
         },
       });
       setusers(res.data.data);
+      console.log("this is data of users:", res.data.data);
+      
       setstats(res.data.stats);
     } catch (error) {
       console.log("Error fetching users:", error);
@@ -51,18 +53,19 @@ const Users = () => {
     getAllUsers();
   }, []);
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const matchesRole =
-        filterRole === "all" || user.role.toLowerCase() === filterRole;
+ const filteredUsers = useMemo(() => {
+  return users.filter((user) => {
+    const matchesRole =
+      filterRole === "all" ||
+      user.role?.toLowerCase() === filterRole;
 
-      const matchesSearch =
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = user.email
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
-      return matchesRole && matchesSearch;
-    });
-  }, [filterRole, searchTerm, users]);
+    return matchesRole && matchesSearch;
+  });
+}, [filterRole, searchTerm, users]);
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
 

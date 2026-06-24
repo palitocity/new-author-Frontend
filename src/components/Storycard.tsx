@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { Sparkles, Bookmark } from "lucide-react";
 
 interface StoryCardProps {
   image: string;
@@ -8,6 +8,8 @@ interface StoryCardProps {
   views: number;
   isFree: boolean;
   onAction: () => void;
+  bookmarked?: boolean;
+  onBookmark?: (e: React.MouseEvent) => void;
 }
 
 export function StoryCard({
@@ -17,6 +19,8 @@ export function StoryCard({
   price,
   isFree,
   onAction,
+  bookmarked = false,
+  onBookmark,
 }: StoryCardProps) {
   return (
     <div className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 border border-stone-200 hover:border-amber-300 hover:-translate-y-2">
@@ -28,6 +32,7 @@ export function StoryCard({
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
+        {/* FREE badge */}
         {isFree && (
           <div className="absolute top-4 right-4">
             <span className="px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
@@ -36,6 +41,21 @@ export function StoryCard({
             </span>
           </div>
         )}
+
+        {/* Bookmark button */}
+        <button
+          onClick={onBookmark}
+          className="absolute top-4 left-4 bg-black/40 hover:bg-black/60 backdrop-blur-sm p-2 rounded-full transition-all duration-200 active:scale-90"
+          aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
+        >
+          <Bookmark
+            className={`w-4 h-4 transition-colors duration-200 ${
+              bookmarked
+                ? "fill-amber-400 text-amber-400"
+                : "text-white fill-transparent"
+            }`}
+          />
+        </button>
       </div>
 
       <div className="p-6">
@@ -55,7 +75,6 @@ export function StoryCard({
             <p className="text-2xl font-bold text-amber-600">
               {isFree ? "Free" : `₦${price.toLocaleString()}`}
             </p>
-            {/* <p>{views}</p> */}
           </div>
 
           <button

@@ -136,7 +136,10 @@ const StoryUpload = () => {
       if (videoFile) formData.append("videoFile", videoFile);
       if (pdfFile) formData.append("pdfFile", pdfFile);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
+
+    
+      
 
       const res = await axios.post("/book", formData, {
         headers: {

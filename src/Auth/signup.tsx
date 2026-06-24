@@ -70,7 +70,7 @@ export default function Signup() {
               <input
                 {...register("firstName")}
                 className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-3 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
-                placeholder="Ada"
+                placeholder="John"
               />
             </span>
             {errors.firstName && (
@@ -87,7 +87,7 @@ export default function Signup() {
               <input
                 {...register("lastName")}
                 className="w-full rounded-md border border-stone-300 py-3 pl-11 pr-3 outline-none focus:border-amber-600 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
-                placeholder="Okafor"
+                placeholder="Doe"
               />
             </span>
             {errors.lastName && (

@@ -12,7 +12,11 @@ const AllBlogs = () => {
   const [showModal, setShowModal] = useState(false);
   const [blogToDelete, setBlogToDelete] = useState<any>(null);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
+
+ 
+
+
 
   const getStatusStyles = (status: string) => {
     switch (status) {

@@ -25,19 +25,27 @@ export default function Blog() {
   const paginatedBlogs = blogs.slice(startIndex, endIndex);
 
   useEffect(() => {
-    const getAllBlogs = async () => {
-      try {
-        const res = await axios.get("/blog");
-        setBlogs(res.data.data);
-      } catch (error) {
-        console.error("Failed to fetch blogs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const getAllBlogs = async () => {
+    try {
+      const res = await axios.get("/blog");
 
-    getAllBlogs();
-  }, []);
+      console.log("API Response:", res.data);
+
+      const blogData = Array.isArray(res.data?.data)
+        ? res.data.data
+        : [];
+
+      setBlogs(blogData);
+    } catch (error) {
+      console.error("Failed to fetch blogs:", error);
+      setBlogs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  getAllBlogs();
+}, []);
 
   const changePage = (page: number) => {
     setCurrentPage(page);

@@ -17,7 +17,7 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    router("/login");
+    router("/admin/login");
   };
 
   return (

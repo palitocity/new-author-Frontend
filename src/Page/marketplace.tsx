@@ -11,6 +11,13 @@ export default function Marketplace() {
   const [stories, setStories] = useState<any[]>([]);
   const [filteredStories, setFilteredStories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [bookmarks, setBookmarks] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("story_bookmarks") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "free" | "paid">("all");
@@ -20,7 +27,6 @@ export default function Marketplace() {
   // GET STORIES
   const getStories = async () => {
     setLoading(true);
-
     try {
       const res = await axios.get("/book");
       const fetchedStories = res.data.data || [];
@@ -47,6 +53,11 @@ export default function Marketplace() {
     getStories();
   }, []);
 
+  // Persist bookmarks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("story_bookmarks", JSON.stringify(bookmarks));
+  }, [bookmarks]);
+
   useEffect(() => {
     let filtered = stories;
 
@@ -72,6 +83,33 @@ export default function Marketplace() {
       navigate(`/order/${story._id}`);
     } else {
       navigate(`/dashboard/story/${story._id}`);
+    }
+  };
+
+  const handleBookmark = (e: React.MouseEvent, storyId: string, title: string) => {
+    e.stopPropagation(); // prevent card click / navigation
+    const isBookmarked = bookmarks.includes(storyId);
+
+    if (isBookmarked) {
+      setBookmarks((prev) => prev.filter((id) => id !== storyId));
+      toast(`Removed "${title}" from bookmarks`, {
+        icon: "🔖",
+        style: {
+          background: "#1c1917",
+          color: "#d6d3d1",
+          border: "1px solid #292524",
+        },
+      });
+    } else {
+      setBookmarks((prev) => [...prev, storyId]);
+      toast.success(`Added "${title}" to bookmarks`, {
+        icon: "🔖",
+        style: {
+          background: "#1c1917",
+          color: "#fff",
+          border: "1px solid #ea580c",
+        },
+      });
     }
   };
 
@@ -176,7 +214,7 @@ export default function Marketplace() {
                 className="relative bg-stone-900 border border-stone-800 rounded-xl overflow-hidden hover:border-orange-500 transition"
               >
                 {/* VIEWS */}
-                <div className="absolute top-3 right-3 z-10 bg-black/60 px-2 py-1 rounded-full flex items-center gap-1 text-xs">
+                <div className="absolute top-3 right-12 z-10 bg-black/60 px-2 py-1 rounded-full flex items-center gap-1 text-xs">
                   <Eye className="w-3 h-3 text-orange-500" />
                   {story.views || 0}
                 </div>
@@ -189,6 +227,8 @@ export default function Marketplace() {
                   views={story.views}
                   isFree={story.price === 0}
                   onAction={() => handleStoryClick(story)}
+                  bookmarked={bookmarks.includes(story._id)}
+                  onBookmark={(e) => handleBookmark(e, story._id, story.title)}
                 />
               </div>
             ))}

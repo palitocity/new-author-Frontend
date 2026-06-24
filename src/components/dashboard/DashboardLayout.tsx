@@ -11,7 +11,7 @@ import {
   Settings,
   ShieldCheck,
   X,
-  Book,
+
   UserRoundCog,
 } from "lucide-react";
 import { useState } from "react";
@@ -23,7 +23,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 const navItems = [
   { label: "Dashboard Overview", to: "/dashboard", icon: Home },
   { label: "Marketplace", to: "/dashboard/marketplace", icon: Store },
-  { label: "Stories", to: "/dashboard/marketplace", icon: Book },
+
   { label: "My Continuity Library", to: "/dashboard/library", icon: Library },
   {
     label: "Reflection Notes",
@@ -32,10 +32,10 @@ const navItems = [
   },
   { label: "Bookmarks", to: "/dashboard/bookmarks", icon: BookMarked },
   { label: "Purchase History", to: "/dashboard/purchases", icon: Clock3 },
-  { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },
+  // { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },
   { label: "Profile Settings", to: "/dashboard/profile", icon: Settings },
   { label: "Security", to: "/dashboard/security", icon: ShieldCheck },
-  { label: "Account", to: "/dashboard/account", icon: UserRoundCog },
+  { label: "Be a Member", to: "/dashboard/account", icon: UserRoundCog },
 ];
 
 export default function DashboardLayout() {

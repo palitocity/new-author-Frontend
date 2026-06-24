@@ -24,6 +24,8 @@ export default function Navbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -87,73 +89,85 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden items-center gap-3 md:flex">
-          {token ? (
-            <>
-              <Link
-                to="/dashboard"
-                className="rounded-md border border-current px-3 py-2 text-sm font-semibold"
-              >
-                Dashboard
-              </Link>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setProfileOpen((value) => !value)}
-                  className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-black/5"
-                >
-                  <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-amber-100 text-sm font-bold text-amber-900">
-                    {user?.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={`${user.firstName} avatar`}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      `${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`
-                    )}
-                  </span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-                {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-lg border border-stone-200 bg-white text-stone-900 shadow-xl">
-                    <Link
-                      to="/dashboard/profile"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-4 py-3 text-sm font-semibold hover:bg-stone-100"
-                    >
-                      <UserRound className="h-4 w-4" />
-                      Profile Settings
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-red-700 hover:bg-red-50"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="rounded-md border border-current px-3 py-2 text-sm font-semibold"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
+    <div className="hidden items-center gap-3 md:flex">
+  
+
+  {token ? (
+    <>
+      <Link
+        to="/dashboard"
+        className="rounded-md border border-current px-3 py-2 text-sm font-semibold"
+      >
+        Dashboard
+      </Link>
+
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setProfileOpen((value) => !value)}
+          className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-black/5"
+        >
+          <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-amber-100 text-sm font-bold text-amber-900">
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={`${user.firstName} avatar`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              `${user?.firstName?.[0] || "U"}${
+                user?.lastName?.[0] || ""
+              }`
+            )}
+          </span>
+
+          <ChevronDown className="h-4 w-4" />
+        </button>
+
+        {profileOpen && (
+          <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-lg border border-stone-200 bg-white text-stone-900 shadow-xl">
+            <Link
+              to="/dashboard/profile"
+              onClick={() => setProfileOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 text-sm font-semibold hover:bg-stone-100"
+            >
+              <UserRound className="h-4 w-4" />
+              Profile Settings
+            </Link>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-red-700 hover:bg-red-50"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  ) : (
+    <>
+      <Link
+        to="/login"
+        className="rounded-md border border-current px-3 py-2 text-sm font-semibold"
+      >
+        Login
+      </Link>
+
+      <Link
+        to="/signup"
+        className="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white"
+      >
+        Sign Up
+      </Link>
+    </>
+  )}
+</div>
+
+
+         
 
         <button
           className="text-3xl md:hidden"
@@ -169,6 +183,7 @@ export default function Navbar() {
           open ? "max-h-[520px] py-4" : "max-h-0 py-0"
         }`}
       >
+        
         <ul className="flex flex-col space-y-4 px-6">
           {menuItems.map((item) => (
             <li key={item.label} onClick={() => setOpen(false)}>
@@ -202,6 +217,8 @@ export default function Navbar() {
               </li>
             </>
           )}
+
+
         </ul>
       </div>
     </nav>
