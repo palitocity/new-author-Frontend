@@ -1,67 +1,103 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Apple,
+  Facebook,
+  Instagram,
+  Mail,
+  Music,
+  Twitter,
+  X,
+  Youtube,
+} from "lucide-react";
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
+import axios from "../config/axiosconfiq";
 import logo from "../assets/sankofaseek.png";
 
-import { Instagram, Twitter, Youtube, X, Facebook, Apple, Music } from "lucide-react";
-import axios from "../config/axiosconfiq";
+const socialLinks = [
+  {
+    Icon: Instagram,
+    href: "https://www.instagram.com/sankofaseekhub?igsh=MXhpd284dXUydTBybg==",
+    label: "Instagram",
+  },
+  {
+    Icon: Apple,
+    href: "https://music.apple.com/us/artist/sankofaseek/1891273794",
+    label: "Apple Podcasts",
+  },
+  {
+    Icon: Music,
+    href: "https://open.spotify.com/artist/3scVWnR14UNTP8Z2dKpa8c?si=TND8NYpUTEuSht8TPXhDnw",
+    label: "Spotify",
+  },
+  {
+    Icon: Twitter,
+    href: "https://x.com/SankofaseekHub",
+    label: "Twitter / X",
+  },
+  {
+    Icon: Youtube,
+    href: "https://www.youtube.com/@sankofaseekartHub",
+    label: "YouTube",
+  },
+  {
+    Icon: Facebook,
+    href: "https://www.facebook.com/share/18BLhZmMtY/",
+    label: "Facebook",
+  },
+];
 
-// Enhanced Footer Component
+const quickLinks = [
+  { label: "Home", to: "/" },
+  { label: "About", to: "/about" },
+  { label: "Blog", to: "/blog" },
+  { label: "Gallery Alter", to: "/gallery" },
+  { label: "Login", to: "/login" },
+];
+
+const resources = [
+  { label: "Contact Us", to: "/contact" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms of Service", to: "/terms" },
+];
+
 export default function Footer() {
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "" });
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleOpenModal = () => {
-    setShowModal(true);
-    setError("");
-    setFormData({ name: "", email: "" });
-  };
-
-  const handleCloseModal = () => {
+  const handleClose = () => {
     setShowModal(false);
     setError("");
     setFormData({ name: "", email: "" });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubscribe = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError("");
-
-    if (!formData.email || !formData.name) return;
 
     try {
       setLoading(true);
-
-      await axios.post("/subscribers/subscribe", {
-        name: formData.name,
-        email: formData.email,
-      });
-
+      await axios.post("/subscribers/subscribe", formData);
       setSubscribed(true);
       setFormData({ name: "", email: "" });
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        typeof err.response === "object" &&
+        err.response !== null &&
+        "data" in err.response &&
+        typeof err.response.data === "object" &&
+        err.response.data !== null &&
+        "message" in err.response.data &&
+        typeof err.response.data.message === "string"
+          ? err.response.data.message
+          : "Subscription failed. Please try again.";
 
-      setTimeout(() => {
-        setSubscribed(false);
-        handleCloseModal();
-      }, 2000);
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          "Subscription failed. Please try again.",
-      );
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -69,352 +105,200 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="bg-linear-to-br from-[#6B4321] via-[#7A4D2A] to-[#5A3719] text-white relative overflow-hidden">
-        {/* Decorative Pattern Overlay */}
-        <div className="absolute inset-0 opacity-5">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          />
+      <footer className="border-t border-stone-800 bg-stone-950 px-6 py-12 text-stone-300">
+        <div className="container mx-auto grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr]">
+          <div>
+            <div className="flex items-center gap-3">
+              <img
+                src={logo}
+                alt="SankofaSeek Logo"
+                className="h-12 w-auto rounded-md bg-white object-contain p-1"
+              />
+              <div>
+                <p className="text-lg font-bold text-white">SankofaSeek</p>
+                <p className="text-sm text-amber-300">Return and retrieve.</p>
+              </div>
+            </div>
+            <p className="mt-5 max-w-md text-sm leading-6 text-stone-300">
+              Connecting you to stories of heritage, culture, and tradition,
+              exploring the pulse of our ancestors through the wisdom of the
+              past.
+            </p>
+            <div className="mt-5 flex items-center gap-2">
+              {socialLinks.map(({ Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-stone-300 transition hover:border-amber-400 hover:text-amber-300"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-amber-300">
+              Quick Links
+            </h3>
+            <nav className="mt-5 grid gap-3 text-sm font-semibold">
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className="transition hover:text-amber-300"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-amber-300">
+              Resources
+            </h3>
+            <nav className="mt-5 grid gap-3 text-sm font-semibold">
+              {resources.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className="transition hover:text-amber-300"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-amber-300">
+              Stay Connected
+            </h3>
+            <p className="mt-5 text-sm leading-6 text-stone-300">
+              Receive new stories, cultural reflections, and learning updates
+              directly in your inbox.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSubscribed(false);
+                setShowModal(true);
+              }}
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-amber-400 px-5 py-3 text-sm font-bold text-stone-950 transition hover:bg-amber-300"
+            >
+              <Mail className="h-4 w-4" />
+              Subscribe
+            </button>
+          </div>
         </div>
 
-        <div className="relative container mx-auto px-6 pt-16 pb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-            {/* Logo & Description */}
-            <div className="flex flex-col space-y-5">
-              <div className="flex items-center space-x-3">
-                <img
-                  src={logo}
-                  alt="SankofaSeek Logo"
-                  className="h-14 w-auto object-contain rounded-md shadow-md bg-white p-1"
-                />
-
-                <div>
-                  <h3 className="font-bold text-xl">SankofaSeek</h3>
-                  <p className="text-xs text-amber-200">Return & Retrieve</p>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-200 leading-relaxed">
-                Connecting you to stories of heritage, culture, and tradition —
-                exploring the pulse of our ancestors through the wisdom of the
-                past.
-              </p>
-
-              {/* Social Links */}
-              <div className="flex space-x-3 pt-2">
-                {[
-                  {
-                    Icon: Instagram,
-                    href: "https://www.instagram.com/sankofaseekhub?igsh=MXhpd284dXUydTBybg==",
-                    label: "Instagram",
-                  },
-                  {
-                      Icon: Apple,
-                      href: "https://music.apple.com/us/artist/sankofaseek/1891273794",
-                      label: "Apple Podcasts",
-                  },
-                  {
-                    Icon: Music,
-                    href: "https://open.spotify.com/artist/3scVWnR14UNTP8Z2dKpa8c?si=TND8NYpUTEuSht8TPXhDnw",
-                    label: "Spotify",
-                  },
-                  {
-                    Icon: Twitter,
-                    href: "https://x.com/SankofaseekHub",
-                    label: "Twitter / X",
-                  },
-                  {
-                    Icon: Youtube,
-                    href: "https://www.youtube.com/@sankofaseekartHub",
-                    label: "YouTube",
-                  },
-                  {
-                     Icon: Facebook,
-                    href: "https://www.facebook.com/share/18BLhZmMtY/",
-                    label: "Facebook",
-                  }
-                ].map(({ Icon, href, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm 
-                    flex items-center justify-center hover:bg-amber-500 hover:scale-110 
-                    transition-all duration-300 group"
-                  >
-                    <Icon className="w-5 h-5 text-white group-hover:text-black transition" />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="flex flex-col space-y-4">
-              <h3 className="font-bold text-lg mb-1 text-amber-200 flex items-center">
-                <span className="w-1 h-6 bg-amber-500 mr-3 rounded-full"></span>
-                Quick Links
-              </h3>
-              <nav className="flex flex-col space-y-3">
-                {["Home", "About", "Blog", "Login"].map((item) => (
-                  <a
-                    key={item}
-                    href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                    className="text-gray-200 hover:text-amber-300 transition-all duration-200 hover:translate-x-1 inline-flex items-center group"
-                  >
-                    <span className="w-0 h-0.5 bg-amber-500 group-hover:w-4 transition-all duration-300 mr-0 group-hover:mr-2"></span>
-                    {item}
-                  </a>
-                ))}
-              </nav>
-            </div>
-
-            {/* Resources */}
-            <div className="flex flex-col space-y-4">
-              <h3 className="font-bold text-lg mb-1 text-amber-200 flex items-center">
-                <span className="w-1 h-6 bg-amber-500 mr-3 rounded-full"></span>
-                Resources
-              </h3>
-              <nav className="flex flex-col space-y-3">
-                {[
-                  { name: "Contact Us", href: "/contact" },
-                  { name: "Privacy Policy", href: "/privacy" },
-                  { name: "Terms of Service", href: "/terms" },
-                ].map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className="text-gray-200 hover:text-amber-300 transition-all duration-200 hover:translate-x-1 inline-flex items-center group"
-                  >
-                    <span className="w-0 h-0.5 bg-amber-500 group-hover:w-4 transition-all duration-300 mr-0 group-hover:mr-2"></span>
-                    {item.name}
-                  </a>
-                ))}
-              </nav>
-            </div>
-
-            {/* Newsletter */}
-            <div className="flex flex-col space-y-4">
-              <h3 className="font-bold text-lg mb-1 text-amber-200 flex items-center">
-                <span className="w-1 h-6 bg-amber-500 mr-3 rounded-full"></span>
-                Stay Connected
-              </h3>
-              <p className="text-gray-200 text-sm leading-relaxed">
-                Receive stories, insights, and cultural wisdom directly in your
-                inbox.
-              </p>
-              <button
-                onClick={handleOpenModal}
-                className="bg-amber-500 px-6 py-3 rounded-lg font-semibold 
-                hover:bg-amber-600 transition-all duration-300 
-                hover:shadow-lg hover:scale-105 active:scale-95 
-                flex items-center justify-center text-white"
-              >
-                Subscribe Now
-              </button>
-            </div>
-          </div>
-
-          {/* Footer Bottom */}
-          <div className="border-t border-white/10 pt-8 mt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <p className="text-gray-300 text-sm text-center md:text-left">
-                &copy; {new Date().getFullYear()} SankofaSeek. All rights
-                reserved. Crafted with heritage in mind.
-              </p>
-            </div>
-          </div>
+        <div className="container mx-auto mt-10 border-t border-white/10 pt-6">
+          <p className="text-sm text-stone-400">
+            &copy; {new Date().getFullYear()} SankofaSeek. All rights reserved.
+          </p>
         </div>
       </footer>
 
-      {/* Subscription Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
-            {/* Modal Header */}
-            <div className="bg-linear-to-br from-[#6B4321] via-[#7A4D2A] to-[#5A3719] text-white px-6 py-5 relative">
-              <div className="absolute inset-0 opacity-10">
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                  }}
-                />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-2xl">
+            <div className="flex items-center justify-between bg-stone-950 px-6 py-5 text-white">
+              <div>
+                <h2 className="text-xl font-bold">Stay connected</h2>
+                <p className="text-sm text-stone-300">
+                  Join the SankofaSeek community.
+                </p>
               </div>
-
-              <div className="relative flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold mb-1">
-                    Join Our Community
-                  </h2>
-                  <p className="text-amber-200 text-sm">
-                    Stay connected with cultural wisdom
-                  </p>
-                </div>
-                <button
-                  onClick={handleCloseModal}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110"
-                  aria-label="Close modal"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleClose}
+                aria-label="Close subscription form"
+                className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition hover:bg-white/20"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6">
               {subscribed ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg
-                      className="w-8 h-8 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                <div className="py-6 text-center">
+                  <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+                    <Mail className="h-5 w-5" />
                   </div>
-                  <h3 className="text-2xl font-bold text-stone-800 mb-2">
-                    Successfully Subscribed!
+                  <h3 className="mt-4 text-xl font-bold text-stone-950">
+                    You are connected
                   </h3>
-                  <p className="text-stone-600">
-                    Check your inbox for confirmation.
+                  <p className="mt-2 text-sm text-stone-600">
+                    Thanks for subscribing to SankofaSeek updates.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubscribe} className="space-y-5">
-                  {/* Name Input */}
+                <form onSubmit={handleSubscribe} className="space-y-4">
                   <div>
                     <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-stone-700 mb-2"
+                      htmlFor="subscriber-name"
+                      className="text-sm font-semibold text-stone-700"
                     >
                       Full Name
                     </label>
                     <input
-                      type="text"
-                      id="name"
+                      id="subscriber-name"
                       name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Enter your full name"
+                      type="text"
                       required
-                      className="w-full px-4 py-3 rounded-lg border-2 border-stone-200 text-stone-800 
-                      focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent 
-                      transition-all placeholder:text-stone-400"
+                      value={formData.name}
+                      onChange={(event) =>
+                        setFormData((current) => ({
+                          ...current,
+                          name: event.target.value,
+                        }))
+                      }
+                      className="mt-2 w-full rounded-md border border-stone-300 px-4 py-3 text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                      placeholder="Enter your name"
                     />
                   </div>
 
-                  {/* Email Input */}
                   <div>
                     <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-stone-700 mb-2"
+                      htmlFor="subscriber-email"
+                      className="text-sm font-semibold text-stone-700"
                     >
                       Email Address
                     </label>
                     <input
-                      type="email"
-                      id="email"
+                      id="subscriber-email"
                       name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="Enter your email address"
+                      type="email"
                       required
-                      className="w-full px-4 py-3 rounded-lg border-2 border-stone-200 text-stone-800 
-                      focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent 
-                      transition-all placeholder:text-stone-400"
+                      value={formData.email}
+                      onChange={(event) =>
+                        setFormData((current) => ({
+                          ...current,
+                          email: event.target.value,
+                        }))
+                      }
+                      className="mt-2 w-full rounded-md border border-stone-300 px-4 py-3 text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                      placeholder="Enter your email"
                     />
                   </div>
 
-                  {/* Error Message */}
                   {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                      <svg
-                        className="w-5 h-5 text-red-600 shrink-0 mt-0.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <p className="text-red-700 text-sm">{error}</p>
-                    </div>
+                    <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                      {error}
+                    </p>
                   )}
 
-                  {/* Privacy Notice */}
-                  <p className="text-xs text-stone-500 leading-relaxed">
-                    By subscribing, you agree to receive occasional emails from
-                    SankofaSeek. You can unsubscribe at any time. We respect
-                    your privacy.
-                  </p>
-
-                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-linear-to-r from-amber-500 to-amber-600 text-white px-6 py-3.5 rounded-lg font-semibold 
-                    hover:from-amber-600 hover:to-amber-700 transition-all duration-300 
-                    hover:shadow-lg hover:scale-[1.02] active:scale-95 
-                    disabled:opacity-50 disabled:cursor-not-allowed 
-                    flex items-center justify-center gap-2"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {loading ? (
-                      <>
-                        <svg
-                          className="animate-spin h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        Subscribing...
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Subscribe Now
-                      </>
-                    )}
+                    <Mail className="h-4 w-4" />
+                    {loading ? "Subscribing..." : "Subscribe Now"}
                   </button>
                 </form>
               )}
