@@ -8,11 +8,10 @@ import { logout } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 const menuItems = [
-  { label: "Home", to: "/" },
-  { label: "About", to: "/about" },
+  { label: "Blog", to: "/blog" },
   { label: "Academy", to: "https://academy.sankofaseek.com", external: true },
-  { label: "Blogs", to: "/blog" },
   { label: "Gallery Alter", to: "/gallery" },
+  { label: "About", to: "/about" },
 ];
 
 export default function Navbar() {
@@ -41,8 +40,8 @@ export default function Navbar() {
   };
 
   const navClass = scrolled
-    ? "bg-white text-black shadow-md"
-    : "bg-primary text-accent shadow-md";
+    ? "bg-white text-stone-950 shadow-sm"
+    : "bg-stone-950 text-white shadow-sm";
 
   const renderMenuLink = (item: (typeof menuItems)[number]) => {
     if (item.external) {
