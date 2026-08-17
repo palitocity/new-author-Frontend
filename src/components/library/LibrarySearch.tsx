@@ -14,7 +14,7 @@ export default function LibrarySearch({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Search My Continuity Library"
-        className="w-full rounded-md border border-stone-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-amber-600"
+        className="w-full rounded-md border border-stone-300 bg-black py-2.5 pl-10 pr-3 text-sm outline-none focus:border-amber-600"
       />
     </label>
   );

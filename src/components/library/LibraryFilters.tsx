@@ -36,7 +36,7 @@ export default function LibraryFilters({
         <select
           value={filter}
           onChange={(event) => setFilter(event.target.value as LibraryFilter)}
-          className="w-full rounded-md border border-stone-300 bg-white py-2.5 pl-10 pr-8 text-sm"
+          className="w-full rounded-md border border-stone-300 bg-black py-2.5 pl-10 pr-8 text-sm"
         >
           {filters.map((item) => (
             <option key={item}>{item}</option>
@@ -47,14 +47,14 @@ export default function LibraryFilters({
       <select
         value={sort}
         onChange={(event) => setSort(event.target.value as LibrarySort)}
-        className="rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm"
+        className="rounded-md border border-stone-300 bg-black px-3 py-2.5 text-sm"
       >
         <option>Recent</option>
         <option>Oldest</option>
         <option>Progress</option>
       </select>
 
-      <div className="flex rounded-md border border-stone-300 bg-white p-1">
+      <div className="flex rounded-md border border-stone-300 bg-black p-1">
         <button
           type="button"
           onClick={() => setView("grid")}

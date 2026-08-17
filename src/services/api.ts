@@ -25,27 +25,34 @@ export type AuthResponse = {
   user: AuthUser;
 };
 
+export type LibraryBook = {
+  bookId: string;
+  orderId: string;
+  transactionId: string;
+  paymentReference: string;
+  purchasedAt: string;
+
+  currentPage: number;
+  totalPages: number;
+  progressPercentage: number;
+  lastReadAt?: string | null;
+
+  bookSnapshot?: {
+    bookId: string;
+    title: string;
+    subtitle?: string;
+    author?: string;
+    coverImage?: string;
+    pdfFile?: string;
+  };
+};
+
 export type LibraryResponse = {
-  title: any;
   success: boolean;
   count: number;
   data: {
     userId: string;
-    books: {
-      bookId: any;
-      orderId: string;
-      transactionId: string;
-      paymentReference: string;
-      purchasedAt: string;
-      bookSnapshot?: {
-        bookId: string;
-        title: string;
-        subtitle?: string;
-        author?: string;
-        coverImage?: string;
-        pdfFile?: string;
-      };
-    }[];
+    books: LibraryBook[];
   };
 };
 
@@ -198,6 +205,34 @@ export const api = createApi({
     dashboardActivity: builder.query<DashboardActivity, void>({
       query: () => "/dashboard/activity",
     }),
+    saveReadingProgress: builder.mutation<
+  {
+    success: boolean;
+    message: string;
+    data: {
+      bookId: string;
+      currentPage: number;
+      totalPages: number;
+      progressPercentage: number;
+      lastReadAt: string;
+    };
+  },
+  {
+    bookId: string;
+    currentPage: number;
+    totalPages: number;
+  }
+>({
+  query: ({ bookId, currentPage, totalPages }) => ({
+    url: `/library/${bookId}/progress`,
+    method: "PATCH",
+    body: {
+      currentPage,
+      totalPages,
+    },
+  }),
+  invalidatesTags: ["Library"],
+}),
   }),
 });
 
@@ -213,6 +248,7 @@ export const {
   useRegisterMutation,
   useRemoveSavedStoryMutation,
   useResetPasswordMutation,
+  useSaveReadingProgressMutation,
   useSaveStoryMutation,
   useSavedStoriesQuery,
   useUpdateProfileMutation,
