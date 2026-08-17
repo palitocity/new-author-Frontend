@@ -7,9 +7,10 @@ import toast from "react-hot-toast";
 import { logout } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-const menuItems = [
+const menuItems: Array<{ label: string; to: string; external?: boolean }> = [
+  { label: "Home", to: "/" },
   { label: "Blog", to: "/blog" },
-  { label: "Academy", to: "https://academy.sankofaseek.com", external: true },
+  // { label: "Academy", to: "https://academy.sankofaseek.com", external: true },
   { label: "Gallery Alter", to: "/gallery" },
   { label: "About", to: "/about" },
 ];
