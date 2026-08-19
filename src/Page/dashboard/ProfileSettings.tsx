@@ -40,13 +40,15 @@ export default function ProfileSettings() {
   useEffect(() => {
     if (profile) {
       reset({
-        firstName: profile.data.firstName || "",
-        lastName: profile.data.lastName || "",
-        email: profile.data.email || "",
-        bio: profile.data.bio || "",
+        firstName: profile?.firstName || "",
+        lastName: profile?.lastName || "",
+        email: profile?.email || "",
+        bio: profile?.bio || "",
       });
     }
   }, [profile, reset]);
+
+  console.log("Profile data after reset:", profile?.firstName );
 
   const onSubmit = async (values: ProfileForm) => {
     try {
@@ -116,20 +118,20 @@ export default function ProfileSettings() {
 
               <div className="flex-1">
                 <h2 className="text-2xl font-semibold">
-                  {profile?.data?.firstName} {profile?.data?.lastName}
+                  {profile?.firstName} {profile?.lastName}
                 </h2>
 
-                <p className="text-stone-500">{profile?.data?.email}</p>
+                <p className="text-stone-500">{profile?.email}</p>
 
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
                   <span className="rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800">
-                    {profile?.data?.role || "User"}
+                    {profile?.role || "User"}
                   </span>
 
                   <span className="text-stone-500">
                     Joined{" "}
-                    {profile?.data?.createdAt
-                      ? new Date(profile.data.createdAt).toLocaleDateString()
+                    {profile?.createdAt
+                      ? new Date(profile.createdAt).toLocaleDateString()
                       : "-"}
                   </span>
                 </div>
@@ -148,28 +150,28 @@ export default function ProfileSettings() {
               <div>
                 <p className="text-sm text-stone-500">First Name</p>
                 <p className="mt-1 font-medium">
-                  {profile?.data?.firstName || "-"}
+                  {profile?.firstName || "-"}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-stone-500">Last Name</p>
                 <p className="mt-1 font-medium">
-                  {profile?.data?.lastName || "-"}
+                  {profile?.lastName || "-"}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-stone-500">Email Address</p>
                 <p className="mt-1 font-medium">
-                  {profile?.data?.email || "-"}
+                  {profile?.email || "-"}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-stone-500">Role</p>
                 <p className="mt-1 font-medium capitalize">
-                  {profile?.data?.role || "User"}
+                  {profile?.role || "User"}
                 </p>
               </div>
             </div>
@@ -178,7 +180,7 @@ export default function ProfileSettings() {
               <p className="text-sm text-stone-500">Bio</p>
 
               <p className="mt-2 leading-relaxed">
-                {profile?.data?.bio || "No bio added yet."}
+                {profile?.bio || "No bio added yet."}
               </p>
             </div>
           </>
@@ -187,9 +189,9 @@ export default function ProfileSettings() {
             {/* AVATAR */}
             <label className="mb-6 flex w-fit cursor-pointer items-center gap-4">
               <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
-                {profile?.data?.avatar ? (
+                {profile?.avatar ? (
                   <img
-                    src={profile.data.avatar}
+                    src={profile.avatar}
                     alt="avatar"
                     className="h-full w-full object-cover"
                   />
@@ -299,10 +301,10 @@ export default function ProfileSettings() {
                   setIsEditing(false);
 
                   reset({
-                    firstName: profile?.data?.firstName || "",
-                    lastName: profile?.data?.lastName || "",
-                    email: profile?.data?.email || "",
-                    bio: profile?.data?.bio || "",
+                    firstName: profile?.firstName || "",
+                    lastName: profile?.lastName || "",
+                    email: profile?.email || "",
+                    bio: profile?.bio || "",
                   });
                 }}
                 className="rounded-md border border-stone-300 px-5 py-3 text-sm font-semibold hover:bg-stone-100 dark:border-stone-700 dark:hover:bg-stone-800"

@@ -26,6 +26,10 @@ export default function Navbar() {
 
 
 
+  console.log("Navbar user:", user);
+
+
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);

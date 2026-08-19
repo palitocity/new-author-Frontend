@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../store/store";
-import type { AuthUser, ProfileResponse } from "../features/auth/authSlice";
+import type { AuthUser } from "../features/auth/authSlice";
 
 export type ContentType = "Book" | "Story";
 export type PaymentStatus = "Paid" | "Pending" | "Failed";
@@ -18,12 +19,140 @@ export type LoginRequest = {
   password: string;
 };
 
-export type AuthResponse = {
-  data: any;
-  message: string;
-  token: string;
-  user: AuthUser;
+/* =========================================================
+   BACKEND USER
+========================================================= */
+
+type BackendUser = {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role?: "user" | "admin";
+  avatar?: string;
+  bio?: string;
+  createdAt?: string;
 };
+
+/* =========================================================
+   LOGIN BACKEND RESPONSE
+
+   Backend returns:
+
+   {
+     success: true,
+     message: "Welcome Daniel!",
+     data: {
+       user: {...},
+       token: "..."
+     }
+   }
+========================================================= */
+
+type LoginBackendResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    user: BackendUser;
+    token: string;
+  };
+};
+
+/* =========================================================
+   PROFILE BACKEND RESPONSE
+
+   Backend returns:
+
+   {
+     success: true,
+     data: {
+       _id: "...",
+       firstName: "Daniel",
+       lastName: "Benevolent",
+       email: "...",
+       role: "user"
+     }
+   }
+========================================================= */
+
+type ProfileBackendResponse = {
+  success: boolean;
+  data: BackendUser;
+  message?: string;
+};
+
+/* =========================================================
+   LOGIN RESPONSE USED BY FRONTEND
+========================================================= */
+
+export type LoginResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    user: AuthUser;
+    token: string;
+  };
+};
+
+/* =========================================================
+   REGISTER RESPONSE
+========================================================= */
+
+export type RegisterResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    user?: BackendUser;
+    token?: string;
+  };
+};
+
+/* =========================================================
+   PROFILE RESPONSE USED BY FRONTEND
+
+   IMPORTANT:
+   This is now AuthUser directly.
+
+   So:
+
+   profile.firstName
+
+   NOT:
+
+   profile.data.firstName
+========================================================= */
+
+export type ProfileResponse = AuthUser;
+
+/* =========================================================
+   NORMALIZE BACKEND USER
+
+   Converts:
+
+   _id
+
+   into:
+
+   id
+========================================================= */
+
+const normalizeUser = (user: BackendUser): AuthUser => {
+  return {
+  _id: user._id,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+  avatar: user.avatar,
+  bio: user.bio,
+  createdAt: user.createdAt,
+  data: undefined
+};
+};
+
+/* =========================================================
+   LIBRARY
+========================================================= */
 
 export type LibraryBook = {
   bookId: string;
@@ -56,15 +185,20 @@ export type LibraryResponse = {
   };
 };
 
-// Replace your Purchase type with this
+/* =========================================================
+   ORDERS
+========================================================= */
+
 export type OrderItem = {
   status: any;
+
   book: {
     _id: string;
     title: string;
     author: string;
     coverImage?: string;
   } | null;
+
   quantity: number;
   priceAtPurchase: number;
   _id: string;
@@ -87,7 +221,9 @@ export type OrdersResponse = {
   data: Order[];
 };
 
-// Also update PaymentStatus to match what the API actually returns
+/* =========================================================
+   SAVED STORIES
+========================================================= */
 
 export type SavedStory = {
   id: string;
@@ -98,6 +234,10 @@ export type SavedStory = {
   dateSaved: string;
 };
 
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
 export type DashboardStats = {
   totalBooksPurchased: number;
   totalStoriesPurchased: number;
@@ -107,134 +247,347 @@ export type DashboardStats = {
 
 export type DashboardActivity = {
   recentlyPurchasedBooks: LibraryResponse[];
-
   recentPayments: OrderItem[];
 };
 
-const baseUrl = import.meta.env.VITE_DEVE_URL || "/api";
+/* =========================================================
+   API BASE URL
+========================================================= */
+
+const baseUrl =
+  import.meta.env.VITE_DEVE_URL ||
+  "https://sanfossa-backend.onrender.com/api";
+
+/* =========================================================
+   API
+========================================================= */
 
 export const api = createApi({
   reducerPath: "api",
+
   baseQuery: fetchBaseQuery({
     baseUrl,
+
     prepareHeaders: (headers, { getState }) => {
+      const state = getState() as RootState;
+
       const token =
-        (getState as () => RootState)()?.auth?.token ||
+        state.auth?.token ||
         localStorage.getItem("authToken");
 
-      if (token) headers.set("authorization", `Bearer ${token}`);
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+
       return headers;
     },
   }),
-  tagTypes: ["Me", "Library", "Payments", "SavedStories", "Profile"],
+
+  tagTypes: [
+    "Me",
+    "Library",
+    "Payments",
+    "SavedStories",
+    "Profile",
+  ],
+
   endpoints: (builder) => ({
-    register: builder.mutation<AuthResponse, RegisterRequest>({
-      query: (body) => ({ url: "/auth/register", method: "POST", body }),
+    /* =====================================================
+       REGISTER
+    ===================================================== */
+
+    register: builder.mutation<
+      RegisterResponse,
+      RegisterRequest
+    >({
+      query: (body) => ({
+        url: "/auth/register",
+        method: "POST",
+        body,
+      }),
     }),
-    login: builder.mutation<AuthResponse, LoginRequest>({
-      query: (body) => ({ url: "/auth/login", method: "POST", body }),
+
+    /* =====================================================
+       LOGIN
+    ===================================================== */
+
+    login: builder.mutation<
+      LoginResponse,
+      LoginRequest
+    >({
+      query: (body) => ({
+        url: "/auth/login",
+        method: "POST",
+        body,
+      }),
+
+      transformResponse: (
+        response: LoginBackendResponse
+      ): LoginResponse => {
+        return {
+          success: response.success,
+          message: response.message,
+
+          data: {
+            user: normalizeUser(response.data.user),
+            token: response.data.token,
+          },
+        };
+      },
     }),
-    forgotPassword: builder.mutation<{ message: string }, { email: string }>({
-      query: (body) => ({ url: "/auth/forgot-password", method: "POST", body }),
+
+    /* =====================================================
+       FORGOT PASSWORD
+    ===================================================== */
+
+    forgotPassword: builder.mutation<
+      { message: string },
+      { email: string }
+    >({
+      query: (body) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body,
+      }),
     }),
+
+    /* =====================================================
+       RESET PASSWORD
+    ===================================================== */
+
     resetPassword: builder.mutation<
       { message: string },
-      { token: string; password: string }
+      {
+        token: string;
+        password: string;
+      }
     >({
       query: ({ token, password }) => ({
         url: "/auth/reset-password",
         method: "POST",
-        body: { token, password },
+        body: {
+          token,
+          password,
+        },
       }),
     }),
-    me: builder.query<AuthUser, void>({
-      query: () => "/auth/me",
-      providesTags: ["Me"],
+
+    /* =====================================================
+       CURRENT USER
+
+       GET:
+       /auth/profile
+
+       Returns AuthUser directly.
+
+       IMPORTANT:
+
+       profile.firstName
+       profile.lastName
+       profile.email
+
+       NOT profile.data.firstName
+    ===================================================== */
+
+    profile: builder.query<
+      AuthUser,
+      void
+    >({
+      query: () => "/auth/profile",
+
+      transformResponse: (
+        response: ProfileBackendResponse
+      ): AuthUser => {
+        return normalizeUser(response.data);
+      },
+
+      providesTags: ["Profile", "Me"],
     }),
-    library: builder.query<LibraryResponse, void>({
+
+    /* =====================================================
+       LIBRARY
+    ===================================================== */
+
+    library: builder.query<
+      LibraryResponse,
+      void
+    >({
       query: () => "/library/me",
       providesTags: ["Library"],
     }),
-    libraryItem: builder.query<LibraryResponse, string>({
+
+    /* =====================================================
+       LIBRARY ITEM
+    ===================================================== */
+
+    libraryItem: builder.query<
+      LibraryResponse,
+      string
+    >({
       query: (id) => `/library/${id}`,
       providesTags: ["Library"],
     }),
-    paymentHistory: builder.query<OrdersResponse, void>({
+
+    /* =====================================================
+       PAYMENT HISTORY
+    ===================================================== */
+
+    paymentHistory: builder.query<
+      OrdersResponse,
+      void
+    >({
       query: () => "/order/me",
       providesTags: ["Payments"],
     }),
-    savedStories: builder.query<SavedStory[], void>({
+
+    /* =====================================================
+       SAVED STORIES
+    ===================================================== */
+
+    savedStories: builder.query<
+      SavedStory[],
+      void
+    >({
       query: () => "/saved-stories",
       providesTags: ["SavedStories"],
     }),
-    saveStory: builder.mutation<SavedStory, string>({
+
+    /* =====================================================
+       SAVE STORY
+    ===================================================== */
+
+    saveStory: builder.mutation<
+      SavedStory,
+      string
+    >({
       query: (storyId) => ({
         url: `/saved-stories/${storyId}`,
         method: "POST",
       }),
+
       invalidatesTags: ["SavedStories"],
     }),
-    removeSavedStory: builder.mutation<{ message: string }, string>({
+
+    /* =====================================================
+       REMOVE SAVED STORY
+    ===================================================== */
+
+    removeSavedStory: builder.mutation<
+      { message: string },
+      string
+    >({
       query: (storyId) => ({
         url: `/saved-stories/${storyId}`,
         method: "DELETE",
       }),
+
       invalidatesTags: ["SavedStories"],
     }),
-    profile: builder.query<ProfileResponse, void>({
-      query: () => "/auth/profile",
-      providesTags: ["Profile"],
-    }),
-    updateProfile: builder.mutation<AuthUser, FormData>({
+
+    /* =====================================================
+       UPDATE PROFILE
+    ===================================================== */
+
+    updateProfile: builder.mutation<
+      AuthUser,
+      FormData
+    >({
       query: (body) => ({
         url: "/profile",
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["Me", "Profile"],
+
+      invalidatesTags: [
+        "Me",
+        "Profile",
+      ],
     }),
+
+    /* =====================================================
+       CHANGE PASSWORD
+    ===================================================== */
+
     changePassword: builder.mutation<
       { message: string },
-      { currentPassword: string; newPassword: string }
+      {
+        currentPassword: string;
+        newPassword: string;
+      }
     >({
-      query: (body) => ({ url: "/profile/password", method: "PUT", body }),
+      query: (body) => ({
+        url: "/profile/password",
+        method: "PUT",
+        body,
+      }),
     }),
-    dashboardStats: builder.query<DashboardStats, void>({
+
+    /* =====================================================
+       DASHBOARD STATS
+    ===================================================== */
+
+    dashboardStats: builder.query<
+      DashboardStats,
+      void
+    >({
       query: () => "/dashboard/stats",
     }),
-    dashboardActivity: builder.query<DashboardActivity, void>({
+
+    /* =====================================================
+       DASHBOARD ACTIVITY
+    ===================================================== */
+
+    dashboardActivity: builder.query<
+      DashboardActivity,
+      void
+    >({
       query: () => "/dashboard/activity",
     }),
+
+    /* =====================================================
+       SAVE READING PROGRESS
+    ===================================================== */
+
     saveReadingProgress: builder.mutation<
-  {
-    success: boolean;
-    message: string;
-    data: {
-      bookId: string;
-      currentPage: number;
-      totalPages: number;
-      progressPercentage: number;
-      lastReadAt: string;
-    };
-  },
-  {
-    bookId: string;
-    currentPage: number;
-    totalPages: number;
-  }
->({
-  query: ({ bookId, currentPage, totalPages }) => ({
-    url: `/library/${bookId}/progress`,
-    method: "PATCH",
-    body: {
-      currentPage,
-      totalPages,
-    },
-  }),
-  invalidatesTags: ["Library"],
-}),
+      {
+        success: boolean;
+        message: string;
+
+        data: {
+          bookId: string;
+          currentPage: number;
+          totalPages: number;
+          progressPercentage: number;
+          lastReadAt: string;
+        };
+      },
+      {
+        bookId: string;
+        currentPage: number;
+        totalPages: number;
+      }
+    >({
+      query: ({
+        bookId,
+        currentPage,
+        totalPages,
+      }) => ({
+        url: `/library/${bookId}/progress`,
+        method: "PATCH",
+        body: {
+          currentPage,
+          totalPages,
+        },
+      }),
+
+      invalidatesTags: ["Library"],
+    }),
   }),
 });
+
+/* =========================================================
+   HOOKS
+========================================================= */
 
 export const {
   useChangePasswordMutation,
