@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import {
   Activity,
-  BookMarked,
-  Compass,
   Library,
-  NotebookPen,
+  BookOpenCheck,
+  Heart,
+  ShoppingBag,
 } from "lucide-react";
 
 import ContinueReadingCard from "../../components/library/ContinueReadingCard";
@@ -16,9 +16,9 @@ import axios from "../../config/axiosconfiq";
 type DashboardOverviewData = {
   stats?: {
     continuityLibrary?: number;
-    reflectionNotes?: number;
-    bookmarks?: number;
-    learningPathways?: number;
+    booksPurchased?: number;
+    wishlist?: number;
+    ordersPlaced?: number;
   };
   continueReading?: Array<{ _id: string; product: any }>;
   readingProgress?: Array<{ _id: string; product: any; percentage: number }>;
@@ -76,8 +76,7 @@ export default function DashboardOverview() {
         </h1>
 
         <p className="mt-1 text-sm text-stone-500">
-          Continue Reading, Reflection Notes, bookmarks, preserved materials,
-          and learning pathways.
+          Continue Reading, your library, purchases, and wishlist.
         </p>
       </div>
 
@@ -90,19 +89,19 @@ export default function DashboardOverview() {
             icon: Library,
           },
           {
-            label: "Reflection Notes",
-            value: stats.reflectionNotes || 0,
-            icon: NotebookPen,
+            label: "Books Purchased",
+            value: stats.booksPurchased || 0,
+            icon: BookOpenCheck,
           },
           {
-            label: "Bookmarks",
-            value: stats.bookmarks || 0,
-            icon: BookMarked,
+            label: "Wishlist",
+            value: stats.wishlist || 0,
+            icon: Heart,
           },
           {
-            label: "Learning Pathways",
-            value: stats.learningPathways || 0,
-            icon: Compass,
+            label: "Orders Placed",
+            value: stats.ordersPlaced || 0,
+            icon: ShoppingBag,
           },
         ].map(({ icon: Icon, label, value }) => (
           <div
