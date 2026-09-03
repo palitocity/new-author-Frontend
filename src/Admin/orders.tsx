@@ -26,7 +26,8 @@ const Orders = () => {
 
   const [deleteOrderModal, setdeleteOrderModal] = useState(false);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
+   console.log("Token in Orders component:", token); // Debugging line
 
   useEffect(() => {
     const getOrders = async () => {

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Mail,
   Send,
@@ -8,6 +8,9 @@ import {
   FileText,
   Calendar,
   Eye,
+  EllipsisVertical,
+  Trash2,
+  X,
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
@@ -35,8 +38,13 @@ interface Subscriber {
   subscribedAt: string;
 }
 
+interface NewsletterListItem {
+  _id: string;
+  subject: string;
+}
+
 const Newsletter = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   // Newsletter form
   const [newsletterData, setNewsletterData] = useState({
@@ -55,6 +63,21 @@ const Newsletter = () => {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loadingSubscribers, setLoadingSubscribers] = useState(true);
 
+  // Row actions menu
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // Delete user modal
+  const [deleteTarget, setDeleteTarget] = useState<Subscriber | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // Send-a-specific-newsletter modal
+  const [sendTarget, setSendTarget] = useState<Subscriber | null>(null);
+  const [newslettersList, setNewslettersList] = useState<NewsletterListItem[]>([]);
+  const [loadingNewsletters, setLoadingNewsletters] = useState(false);
+  const [selectedNewsletterId, setSelectedNewsletterId] = useState("");
+  const [sendingToUser, setSendingToUser] = useState(false);
+
   // Fetch subscribers
   useEffect(() => {
     const fetchSubscribers = async () => {
@@ -71,6 +94,19 @@ const Newsletter = () => {
     };
     fetchSubscribers();
   }, []);
+
+  // Close the row menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    if (openMenuId) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openMenuId]);
 
   // Form handlers
   const handleChange = (
@@ -146,6 +182,63 @@ const Newsletter = () => {
     } catch (err) {
       console.error("Failed to schedule", err);
       toast.error("Failed to schedule newsletter");
+    }
+  };
+
+  // ---- Row actions: delete user ----
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return;
+    try {
+      setDeleting(true);
+      await axios.delete(`/subscribers/${deleteTarget._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSubscribers((prev) => prev.filter((s) => s._id !== deleteTarget._id));
+      toast.success("Subscriber deleted");
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error("Failed to delete subscriber", err);
+      toast.error("Failed to delete subscriber");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // ---- Row actions: send a specific newsletter to this subscriber ----
+  const openSendModal = async (subscriber: Subscriber) => {
+    setOpenMenuId(null);
+    setSendTarget(subscriber);
+    setSelectedNewsletterId("");
+    try {
+      setLoadingNewsletters(true);
+      const res = await axios.get("/newsletter", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNewslettersList(res.data.data || res.data);
+    } catch (err) {
+      console.error("Failed to load newsletters", err);
+      toast.error("Failed to load newsletters");
+    } finally {
+      setLoadingNewsletters(false);
+    }
+  };
+
+  const handleSendToSubscriber = async () => {
+    if (!sendTarget || !selectedNewsletterId) return;
+    try {
+      setSendingToUser(true);
+      await axios.post(
+        `/newsletter/${selectedNewsletterId}/send`,
+        { dryRun: false, targetEmail: sendTarget.email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(`Newsletter sent to ${sendTarget.email}`);
+      setSendTarget(null);
+    } catch (err) {
+      console.error("Failed to send newsletter to subscriber", err);
+      toast.error("Failed to send newsletter");
+    } finally {
+      setSendingToUser(false);
     }
   };
 
@@ -349,18 +442,19 @@ const Newsletter = () => {
                 <th className="py-4 px-6 text-left">Status</th>
                 <th className="py-4 px-6 text-left">Verified</th>
                 <th className="py-4 px-6 text-left">Subscribed At</th>
+                <th className="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loadingSubscribers ? (
                 <tr>
-                  <td colSpan={4} className="py-6 text-center text-stone-500">
+                  <td colSpan={5} className="py-6 text-center text-stone-500">
                     Loading subscribers...
                   </td>
                 </tr>
               ) : subscribers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-6 text-center text-stone-500">
+                  <td colSpan={5} className="py-6 text-center text-stone-500">
                     No subscribers found
                   </td>
                 </tr>
@@ -390,6 +484,42 @@ const Newsletter = () => {
                     <td className="py-4 px-6 text-stone-600">
                       {new Date(sub.subscribedAt).toLocaleDateString()}
                     </td>
+                    <td className="py-4 px-6 text-right relative">
+                      <button
+                        onClick={() =>
+                          setOpenMenuId(openMenuId === sub._id ? null : sub._id)
+                        }
+                        className="p-2 rounded-lg hover:bg-stone-100 transition"
+                        aria-label="Row actions"
+                      >
+                        <EllipsisVertical className="w-5 h-5 text-stone-500" />
+                      </button>
+
+                      {openMenuId === sub._id && (
+                        <div
+                          ref={menuRef}
+                          className="absolute right-6 top-12 z-20 w-48 bg-white border border-stone-200 rounded-lg shadow-lg overflow-hidden text-left"
+                        >
+                          <button
+                            onClick={() => openSendModal(sub)}
+                            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 transition"
+                          >
+                            <Send className="w-4 h-4 text-amber-600" />
+                            Send a newsletter
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              setDeleteTarget(sub);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete user
+                          </button>
+                        </div>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
@@ -397,6 +527,110 @@ const Newsletter = () => {
           </table>
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="text-lg font-bold text-stone-800">
+                Delete user?
+              </h3>
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="text-stone-400 hover:text-stone-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-stone-600 text-sm mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-stone-800">
+                {deleteTarget.email}
+              </span>
+              ? This action can't be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition disabled:opacity-60"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send a specific newsletter modal */}
+      {sendTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="text-lg font-bold text-stone-800">
+                Send newsletter
+              </h3>
+              <button
+                onClick={() => setSendTarget(null)}
+                className="text-stone-400 hover:text-stone-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-stone-600 text-sm mb-4">
+              Choose a newsletter to send to{" "}
+              <span className="font-semibold text-stone-800">
+                {sendTarget.email}
+              </span>
+              .
+            </p>
+
+            {loadingNewsletters ? (
+              <p className="text-sm text-stone-500 mb-6">Loading newsletters...</p>
+            ) : newslettersList.length === 0 ? (
+              <p className="text-sm text-stone-500 mb-6">No newsletters found.</p>
+            ) : (
+              <select
+                value={selectedNewsletterId}
+                onChange={(e) => setSelectedNewsletterId(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none mb-6"
+              >
+                <option value="" disabled>
+                  Select a newsletter...
+                </option>
+                {newslettersList.map((nl) => (
+                  <option key={nl._id} value={nl._id}>
+                    {nl.subject}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setSendTarget(null)}
+                className="px-4 py-2 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendToSubscriber}
+                disabled={sendingToUser || !selectedNewsletterId}
+                className="px-4 py-2 rounded-lg bg-linear-to-r from-amber-600 to-orange-600 text-white font-medium disabled:opacity-60"
+              >
+                {sendingToUser ? "Sending..." : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

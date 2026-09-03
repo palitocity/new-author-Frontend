@@ -72,36 +72,49 @@ export default function Footer() {
     setError("");
     setFormData({ name: "", email: "" });
   };
+const handleSubscribe = async (
+  event: React.FormEvent<HTMLFormElement>
+) => {
+  event.preventDefault();
+  setError("");
 
-  const handleSubscribe = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError("");
+  try {
+    setLoading(true);
 
-    try {
-      setLoading(true);
-      await axios.post("/subscribers/subscribe", formData);
-      setSubscribed(true);
-      setFormData({ name: "", email: "" });
-    } catch (err: unknown) {
-      const message =
-        typeof err === "object" &&
-        err !== null &&
-        "response" in err &&
-        typeof err.response === "object" &&
-        err.response !== null &&
-        "data" in err.response &&
-        typeof err.response.data === "object" &&
-        err.response.data !== null &&
-        "message" in err.response.data &&
-        typeof err.response.data.message === "string"
-          ? err.response.data.message
-          : "Subscription failed. Please try again.";
+    const [firstName, ...lastNameParts] = formData.name.trim().split(" ");
 
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    await axios.post("/subscribers/subscribe", {
+      email: formData.email,
+      firstName: firstName || "",
+      lastName: lastNameParts.join(" ") || "",
+    });
+
+    setSubscribed(true);
+
+    setFormData({
+      name: "",
+      email: "",
+    });
+  } catch (err: unknown) {
+    const message =
+      typeof err === "object" &&
+      err !== null &&
+      "response" in err &&
+      typeof err.response === "object" &&
+      err.response !== null &&
+      "data" in err.response &&
+      typeof err.response.data === "object" &&
+      err.response.data !== null &&
+      "message" in err.response.data &&
+      typeof err.response.data.message === "string"
+        ? err.response.data.message
+        : "Subscription failed. Please try again.";
+
+    setError(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>

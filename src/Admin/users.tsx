@@ -31,7 +31,7 @@ const Users = () => {
     admins: 0,
   });
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   const getAllUsers = async () => {
     try {

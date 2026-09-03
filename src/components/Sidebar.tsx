@@ -13,8 +13,8 @@ import {
   List,
   PackageOpen,
   ShieldCheck,
-  LockKeyhole,
-  BadgeCheck,
+  // LockKeyhole,
+  // BadgeCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -48,33 +48,33 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       icon: <ShoppingBag className="w-5 h-5" />,
       path: "/admin/orders",
     },
-    {
-      name: "Purchases",
-      icon: <BadgeCheck className="w-5 h-5" />,
-      path: "/admin/purchases",
-    },
+    // {
+    //   name: "Purchases",
+    //   icon: <BadgeCheck className="w-5 h-5" />,
+    //   path: "/admin/purchases",
+    // },
     {
       name: "Subscriptions",
       icon: <ShieldCheck className="w-5 h-5" />,
       path: "/admin/subscriptions",
     },
-    {
-      name: "Access",
-      icon: <LockKeyhole className="w-5 h-5" />,
-      path: "/admin/access",
-    },
-    {
-      name: "Protected Content",
-      icon: <ShieldCheck className="w-5 h-5" />,
-      path: "/admin/content",
-    },
+    // {
+    //   name: "Access",
+    //   icon: <LockKeyhole className="w-5 h-5" />,
+    //   path: "/admin/access",
+    // },
+    // {
+    //   name: "Protected Content",
+    //   icon: <ShieldCheck className="w-5 h-5" />,
+    //   path: "/admin/content",
+    // },
     {
       name: "Watchlist",
       icon: <List className="w-5 h-5" />,
       path: "/admin/watchlist",
     },
     {
-      name: "Blog",
+      name: "Add Blog",
       icon: <FileText className="w-5 h-5" />,
       path: "/admin/blog",
     },
@@ -84,7 +84,7 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       path: "/admin/newsletter",
     },
     {
-      name: "Stories",
+      name: " Add Stories",
       icon: <BookOpen className="w-5 h-5" />,
       path: "/admin/stories",
     },
