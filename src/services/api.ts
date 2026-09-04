@@ -19,6 +19,17 @@ export type LoginRequest = {
   password: string;
 };
 
+
+export type VerifyEmailRequest = {
+  email: string;
+  otp: string;
+};
+
+export type VerifyEmailResponse = {
+  success: boolean;
+  message: string;
+};
+
 /* =========================================================
    BACKEND USER
 ========================================================= */
@@ -308,6 +319,21 @@ export const api = createApi({
     }),
 
     /* =====================================================
+       VERIFY EMAIL
+    ===================================================== */
+
+    verifyEmail: builder.mutation<
+      VerifyEmailResponse,
+      VerifyEmailRequest
+    >({
+      query: (body) => ({
+        url: "/auth/verify-email",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    /* =====================================================
        LOGIN
     ===================================================== */
 
@@ -585,6 +611,8 @@ export const api = createApi({
   }),
 });
 
+
+
 /* =========================================================
    HOOKS
 ========================================================= */
@@ -605,4 +633,5 @@ export const {
   useSaveStoryMutation,
   useSavedStoriesQuery,
   useUpdateProfileMutation,
+   useVerifyEmailMutation,
 } = api;

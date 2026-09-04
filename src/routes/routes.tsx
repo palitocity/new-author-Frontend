@@ -55,6 +55,8 @@ import SessionExpiredPage from "../Page/security/SessionExpiredPage";
 import RestrictedContentPage from "../Page/security/RestrictedContentPage";
 import ContinuityAdminPage from "../Admin/ContinuityAdminPage";
 
+import VerifyEmail from "../Auth/verifyemail";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -146,6 +148,10 @@ export const router = createBrowserRouter([
   {
     path: "login",
     element: <Login />,
+  },
+  {
+    path : 'verify-email',
+    element: <VerifyEmail/>
   },
   {
     path: "signup",
