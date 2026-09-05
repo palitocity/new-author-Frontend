@@ -32,7 +32,7 @@ const navItems = [
   },
 
   { label: "Purchase History", to: "/dashboard/purchases", icon: Clock3 },
-  // { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },
+
   { label: "Profile Settings", to: "/dashboard/profile", icon: Settings },
   { label: "Security", to: "/dashboard/security", icon: ShieldCheck },
   { label: "Be a Member", to: "/dashboard/account", icon: UserRoundCog },
