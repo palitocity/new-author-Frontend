@@ -31,7 +31,7 @@ export default function Signup() {
     try {
       const response = await registerUser(values).unwrap();
       toast.success(response.message || "Account created successfully");
-      navigate("/login");
+navigate("/verify-email", { state: { email: formValues.email } });
     } catch (error) {
       const message =
         (error as { data?: { message?: string } })?.data?.message ||
