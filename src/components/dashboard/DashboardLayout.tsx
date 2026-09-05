@@ -30,7 +30,7 @@ const navItems = [
     to: "/dashboard/reflection-notes",
     icon: NotebookPen,
   },
-  // { label: "Bookmarks", to: "/dashboard/bookmarks", icon: BookMarked },
+
   { label: "Purchase History", to: "/dashboard/purchases", icon: Clock3 },
   // { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },
   { label: "Profile Settings", to: "/dashboard/profile", icon: Settings },
