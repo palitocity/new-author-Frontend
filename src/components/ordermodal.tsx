@@ -48,11 +48,13 @@ export default function OrderModal({
     coin: string;
     amount: number;
     currency: string;
+    coinAmount: number | null;
     qrCode: string | null;
   } | null>(null);
-  const [cryptoStatus, setCryptoStatus] = useState<"pending" | "Paid" | "Failed">(
-    "pending",
-  );
+  const [cryptoStatus, setCryptoStatus] = useState<
+    "pending" | "Paid" | "Failed" | "Cancelled"
+  >("pending");
+  const [cancelling, setCancelling] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -127,7 +129,11 @@ export default function OrderModal({
       try {
         const statusRes = await axios.get(`/crypto/status/${data.reference}`);
         const status = statusRes.data?.data?.paymentStatus;
-        if (status === "Paid" || status === "Failed") {
+        if (
+          status === "Paid" ||
+          status === "Failed" ||
+          status === "Cancelled"
+        ) {
           setCryptoStatus(status);
           if (pollRef.current) clearInterval(pollRef.current);
         }
@@ -135,6 +141,23 @@ export default function OrderModal({
         // transient polling error, keep trying
       }
     }, 5000);
+  };
+
+  const handleCancelCrypto = async () => {
+    if (!cryptoPayment) return;
+
+    setCancelling(true);
+    try {
+      await axios.post(`/crypto/cancel/${cryptoPayment.reference}`);
+      if (pollRef.current) clearInterval(pollRef.current);
+      setCryptoStatus("Cancelled");
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.error || err.message || "Failed to cancel order",
+      );
+    } finally {
+      setCancelling(false);
+    }
   };
 
   const handlePayment = async () => {
@@ -177,7 +200,12 @@ export default function OrderModal({
       <div className="bg-white rounded-xl w-full max-w-md p-6 relative">
         <button
           className="absolute top-3 right-3 text-stone-400 hover:text-stone-600 font-bold"
-          onClick={onClose}
+          onClick={() => {
+            if (cryptoPayment && cryptoStatus === "pending") {
+              handleCancelCrypto();
+            }
+            onClose();
+          }}
         >
           ×
         </button>
@@ -217,15 +245,30 @@ export default function OrderModal({
                   Try Again
                 </button>
               </div>
+            ) : cryptoStatus === "Cancelled" ? (
+              <div className="flex flex-col items-center gap-3 py-6 text-center">
+                <p className="font-semibold text-stone-700">
+                  Order cancelled.
+                </p>
+                <p className="text-sm text-stone-600">
+                  You have not been charged. You can close this window.
+                </p>
+                <button
+                  onClick={onClose}
+                  className="mt-2 w-full py-3 rounded-lg text-white font-semibold bg-stone-700 hover:bg-stone-800"
+                >
+                  Close
+                </button>
+              </div>
             ) : (
               <>
                 <p className="mb-4 text-stone-600 text-sm">
                   Send exactly{" "}
                   <strong>
-                    {cryptoPayment.amount} {cryptoPayment.currency}
+                    {cryptoPayment.coinAmount ?? "—"}{" "}
+                    {cryptoPayment.coin.toUpperCase()}
                   </strong>{" "}
-                  worth of{" "}
-                  <strong>{cryptoPayment.coin.toUpperCase()}</strong> to the
+                  (≈ {cryptoPayment.amount} {cryptoPayment.currency}) to the
                   address below.
                 </p>
 
@@ -246,10 +289,18 @@ export default function OrderModal({
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-stone-500 justify-center">
+                <div className="flex items-center gap-2 text-sm text-stone-500 justify-center mb-4">
                   <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                   Waiting for payment confirmation…
                 </div>
+
+                <button
+                  onClick={handleCancelCrypto}
+                  disabled={cancelling}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold text-stone-600 border border-stone-300 hover:bg-stone-100 disabled:opacity-60"
+                >
+                  {cancelling ? "Cancelling..." : "Cancel Order"}
+                </button>
               </>
             )}
           </>
