@@ -44,7 +44,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   open,
   onClose,
-  endpoint = "https://sanfossa-backend.onrender.com/api/subscribers/subscribe",
+  endpoint = import.meta.env.VITE_DEVE_URL
+    ? `${import.meta.env.VITE_DEVE_URL}/subscribers/subscribe`
+    : "https://api.sankofaseek.com/api/subscribers/subscribe",
   onSuccess,
   extraHeaders,
   defaultEmail = "",
