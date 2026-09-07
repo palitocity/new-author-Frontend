@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
 import { CreditCard, Coins, Copy, CheckCircle2 } from "lucide-react";
+import Turnstile from "./Turnstile";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ export default function OrderModal({
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [coin, setCoin] = useState(CRYPTO_COINS[0].code);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const [cryptoPayment, setCryptoPayment] = useState<{
     reference: string;
@@ -80,6 +82,7 @@ export default function OrderModal({
         },
       ],
       userInfo: { name, email: normalizedEmail, phone, address },
+      turnstileToken,
     });
 
     if (!orderRes.data.success) {
@@ -137,6 +140,11 @@ export default function OrderModal({
   const handlePayment = async () => {
     if (!name || !email || !phone || !address) {
       toast.error("Please fill all fields!");
+      return;
+    }
+
+    if (!turnstileToken) {
+      toast.error("Please complete the verification challenge.");
       return;
     }
 
@@ -331,9 +339,15 @@ export default function OrderModal({
               </div>
             )}
 
+            <Turnstile
+              className="mb-4"
+              onVerify={setTurnstileToken}
+              onExpire={() => setTurnstileToken("")}
+            />
+
             <button
               onClick={handlePayment}
-              disabled={loading}
+              disabled={loading || !turnstileToken}
               className={`w-full py-3 rounded-lg text-white font-semibold ${
                 loading ? "bg-stone-400" : "bg-amber-600 hover:bg-amber-700"
               }`}

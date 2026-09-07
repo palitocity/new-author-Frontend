@@ -12,11 +12,13 @@ export type RegisterRequest = {
   lastName: string;
   email: string;
   password: string;
+  turnstileToken: string;
 };
 
 export type LoginRequest = {
   email: string;
   password: string;
+  turnstileToken: string;
 };
 
 
@@ -367,7 +369,7 @@ export const api = createApi({
 
     forgotPassword: builder.mutation<
       { message: string },
-      { email: string }
+      { email: string; turnstileToken: string }
     >({
       query: (body) => ({
         url: "/auth/forgot-password",

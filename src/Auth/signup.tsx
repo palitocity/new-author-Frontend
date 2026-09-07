@@ -5,10 +5,12 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../services/api";
+import Turnstile from "../components/Turnstile";
 import { signupSchema, type SignupForm } from "./validation";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [registerUser, { isLoading }] = useRegisterMutation();
   const navigate = useNavigate();
 
@@ -21,11 +23,17 @@ export default function Signup() {
   });
 
   const onSubmit = async (formValues: SignupForm) => {
+    if (!turnstileToken) {
+      toast.error("Please complete the verification challenge.");
+      return;
+    }
+
     const values = {
       email: formValues.email,
       firstName: formValues.firstName,
       lastName: formValues.lastName,
       password: formValues.password,
+      turnstileToken,
     };
 
     try {
@@ -169,9 +177,15 @@ navigate("/verify-email", { state: { email: formValues.email } });
           </label>
         </div>
 
+        <Turnstile
+          className="mt-4"
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
+
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !turnstileToken}
           className="mt-6 w-full rounded-md bg-amber-700 px-4 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isLoading ? "Creating account..." : "Create Account"}
