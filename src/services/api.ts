@@ -267,7 +267,7 @@ export type DashboardActivity = {
 
 const baseUrl =
   import.meta.env.VITE_DEVE_URL ||
-  "https://sanfossa-backend.onrender.com/api";
+  "https://api.sankofaseek.com/api";
 
 /* =========================================================
    API

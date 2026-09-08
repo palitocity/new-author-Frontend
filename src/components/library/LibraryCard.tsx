@@ -18,6 +18,11 @@ export default function LibraryCard({
 }) {
   const list = view === "list";
 
+  console.log("FULL PRODUCT:", product);
+
+console.log("product._id:", product._id);
+console.log("product keys:", Object.keys(product));
+
   const progress = product.progressPercentage ?? product.progress ?? 0;
 
   const lastOpened = product.lastReadAt
@@ -117,7 +122,7 @@ export default function LibraryCard({
         {/* ACTIONS */}
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <Link
-  to={`/reader/${product.id}`}
+ to={`/dashboard/reader/${product._id}`}
   state={{ product }}
   className="inline-flex items-center justify-center gap-2 rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-800"
 >
@@ -126,7 +131,7 @@ export default function LibraryCard({
 </Link>
 
           <Link
-            to={`/library/${product.id}`}
+            to={`dashboard/library/${product._id}`}
             className="inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-800 hover:bg-stone-50"
           >
             <PackageOpen className="h-4 w-4" />
@@ -134,7 +139,7 @@ export default function LibraryCard({
           </Link>
 
           <Link
-            to={`/dashboard/reflection-notes?product=${product.id}`}
+            to={`/dashboard/reflection-notes?product=${product._id}`}
             className="inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-800 hover:bg-stone-50"
           >
             <NotebookPen className="h-4 w-4" />

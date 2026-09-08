@@ -54,6 +54,7 @@ import AccessDeniedPage from "../Page/security/AccessDeniedPage";
 import SessionExpiredPage from "../Page/security/SessionExpiredPage";
 import RestrictedContentPage from "../Page/security/RestrictedContentPage";
 import ContinuityAdminPage from "../Admin/ContinuityAdminPage";
+import Reader from '../Page/reader'
 
 import VerifyEmail from "../Auth/verifyemail";
 
@@ -190,7 +191,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "reader/:id",
-            element: <ReaderPage />,
+            element: <Reader />,
           },
           {
             path: "reflection-notes",
