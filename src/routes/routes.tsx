@@ -189,6 +189,10 @@ export const router = createBrowserRouter([
             element: <MyLibrary />,
           },
           {
+            path: "reader/:id",
+            element: <ReaderPage />,
+          },
+          {
             path: "reflection-notes",
             element: <ReflectionNotesPage />,
           },
