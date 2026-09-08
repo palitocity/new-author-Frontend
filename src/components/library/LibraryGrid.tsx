@@ -18,7 +18,7 @@ export default function LibraryGrid({
     >
       {products.map((product) => (
         <LibraryCard
-          key={product.id}
+          key={product._id}
           product={product}
           view={view}
         />

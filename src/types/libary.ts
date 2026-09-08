@@ -1,5 +1,5 @@
 export type LibraryProduct = {
-  id: string;
+  _id: string;
   title: string;
   subtitle?: string;
   author: string;

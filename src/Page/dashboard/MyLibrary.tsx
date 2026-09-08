@@ -45,7 +45,7 @@ export default function MyLibrary() {
           return null;
         }
         return {
-          id: item.bookId,
+          _id: item.bookId,
           title: book.title,
           subtitle: book.subtitle,
           author: book.author || "Unknown Author",
