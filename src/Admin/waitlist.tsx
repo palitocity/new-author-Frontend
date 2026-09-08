@@ -317,7 +317,7 @@ const getStatusStyles = (status: string) => {
 };
 
 const Watchlist = () => {
-  const token = localStorage.getItem("token");
+ const token = localStorage.getItem("adminToken");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);

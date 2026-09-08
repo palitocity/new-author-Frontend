@@ -11,8 +11,8 @@ import {
   FileText,
   ImageUp,
   List,
-  PackageOpen,
-  ShieldCheck,
+  // PackageOpen,
+  // ShieldCheck,
   // LockKeyhole,
   // BadgeCheck,
 } from "lucide-react";
@@ -38,11 +38,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       icon: <Users className="w-5 h-5" />,
       path: "/admin/users",
     },
-    {
-      name: "Products",
-      icon: <PackageOpen className="w-5 h-5" />,
-      path: "/admin/products",
-    },
+    // {
+    //   name: "Products",
+    //   icon: <PackageOpen className="w-5 h-5" />,
+    //   path: "/admin/products",
+    // },
     {
       name: "Orders",
       icon: <ShoppingBag className="w-5 h-5" />,
@@ -53,11 +53,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
     //   icon: <BadgeCheck className="w-5 h-5" />,
     //   path: "/admin/purchases",
     // },
-    {
-      name: "Subscriptions",
-      icon: <ShieldCheck className="w-5 h-5" />,
-      path: "/admin/subscriptions",
-    },
+    // {
+    //   name: "Subscriptions",
+    //   icon: <ShieldCheck className="w-5 h-5" />,
+    //   path: "/admin/subscriptions",
+    // },
     // {
     //   name: "Access",
     //   icon: <LockKeyhole className="w-5 h-5" />,
