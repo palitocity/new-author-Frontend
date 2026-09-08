@@ -116,13 +116,14 @@ export default function LibraryCard({
 
         {/* ACTIONS */}
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          <Link
-            to={`/reader/${product.id}`}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-800"
-          >
-            <BookOpen className="h-4 w-4" />
-            Continue Reading
-          </Link>
+        <Link
+  to={`/reader/${product.id}`}
+  state={{ product }}
+  className="inline-flex items-center justify-center gap-2 rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-800"
+>
+  <BookOpen className="h-4 w-4" />
+  Continue Reading
+</Link>
 
           <Link
             to={`/library/${product.id}`}
