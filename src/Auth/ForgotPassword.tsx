@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Mail } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useForgotPasswordMutation } from "../services/api";
+import Turnstile from "../components/Turnstile";
 import { forgotPasswordSchema, type ForgotPasswordForm } from "./validation";
 
 export default function ForgotPassword() {
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const {
     formState: { errors },
@@ -17,8 +20,13 @@ export default function ForgotPassword() {
   });
 
   const onSubmit = async (values: ForgotPasswordForm) => {
+    if (!turnstileToken) {
+      toast.error("Please complete the verification challenge.");
+      return;
+    }
+
     try {
-      const response = await forgotPassword(values).unwrap();
+      const response = await forgotPassword({ ...values, turnstileToken }).unwrap();
       toast.success(response.message || "Reset link sent to your email");
     } catch (error) {
       const message =
@@ -66,9 +74,15 @@ export default function ForgotPassword() {
           )}
         </label>
 
+        <Turnstile
+          className="mt-4"
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
+
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !turnstileToken}
           className="mt-6 w-full rounded-md bg-amber-700 px-4 py-3 font-semibold text-white hover:bg-amber-800 disabled:opacity-60"
         >
           {isLoading ? "Sending..." : "Send Reset Link"}

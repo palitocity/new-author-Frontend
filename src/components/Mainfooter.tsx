@@ -50,7 +50,7 @@ const quickLinks = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
   { label: "Blog", to: "/blog" },
-  { label: "Gallery Alter", to: "/gallery" },
+  { label: "Gallery", to: "/gallery" },
   { label: "Login", to: "/login" },
 ];
 

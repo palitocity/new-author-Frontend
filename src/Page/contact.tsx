@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Send, Mail, User, MessageSquare, CheckCircle } from "lucide-react";
+import toast from "react-hot-toast";
+import axios from "../config/axiosconfiq";
+import Turnstile from "../components/Turnstile";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -7,14 +10,50 @@ const Contact = () => {
     email: "",
     message: "",
   });
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: "", email: "", message: "" });
-    }, 3000);
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    if (!turnstileToken) {
+      toast.error("Please complete the verification challenge.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await axios.post("/contact", {
+        fullName: formData.name,
+        email: formData.email,
+        message: formData.message,
+        turnstileToken,
+      });
+
+      if (!res.data.success) {
+        throw new Error(res.data.error || "Failed to send message");
+      }
+
+      setSubmitted(true);
+      setTurnstileToken("");
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({ name: "", email: "", message: "" });
+      }, 3000);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.error ||
+          error.message ||
+          "Failed to send message. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -111,13 +150,16 @@ const Contact = () => {
                 </div>
               </div>
 
+              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
               {/* Submit */}
               <button
                 onClick={handleSubmit}
-                className="w-full bg-amber-600 text-white font-semibold py-4 px-6 rounded-xl hover:bg-amber-700 transition shadow-md flex items-center justify-center gap-2"
+                disabled={submitting || !turnstileToken}
+                className="w-full bg-amber-600 text-white font-semibold py-4 px-6 rounded-xl hover:bg-amber-700 transition shadow-md flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Send className="w-5 h-5" />
-                Send Message
+                {submitting ? "Sending..." : "Send Message"}
               </button>
             </div>
           )}

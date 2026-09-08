@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
+import Turnstile from "./Turnstile";
 
 type SubscribePayload = {
   firstName: string;
@@ -44,7 +45,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   open,
   onClose,
-  endpoint = "https://sanfossa-backend.onrender.com/api/subscribers/subscribe",
+  endpoint = import.meta.env.VITE_DEVE_URL
+    ? `${import.meta.env.VITE_DEVE_URL}/subscribers/subscribe`
+    : "https://api.sankofaseek.com/api/subscribers/subscribe",
   onSuccess,
   extraHeaders,
   defaultEmail = "",
@@ -63,6 +66,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   // Focus first input when opened, reset when closed
   useEffect(() => {
@@ -74,6 +78,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       setServerError(null);
       setSuccessMsg(null);
       setSubmitting(false);
+      setTurnstileToken("");
     }
   }, [open, defaultEmail]);
 
@@ -121,6 +126,11 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
     if (!validate(payload)) return;
 
+    if (!turnstileToken) {
+      setServerError("Please complete the verification challenge.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     setSubmitting(true);
 
@@ -133,7 +143,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...(extraHeaders ?? {}),
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, turnstileToken }),
       });
 
       const isJson = res.headers.get("content-type")?.includes("application/json");
@@ -355,6 +365,12 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
             .
           </p>
 
+          <Turnstile
+            className="mt-4"
+            onVerify={setTurnstileToken}
+            onExpire={() => setTurnstileToken("")}
+          />
+
           {/* CTA Row */}
           <div className="mt-6 flex items-center justify-between gap-3">
             <button
@@ -367,7 +383,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !turnstileToken}
               className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all ${brandBtn} disabled:cursor-not-allowed disabled:opacity-70`}
             >
               {submitting ? (

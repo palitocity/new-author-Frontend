@@ -26,7 +26,9 @@ type WaitlistEntry = {
 };
 
 const WAITLIST_ENDPOINT =
-  "https://sanfossa-backend.onrender.com/api/admin/waitlist";
+  import.meta.env.VITE_DEVE_URL
+    ? `${import.meta.env.VITE_DEVE_URL}/admin/waitlist`
+    : "https://api.sankofaseek.com/api/admin/waitlist";
 
 const ARRAY_KEYS = [
   "waitlist",

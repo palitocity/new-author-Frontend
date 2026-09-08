@@ -18,6 +18,7 @@ import {
 import { setCredentials } from "../features/auth/authSlice";
 import { useLoginMutation } from "../services/api";
 import { useAppDispatch } from "../store/hooks";
+import Turnstile from "../components/Turnstile";
 import {
   loginSchema,
   type LoginForm,
@@ -26,6 +27,8 @@ import {
 export default function Login() {
   const [showPassword, setShowPassword] =
     useState(false);
+
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const [login, { isLoading }] =
     useLoginMutation();
@@ -57,13 +60,18 @@ export default function Login() {
   const onSubmit = async (
     values: LoginForm
   ) => {
+    if (!turnstileToken) {
+      toast.error("Please complete the verification challenge.");
+      return;
+    }
+
     try {
       /* =====================================================
          LOGIN
       ===================================================== */
 
       const response =
-        await login(values).unwrap();
+        await login({ ...values, turnstileToken }).unwrap();
 
       console.log(
         "LOGIN RESPONSE:",
@@ -275,12 +283,22 @@ export default function Login() {
         </div>
 
         {/* =================================================
+            VERIFICATION
+        ================================================= */}
+
+        <Turnstile
+          className="mt-4"
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+        />
+
+        {/* =================================================
             LOGIN BUTTON
         ================================================= */}
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !turnstileToken}
           className="mt-6 w-full rounded-md bg-amber-700 px-4 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isLoading
