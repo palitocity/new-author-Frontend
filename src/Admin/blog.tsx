@@ -32,7 +32,7 @@ const BlogUpload = () => {
 
   const [showPreview, setShowPreview] = useState(false);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   const categories = [
     "Ancient Civilizations",

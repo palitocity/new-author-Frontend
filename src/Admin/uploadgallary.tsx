@@ -24,7 +24,7 @@ const UploadGallery = () => {
   const [viewImage, setViewImage] = useState<any>(null);
   const [deleteImage, setDeleteImage] = useState<any>(null);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   // Fetch all images
   const getAllImages = async () => {

@@ -35,7 +35,7 @@ const Settings = () => {
   });
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   const tabs = [
     {

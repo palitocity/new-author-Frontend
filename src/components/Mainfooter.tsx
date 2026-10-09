@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Turnstile from "./Turnstile";
 import axios from "../config/axiosconfiq";
 import logo from "../assets/sankofaseek.png";
 
@@ -66,6 +67,8 @@ export default function Footer() {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const handleClose = () => {
     setShowModal(false);
@@ -78,6 +81,11 @@ const handleSubscribe = async (
   event.preventDefault();
   setError("");
 
+  if (!turnstileToken) {
+    setError("Please complete the verification challenge.");
+    return;
+  }
+
   try {
     setLoading(true);
 
@@ -87,6 +95,7 @@ const handleSubscribe = async (
       email: formData.email,
       firstName: firstName || "",
       lastName: lastNameParts.join(" ") || "",
+      turnstileToken,
     });
 
     setSubscribed(true);
@@ -105,14 +114,22 @@ const handleSubscribe = async (
       "data" in err.response &&
       typeof err.response.data === "object" &&
       err.response.data !== null &&
-      "message" in err.response.data &&
-      typeof err.response.data.message === "string"
-        ? err.response.data.message
+      ("message" in err.response.data || "error" in err.response.data)
+        ? String(
+            (err.response.data as { message?: string; error?: string })
+              .message ||
+              (err.response.data as { message?: string; error?: string })
+                .error ||
+              "Subscription failed. Please try again.",
+          )
         : "Subscription failed. Please try again.";
 
     setError(message);
   } finally {
     setLoading(false);
+    // Turnstile tokens are single-use.
+    setTurnstileToken("");
+    setTurnstileReset((count) => count + 1);
   }
 };
 
@@ -299,6 +316,12 @@ const handleSubscribe = async (
                     />
                   </div>
 
+                  <Turnstile
+                    resetKey={turnstileReset}
+                    onVerify={setTurnstileToken}
+                    onExpire={() => setTurnstileToken("")}
+                  />
+
                   {error && (
                     <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
                       {error}
@@ -307,7 +330,7 @@ const handleSubscribe = async (
 
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !turnstileToken}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Mail className="h-4 w-4" />

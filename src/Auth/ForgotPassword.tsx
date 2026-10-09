@@ -10,6 +10,7 @@ import { forgotPasswordSchema, type ForgotPasswordForm } from "./validation";
 
 export default function ForgotPassword() {
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const {
     formState: { errors },
@@ -29,10 +30,16 @@ export default function ForgotPassword() {
       const response = await forgotPassword({ ...values, turnstileToken }).unwrap();
       toast.success(response.message || "Reset link sent to your email");
     } catch (error) {
+      const data = (
+        error as { data?: { message?: string; error?: string } }
+      )?.data;
       const message =
-        (error as { data?: { message?: string } })?.data?.message ||
-        "Unable to send reset link.";
+        data?.message || data?.error || "Unable to send reset link.";
       toast.error(message);
+    } finally {
+      // Turnstile tokens are single-use.
+      setTurnstileToken("");
+      setTurnstileReset((count) => count + 1);
     }
   };
 
@@ -76,6 +83,7 @@ export default function ForgotPassword() {
 
         <Turnstile
           className="mt-4"
+          resetKey={turnstileReset}
           onVerify={setTurnstileToken}
           onExpire={() => setTurnstileToken("")}
         />

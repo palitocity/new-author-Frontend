@@ -11,6 +11,7 @@ import { signupSchema, type SignupForm } from "./validation";
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [registerUser, { isLoading }] = useRegisterMutation();
   const navigate = useNavigate();
 
@@ -41,10 +42,18 @@ export default function Signup() {
       toast.success(response.message || "Account created successfully");
 navigate("/verify-email", { state: { email: formValues.email } });
     } catch (error) {
+      const data = (
+        error as { data?: { message?: string; error?: string } }
+      )?.data;
       const message =
-        (error as { data?: { message?: string } })?.data?.message ||
+        data?.message ||
+        data?.error ||
         "Signup failed. This email may already be registered.";
       toast.error(message);
+    } finally {
+      // Turnstile tokens are single-use.
+      setTurnstileToken("");
+      setTurnstileReset((count) => count + 1);
     }
   };
 
@@ -179,6 +188,7 @@ navigate("/verify-email", { state: { email: formValues.email } });
 
         <Turnstile
           className="mt-4"
+          resetKey={turnstileReset}
           onVerify={setTurnstileToken}
           onExpire={() => setTurnstileToken("")}
         />

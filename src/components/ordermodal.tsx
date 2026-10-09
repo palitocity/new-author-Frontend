@@ -44,6 +44,7 @@ export default function OrderModal({
   const [coin, setCoin] = useState(CRYPTO_COINS[0].code);
 
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const [cryptoPayment, setCryptoPayment] = useState<{
     reference: string;
@@ -233,6 +234,9 @@ export default function OrderModal({
       );
     } finally {
       setLoading(false);
+      // Turnstile tokens are single-use.
+      setTurnstileToken("");
+      setTurnstileReset((count) => count + 1);
     }
   };
 
@@ -723,6 +727,7 @@ export default function OrderModal({
               >
                 <Turnstile
                   className="w-full max-w-[304px]"
+                  resetKey={turnstileReset}
                   onVerify={setTurnstileToken}
                   onExpire={() =>
                     setTurnstileToken("")
