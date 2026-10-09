@@ -241,6 +241,15 @@ const authSlice = createSlice({
     },
 
     /* =====================================================
+       REPLACE TOKEN (session extended)
+    ===================================================== */
+
+    setToken: (state, action: PayloadAction<string>) => {
+      state.token = action.payload;
+      localStorage.setItem("authToken", action.payload);
+    },
+
+    /* =====================================================
        LOGOUT
     ===================================================== */
 
@@ -260,6 +269,7 @@ const authSlice = createSlice({
 export const {
   logout,
   setCredentials,
+  setToken,
   setUser,
 } = authSlice.actions;
 

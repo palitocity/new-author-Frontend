@@ -36,7 +36,7 @@ type MediaItem = {
 };
 
 // pass your admin token here
-const token = localStorage.getItem("token");
+const token = localStorage.getItem("adminToken");
 
 const MediaPage = () => {
   const [media, setMedia] = useState<MediaItem[]>([]);
