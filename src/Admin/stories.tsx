@@ -17,6 +17,8 @@ import {
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
 import { FileText } from "lucide-react";
+import ManagedSelect from "../components/admin/ManagedSelect";
+import { useStoryOptions, type StoryOptionField } from "../hooks/useStoryOptions";
 
 const StoryUpload = () => {
   const [storyData, setStoryData] = useState({
@@ -44,27 +46,18 @@ const StoryUpload = () => {
 
   const [showPreview, setShowPreview] = useState(false);
 
-  const categories = [
-    "Folklore & Legends",
-    "Historical Fiction",
-    "Oral Traditions",
-    "Biography & Memoirs",
-    "Cultural Tales",
-    "War & Resistance",
-    "Family Stories",
-    "Mythology",
-  ];
-
-  const historicalPeriods = [
-    "Ancient Times (Before 500 CE)",
-    "Medieval Period (500-1500 CE)",
-    "Early Modern (1500-1800)",
-    "Colonial Era (1800-1960)",
-    "Independence Era (1960-1990)",
-    "Contemporary (1990-Present)",
-  ];
-
-  const ageRatings = ["All Ages", "8+", "12+", "16+", "18+"];
+  // Admin-managed choices for the category / period / age rating selects.
+  const { options, addOption, removeOption } = useStoryOptions();
+  const optionProps = (field: StoryOptionField) => ({
+    name: field,
+    value: storyData[field],
+    options: options[field],
+    onChange: handleInputChange,
+    onAdd: (value: string) => addOption(field, value),
+    onRemove: (value: string) => removeOption(field, value),
+    onAdded: (value: string) =>
+      setStoryData((prev) => ({ ...prev, [field]: value })),
+  });
 
   const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -602,45 +595,20 @@ const StoryUpload = () => {
             </div>
 
             {/* Category */}
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-stone-700 mb-2">
-                Category *
-              </label>
-              <select
-                name="category"
-                value={storyData.category}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border-2 border-stone-200 rounded-lg focus:border-orange-600 focus:outline-none transition"
-              >
-                <option value="">Select category</option>
-                {categories.map((cat, idx) => (
-                  <option key={idx} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ManagedSelect
+              {...optionProps("category")}
+              label="Category"
+              required
+              placeholder="Select category"
+            />
 
             {/* Historical Period */}
-            <div className="mb-4">
-              <label className=" text-sm font-semibold text-stone-700 mb-2 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Historical Period
-              </label>
-              <select
-                name="historicalPeriod"
-                value={storyData.historicalPeriod}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border-2 border-stone-200 rounded-lg focus:border-orange-600 focus:outline-none transition"
-              >
-                <option value="">Select period</option>
-                {historicalPeriods.map((period, idx) => (
-                  <option key={idx} value={period}>
-                    {period}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ManagedSelect
+              {...optionProps("historicalPeriod")}
+              label="Historical Period"
+              icon={<Calendar className="w-4 h-4" />}
+              placeholder="Select period"
+            />
 
             {/* Location */}
             <div className="mb-4">
@@ -674,24 +642,11 @@ const StoryUpload = () => {
             </div>
 
             {/* Age Rating */}
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-stone-700 mb-2">
-                Age Rating
-              </label>
-              <select
-                name="ageRating"
-                value={storyData.ageRating}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border-2 border-stone-200 rounded-lg focus:border-orange-600 focus:outline-none transition"
-              >
-                <option value="">Select age rating</option>
-                {ageRatings.map((rating, idx) => (
-                  <option key={idx} value={rating}>
-                    {rating}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ManagedSelect
+              {...optionProps("ageRating")}
+              label="Age Rating"
+              placeholder="Select age rating"
+            />
 
             {/* Tags */}
             <div>

@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import toast from "react-hot-toast";
+import ManagedSelect from "../components/admin/ManagedSelect";
+import { useStoryOptions, type StoryOptionField } from "../hooks/useStoryOptions";
 
 const ViewStories = () => {
   const [stories, setStories] = useState<any[]>([]);
@@ -123,27 +125,21 @@ const ViewStories = () => {
 
   const formatPrice = (price: number) => `₦${(price ?? 0).toFixed(2)}`;
 
-  const categories = [
-    "Folklore & Legends",
-    "Historical Fiction",
-    "Oral Traditions",
-    "Biography & Memoirs",
-    "Cultural Tales",
-    "War & Resistance",
-    "Family Stories",
-    "Mythology",
-  ];
-
-  const historicalPeriods = [
-    "Ancient Times (Before 500 CE)",
-    "Medieval Period (500-1500 CE)",
-    "Early Modern (1500-1800)",
-    "Colonial Era (1800-1960)",
-    "Independence Era (1960-1990)",
-    "Contemporary (1990-Present)",
-  ];
-
-  const ageRatings = ["All Ages", "8+", "12+", "16+", "18+"];
+  // Admin-managed choices for the category / period / age rating selects.
+  const { options, addOption, removeOption } = useStoryOptions();
+  const editSelectClass =
+    "w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition";
+  const optionProps = (field: StoryOptionField) => ({
+    name: field,
+    value: editFormData[field] || "",
+    options: options[field],
+    onChange: handleEditInputChange,
+    onAdd: (value: string) => addOption(field, value),
+    onRemove: (value: string) => removeOption(field, value),
+    onAdded: (value: string) =>
+      setEditFormData((prev: any) => ({ ...prev, [field]: value })),
+    selectClassName: editSelectClass,
+  });
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-6">
@@ -531,42 +527,17 @@ const ViewStories = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-stone-700 mb-2">
-                      Category *
-                    </label>
-                    <select
-                      name="category"
-                      value={editFormData.category}
-                      onChange={handleEditInputChange}
-                      className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
-                    >
-                      <option value="">Select category</option>
-                      {categories.map((cat, idx) => (
-                        <option key={idx} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-stone-700 mb-2">
-                      Historical Period
-                    </label>
-                    <select
-                      name="historicalPeriod"
-                      value={editFormData.historicalPeriod}
-                      onChange={handleEditInputChange}
-                      className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
-                    >
-                      <option value="">Select period</option>
-                      {historicalPeriods.map((period, idx) => (
-                        <option key={idx} value={period}>
-                          {period}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <ManagedSelect
+                    {...optionProps("category")}
+                    label="Category"
+                    required
+                    placeholder="Select category"
+                  />
+                  <ManagedSelect
+                    {...optionProps("historicalPeriod")}
+                    label="Historical Period"
+                    placeholder="Select period"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -595,24 +566,11 @@ const ViewStories = () => {
                       className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-stone-700 mb-2">
-                      Age Rating
-                    </label>
-                    <select
-                      name="ageRating"
-                      value={editFormData.ageRating}
-                      onChange={handleEditInputChange}
-                      className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg focus:border-amber-600 focus:outline-none transition"
-                    >
-                      <option value="">Select rating</option>
-                      {ageRatings.map((rating, idx) => (
-                        <option key={idx} value={rating}>
-                          {rating}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <ManagedSelect
+                    {...optionProps("ageRating")}
+                    label="Age Rating"
+                    placeholder="Select rating"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
