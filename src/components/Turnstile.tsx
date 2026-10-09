@@ -59,6 +59,11 @@ type TurnstileProps = {
   onExpire?: () => void;
   onError?: () => void;
   className?: string;
+  /**
+   * Change this value to get a fresh challenge. Turnstile tokens are
+   * single-use, so forms bump it after every submit attempt.
+   */
+  resetKey?: number;
 };
 
 export default function Turnstile({
@@ -66,6 +71,7 @@ export default function Turnstile({
   onExpire,
   onError,
   className,
+  resetKey,
 }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -109,6 +115,11 @@ export default function Turnstile({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!resetKey || !widgetIdRef.current || !window.turnstile) return;
+    window.turnstile.reset(widgetIdRef.current);
+  }, [resetKey]);
 
   if (failedToLoad) {
     return (

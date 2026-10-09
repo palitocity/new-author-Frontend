@@ -29,6 +29,7 @@ export default function Login() {
     useState(false);
 
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const [login, { isLoading }] =
     useLoginMutation();
@@ -72,21 +73,6 @@ export default function Login() {
 
       const response =
         await login({ ...values, turnstileToken }).unwrap();
-
-      console.log(
-        "LOGIN RESPONSE:",
-        response
-      );
-
-      console.log(
-        "LOGIN USER:",
-        response.data.user
-      );
-
-      console.log(
-        "LOGIN TOKEN:",
-        response.data.token
-      );
 
       /* =====================================================
          MAKE SURE WE ACTUALLY RECEIVED THE USER
@@ -134,23 +120,19 @@ export default function Login() {
         replace: true,
       });
     } catch (error) {
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
-
+      const data = (
+        error as { data?: { message?: string; error?: string } }
+      )?.data;
       const message =
-        (
-          error as {
-            data?: {
-              message?: string;
-            };
-            error?: string;
-          }
-        )?.data?.message ||
+        data?.message ||
+        data?.error ||
         "Login failed. Check your email and password.";
 
       toast.error(message);
+    } finally {
+      // Turnstile tokens are single-use.
+      setTurnstileToken("");
+      setTurnstileReset((count) => count + 1);
     }
   };
 
@@ -288,6 +270,7 @@ export default function Login() {
 
         <Turnstile
           className="mt-4"
+          resetKey={turnstileReset}
           onVerify={setTurnstileToken}
           onExpire={() => setTurnstileToken("")}
         />

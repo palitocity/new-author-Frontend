@@ -16,6 +16,7 @@ const Contact = () => {
     message: "",
   });
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -44,7 +45,6 @@ const Contact = () => {
       }
 
       setSubmitted(true);
-      setTurnstileToken("");
       setTimeout(() => {
         setSubmitted(false);
         setFormData({ name: "", email: "", message: "" });
@@ -58,6 +58,9 @@ const Contact = () => {
       );
     } finally {
       setSubmitting(false);
+      // Turnstile tokens are single-use.
+      setTurnstileToken("");
+      setTurnstileReset((count) => count + 1);
     }
   };
 
@@ -155,7 +158,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+              <Turnstile resetKey={turnstileReset} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
 
               {/* Submit */}
               <button

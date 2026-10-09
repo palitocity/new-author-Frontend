@@ -67,6 +67,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   // Focus first input when opened, reset when closed
   useEffect(() => {
@@ -164,6 +165,9 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
       setServerError(err?.message || "An unexpected error occurred.");
     } finally {
       setSubmitting(false);
+      // Turnstile tokens are single-use.
+      setTurnstileToken("");
+      setTurnstileReset((count) => count + 1);
     }
   };
 
@@ -367,6 +371,7 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({
 
           <Turnstile
             className="mt-4"
+            resetKey={turnstileReset}
             onVerify={setTurnstileToken}
             onExpire={() => setTurnstileToken("")}
           />
