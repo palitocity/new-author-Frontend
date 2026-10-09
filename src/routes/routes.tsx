@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import Landingpage from "../Page/Landingpage";
 import About from "../Page/About";
@@ -30,10 +30,10 @@ import BlogbyId from "../Page/BlogbyId";
 import OrderPage from "../Page/Orderpage";
 import VerifyPayment from "../Page/Verifypayment";
 import Watchlist from "../Admin/waitlist";
-import Library from "../Page/Library";
 import MediaPage from "../Admin/media";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AdminProtectedRoute from "../components/auth/AdminProtectedRoute";
+import NoIndexRoute from "../components/auth/NoIndexRoute";
 import DashboardLayout from "../components/dashboard/DashboardLayout";
 import DashboardOverview from "../Page/dashboard/DashboardOverview";
 import MyLibrary from "../Page/dashboard/MyLibrary";
@@ -59,6 +59,7 @@ import Reader from '../Page/reader'
 import VerifyEmail from "../Auth/verifyemail";
 
 export const router = createBrowserRouter([
+  /* ---------- Public, indexable pages ---------- */
   {
     path: "/",
     element: <Landingpage />,
@@ -68,7 +69,7 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/about",
+        path: "about",
         element: <About />,
       },
       {
@@ -95,80 +96,99 @@ export const router = createBrowserRouter([
         path: "blog/:id",
         element: <BlogbyId />,
       },
-
       {
-        path: "order/:id",
-        element: <OrderPage />,
-      },
-      {
-        path: "verify",
-        element: <VerifyPayment />,
-      },
-      {
+        // Purchased content lives in the signed-in dashboard.
         path: "library",
-        element: <Library />,
-      },
-      {
-        path: "library/:productId",
-        element: <ProductDetailsPage />,
+        element: <Navigate to="/dashboard/library" replace />,
       },
     ],
   },
+
+  /* ---------- Sign-in, recovery and notices (not indexed) ---------- */
   {
-    path: "reader/:productId",
-    element: <ReaderPage />,
+    element: <NoIndexRoute />,
+    children: [
+      {
+        path: "access-denied",
+        element: <AccessDeniedPage />,
+      },
+      {
+        path: "session-expired",
+        element: <SessionExpiredPage />,
+      },
+      {
+        path: "restricted-content",
+        element: <RestrictedContentPage />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "verify-email",
+        element: <VerifyEmail />,
+      },
+      {
+        path: "signup",
+        element: <Signup />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "admin/login",
+        element: <AdminLogin />,
+      },
+    ],
   },
+
+  /* ---------- Signed-in users only ---------- */
   {
-    path: "checkout/:productId",
-    element: <CheckoutPage />,
-  },
-  {
-    path: "checkout/:productId/pending",
-    element: <PaymentPendingPage />,
-  },
-  {
-    path: "checkout/:productId/success",
-    element: <PaymentSuccessPage />,
-  },
-  {
-    path: "checkout/:productId/confirmation",
-    element: <PurchaseConfirmationPage />,
-  },
-  {
-    path: "access-denied",
-    element: <AccessDeniedPage />,
-  },
-  {
-    path: "session-expired",
-    element: <SessionExpiredPage />,
-  },
-  {
-    path: "restricted-content",
-    element: <RestrictedContentPage />,
-  },
-  {
-    path: "login",
-    element: <Login />,
-  },
-  {
-    path : 'verify-email',
-    element: <VerifyEmail/>
-  },
-  {
-    path: "signup",
-    element: <Signup />,
-  },
-  {
-    path: "forgot-password",
-    element: <ForgotPassword />,
-  },
-  {
-    path: "reset-password",
-    element: <ResetPassword />,
-  },
-  {
-    path: "admin/login",
-    element: <AdminLogin />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <Landingpage />,
+        children: [
+          {
+            path: "order/:id",
+            element: <OrderPage />,
+          },
+          {
+            path: "verify",
+            element: <VerifyPayment />,
+          },
+          {
+            path: "library/:productId",
+            element: <ProductDetailsPage />,
+          },
+        ],
+      },
+      {
+        path: "reader/:productId",
+        element: <ReaderPage />,
+      },
+      {
+        path: "checkout/:productId",
+        element: <CheckoutPage />,
+      },
+      {
+        path: "checkout/:productId/pending",
+        element: <PaymentPendingPage />,
+      },
+      {
+        path: "checkout/:productId/success",
+        element: <PaymentSuccessPage />,
+      },
+      {
+        path: "checkout/:productId/confirmation",
+        element: <PurchaseConfirmationPage />,
+      },
+    ],
   },
   {
     element: <ProtectedRoute />,

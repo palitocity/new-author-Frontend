@@ -4,7 +4,12 @@ import toast from "react-hot-toast";
 import axios from "../config/axiosconfiq";
 import Turnstile from "../components/Turnstile";
 
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 const Contact = () => {
+  usePageMeta(PUBLIC_PAGES.contact);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",

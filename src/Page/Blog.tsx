@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "../config/axiosconfiq";
 import BlogCard from "../components/Blogcard";
 
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 type BlogType = {
   _id: string;
   featuredImage: string;
@@ -13,6 +16,8 @@ type BlogType = {
 };
 
 export default function Blog() {
+  usePageMeta(PUBLIC_PAGES.blog);
+
   const [blogs, setBlogs] = useState<BlogType[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);

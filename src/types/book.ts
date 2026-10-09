@@ -1,3 +1,5 @@
+export type MediaKind = "pdf" | "audio" | "video";
+
 export interface Book {
   _id: string;
   title: string;
@@ -14,6 +16,12 @@ export interface Book {
   readingTime?: string;
   ageRating?: string;
   coverImage?: string;
+  // Which media the story has. File URLs are never sent to readers.
+  media?: MediaKind[];
+  hasPdf?: boolean;
+  hasAudio?: boolean;
+  hasVideo?: boolean;
+  // Admin-only (GET /book/admin/all); absent on public/reader responses.
   pdfFile?: string;
   audioFile?: string;
   videoFile?: string;

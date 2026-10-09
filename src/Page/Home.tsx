@@ -14,6 +14,9 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Hero from "../components/Hero";
 
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0 },
@@ -197,6 +200,8 @@ function ProductPreview() {
 }
 
 export default function Home() {
+  usePageMeta(PUBLIC_PAGES.home);
+
   return (
     <>
       <Hero />
