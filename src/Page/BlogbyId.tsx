@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import axios from "../config/axiosconfiq";
 import { useParams } from "react-router-dom";
+import { usePageMeta } from "../seo/usePageMeta";
+
+const toPlainText = (html = "") =>
+  html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
 interface Blog {
   _id: string;
@@ -21,6 +25,21 @@ const BlogbyId = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  usePageMeta(
+    blog
+      ? {
+          title: `${blog.title} | SankofaSeek`,
+          description:
+            (blog.excerpt || toPlainText(blog.content)).slice(0, 160) ||
+            blog.title,
+          path: `/blog/${blog._id}`,
+          image: blog.featuredImage,
+          imageAlt: blog.title,
+          type: "article",
+        }
+      : null,
+  );
 
   const getBlogById = async () => {
     try {

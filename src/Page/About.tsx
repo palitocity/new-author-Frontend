@@ -5,10 +5,14 @@ import {
   Sparkles,
   BookOpen,
   Target,
-  Globe,
 } from "lucide-react";
 
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 export default function AboutUs() {
+  usePageMeta(PUBLIC_PAGES.about);
+
   const values = [
     {
       icon: Heart,
@@ -218,84 +222,6 @@ export default function AboutUs() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Founder Section */}
-        <div className="max-w-5xl mx-auto mb-24">
-          <div className="bg-linear-to-br from-amber-900 via-orange-900 to-stone-900 text-white rounded-3xl p-10 md:p-16 shadow-2xl relative overflow-hidden">
-            {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-600/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-600/20 rounded-full blur-3xl"></div>
-
-            <div className="relative z-10">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-20 h-20 md:w-16 md:h-16 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/20">
-                  <Globe className="w-8 h-8 text-amber-300" />
-                </div>
-                <h2 className="text-4xl md:text-5xl font-bold">
-                  Meet the Founder
-                </h2>
-              </div>
-
-              <h3 className="text-3xl font-bold text-amber-300 mb-4">
-                Adetunji Adeyemi I
-              </h3>
-
-              <p className="text-2xl italic text-amber-100 mb-8 font-light">
-                "My work exists at the intersection of memory and possibility."
-              </p>
-
-              <div className="space-y-6 text-lg leading-relaxed text-stone-100">
-                <p>
-                  I am building SankofaSeek as a living compass — a place where
-                  ancestral intelligence, cultural design, and future systems
-                  thinking converge. I believe humanity advances not by
-                  abandoning its origins, but by decoding them.
-                </p>
-
-                <p className="text-amber-100">
-                  Every forgotten story is an algorithm. Every symbol is an
-                  instruction. Every lineage is a technology the world has yet
-                  to fully understand.
-                </p>
-
-                <p>
-                  Through storytelling, visual cosmology, and heritage
-                  innovation, I create bridges between worlds — between past and
-                  future, identity and imagination, what we inherited and what
-                  we must build next.
-                </p>
-
-                <p>
-                  My background spans cultural anthropology, design thinking,
-                  and digital innovation. But my deepest education came from
-                  listening — to elders, to stories, to the quiet wisdom
-                  embedded in traditions that have survived centuries of
-                  disruption.
-                </p>
-
-                <p className="text-amber-100">
-                  My mission is simple but vast: to guide a global renaissance
-                  of African memory, creativity, and consciousness — one
-                  narrative, one symbol, one awakened seeker at a time.
-                </p>
-
-                <div className="mt-8 p-6 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-                  <p className="font-bold text-xl text-amber-300 mb-2">
-                    My Philosophy
-                  </p>
-                  <p className="font-medium">
-                    I work in spirals, not lines. I build systems, not moments.
-                    I honor the old while architecting the new.
-                  </p>
-                  <p className="mt-4 text-amber-200">
-                    Legacy is my curriculum. Future is my material. Sankofa is
-                    my methodology.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

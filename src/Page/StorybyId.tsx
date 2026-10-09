@@ -17,9 +17,10 @@ import {
 } from "lucide-react";
 import axios from "../config/axiosconfiq";
 import type { Book } from "../types/book";
-import { formatPrice, getMediaAssets } from "../utils/media";
+import { formatPrice, getMediaKinds } from "../utils/media";
 import { useAppSelector } from "../store/hooks";
-import { useLibraryQuery, useSaveStoryMutation } from "../services/api";
+import { useSaveStoryMutation } from "../services/api";
+import { useBookAccess } from "../hooks/useBookAccess";
 import toast from "react-hot-toast";
 
 const MediaExperience = lazy(
@@ -45,9 +46,12 @@ const StorybyId = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const token = useAppSelector((state) => state.auth.token);
-  const { data: library = [] } = useLibraryQuery(undefined, { skip: !token });
   const [saveStory] = useSaveStoryMutation();
-  const libraryItems = Array.isArray(library) ? library : [];
+  const {
+    access,
+    loading: accessLoading,
+    reload: reloadAccess,
+  } = useBookAccess(token ? id : undefined);
 
   useEffect(() => {
     if (!id || !story) return;
@@ -126,16 +130,12 @@ const StorybyId = () => {
     );
   }
 
-  const mediaAssets = getMediaAssets(story);
+  const mediaKinds = getMediaKinds(story);
   const price = story.price || 0;
   const tags = story.tags || [];
-  const isPremium = price > 0;
-  const hasPurchased =
-    !isPremium ||
-    libraryItems.some(
-      (item: { contentId: string }) => item.contentId === story._id,
-    );
-  const canRead = !isPremium || hasPurchased;
+  // Entitlement is decided by the API (free, or in the user's library).
+  const canRead = Boolean(access?.canRead && access.streamToken);
+  const notes = canRead ? access?.book?.content : undefined;
 
   const handleSaveStory = async () => {
     if (!token) {
@@ -243,7 +243,7 @@ const StorybyId = () => {
                 <Bookmark className="h-4 w-4" />
                 Save Story
               </button>
-              {!canRead && (
+              {!accessLoading && !canRead && (
                 <Link
                   to={token ? `/order/${story._id}` : "/login"}
                   className="inline-flex items-center gap-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-800"
@@ -261,14 +261,19 @@ const StorybyId = () => {
           <div>
             <h2 className="text-xl font-bold text-stone-950">Media player</h2>
             <p className="mt-1 text-sm text-stone-500">
-              {mediaAssets.length > 0
-                ? "Read, listen, or watch without leaving the app."
+              {mediaKinds.length > 0
+                ? "Read, listen, or watch here. Content is available on SankofaSeek only and can't be downloaded."
                 : "No media file has been attached to this item yet."}
             </p>
           </div>
         </div>
 
-        {canRead ? (
+        {accessLoading ? (
+          <div className="flex min-h-72 items-center justify-center gap-3 rounded-lg border border-stone-200 bg-white text-stone-600">
+            <Loader2 className="h-5 w-5 animate-spin text-amber-700" />
+            <span className="text-sm font-semibold">Checking access</span>
+          </div>
+        ) : canRead && access?.streamToken ? (
           <Suspense
             fallback={
               <div className="flex min-h-72 items-center justify-center gap-3 rounded-lg border border-stone-200 bg-white text-stone-600">
@@ -277,7 +282,16 @@ const StorybyId = () => {
               </div>
             }
           >
-            <MediaExperience book={story} />
+            <MediaExperience
+              bookId={story._id}
+              streamToken={access.streamToken}
+              media={getMediaKinds(access.book)}
+              title={story.title}
+              author={story.author}
+              narrator={story.narrator}
+              coverImage={story.coverImage}
+              onRetry={reloadAccess}
+            />
           </Suspense>
         ) : (
           <div className="rounded-lg border border-amber-200 bg-white p-6 shadow-sm">
@@ -302,10 +316,10 @@ const StorybyId = () => {
           </div>
         )}
 
-        {story.content && canRead && (
+        {notes && (
           <article className="mt-8 rounded-lg border border-stone-200 bg-white p-6 text-stone-700 shadow-sm">
             <h2 className="mb-4 text-xl font-bold text-stone-950">Notes</h2>
-            <div className="prose max-w-none">{story.content}</div>
+            <div className="prose max-w-none">{notes}</div>
           </article>
         )}
 

@@ -1,4 +1,9 @@
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 export const TermsAndConditions = () => {
+  usePageMeta(PUBLIC_PAGES.terms);
+
   return (
     <div className="min-h-screen bg-stone-50 py-16 px-6">
       <div className="max-w-4xl mx-auto bg-white p-10 rounded-2xl shadow-sm leading-relaxed text-stone-700">

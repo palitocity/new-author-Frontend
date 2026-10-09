@@ -1,8 +1,14 @@
 User-agent: *
-Disallow:
-
-# Allow everything (no blocked pages)
 Allow: /
 
-# Sitemap location
+# Private areas: account, admin, purchased content and payment flows.
+# These pages also send "X-Robots-Tag: noindex" (see vercel.json).
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /checkout
+Disallow: /reader
+Disallow: /order
+Disallow: /verify
+Disallow: /library
+
 Sitemap: https://www.sankofaseek.com/sitemap.xml

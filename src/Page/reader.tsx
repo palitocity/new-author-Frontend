@@ -1,77 +1,97 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { lazy, Suspense, useCallback, useEffect, useRef } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { ArrowLeft, Loader2, Lock } from "lucide-react";
 import type { LibraryProduct } from "../types/libary";
-import axios from "../config/axiosconfiq";
+import { useBookAccess } from "../hooks/useBookAccess";
+import {
+  useLibraryQuery,
+  useSaveReadingProgressMutation,
+} from "../services/api";
+import { getMediaKinds } from "../utils/media";
+
+const MediaExperience = lazy(
+  () => import("../components/media/MediaExperience"),
+);
+
+const PROGRESS_SAVE_DELAY_MS = 1500;
+
+const FullScreenMessage = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex h-screen flex-col items-center justify-center gap-3 px-4 text-center text-stone-600">
+    {children}
+  </div>
+);
+
+const Spinner = () => (
+  <div className="flex h-screen items-center justify-center">
+    <Loader2 className="h-6 w-6 animate-spin text-amber-700" />
+  </div>
+);
 
 export default function Reader() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
-  const stateProduct = (location.state as { product?: LibraryProduct } | null)?.product;
+  const stateProduct = (location.state as { product?: LibraryProduct } | null)
+    ?.product;
 
-  const [product, setProduct] = useState<LibraryProduct | null>(stateProduct ?? null);
-  const [loading, setLoading] = useState(!stateProduct);
-  const [error, setError] = useState<string | null>(null);
+  const { access, loading, error, reload } = useBookAccess(id);
+  const { data: libraryData, isLoading: libraryLoading } = useLibraryQuery();
+  const [saveReadingProgress] = useSaveReadingProgressMutation();
 
-useEffect(() => {
-  // If we already got the product via route state, no need to fetch.
-  if (stateProduct) return;
+  const libraryEntry = libraryData?.data?.books?.find(
+    (entry) => String(entry.bookId) === id,
+  );
+  const initialPage =
+    libraryEntry?.currentPage || stateProduct?.currentPage || 1;
 
-  async function fetchProduct() {
-    try {
-      setLoading(true);
-      const res = await axios.get(`/library/${id}`, {
-        withCredentials: true,
-      });
-      const data = res.data;
-      setProduct(data.product ?? data); // adjust to your API's response shape
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ??
-          (err instanceof Error ? err.message : "Something went wrong."),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Save progress after the reader settles on a page, not on every flip.
+  const saveTimer = useRef<number | undefined>(undefined);
+  const canSaveProgress = Boolean(access?.owned);
 
-  fetchProduct();
-}, [id, stateProduct]);
-  if (loading) {
+  const handlePageChange = useCallback(
+    (page: number, totalPages: number) => {
+      if (!id || !canSaveProgress) return;
+
+      window.clearTimeout(saveTimer.current);
+      saveTimer.current = window.setTimeout(() => {
+        saveReadingProgress({ bookId: id, currentPage: page, totalPages })
+          .unwrap()
+          .catch(() => undefined);
+      }, PROGRESS_SAVE_DELAY_MS);
+    },
+    [id, canSaveProgress, saveReadingProgress],
+  );
+
+  useEffect(() => () => window.clearTimeout(saveTimer.current), []);
+
+  if (loading || libraryLoading) return <Spinner />;
+
+  if (error || !access) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-amber-700" />
-      </div>
-    );
-  }
-
-  if (error || !product) {
-    return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 text-stone-600">
-        <p>{error ?? "Book not found."}</p>
+      <FullScreenMessage>
+        <p>{error || "Book not found."}</p>
         <Link to="/dashboard/library" className="text-amber-700 underline">
           Back to Library
         </Link>
-      </div>
+      </FullScreenMessage>
     );
   }
 
-  if (!product.pdfFile) {
+  const book = access.book;
+
+  if (!access.canRead || !access.streamToken) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 text-stone-600">
-        <p>No PDF is available for this book yet.</p>
-        <Link to="/dashboard/library" className="text-amber-700 underline">
-          Back to Library
+      <FullScreenMessage>
+        <Lock className="h-8 w-8 text-amber-700" />
+        <p>This item is part of the paid collection. Purchase it to read.</p>
+        <Link to={`/order/${id}`} className="text-amber-700 underline">
+          Purchase
         </Link>
-      </div>
+      </FullScreenMessage>
     );
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      {/* HEADER */}
+    <div className="flex min-h-screen flex-col bg-stone-100">
       <div className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
         <Link
           to="/dashboard/library"
@@ -82,20 +102,33 @@ useEffect(() => {
         </Link>
 
         <div className="min-w-0 text-center">
-          <p className="truncate text-sm font-bold text-stone-950">{product.title}</p>
-          <p className="text-xs text-stone-500">by {product.author}</p>
+          <p className="truncate text-sm font-bold text-stone-950">
+            {book.title}
+          </p>
+          {book.author && (
+            <p className="text-xs text-stone-500">by {book.author}</p>
+          )}
         </div>
 
-        <div className="w-16" /> {/* spacer to balance the back button */}
+        <div className="w-16" />
       </div>
 
-      {/* PDF VIEWER */}
-      <div className="flex-1 bg-stone-100">
-        <iframe
-          src={`${product.pdfFile}#page=${product.currentPage || 1}`}
-          title={product.title}
-          className="h-full w-full"
-        />
+      <div className="flex-1 p-2 md:p-4">
+        <Suspense fallback={<Spinner />}>
+          <MediaExperience
+            bookId={book._id}
+            streamToken={access.streamToken}
+            media={getMediaKinds(book)}
+            title={book.title}
+            author={book.author}
+            narrator={book.narrator}
+            coverImage={book.coverImage}
+            initialPage={initialPage}
+            onPageChange={handlePageChange}
+            onRetry={reload}
+            fullHeight
+          />
+        </Suspense>
       </div>
     </div>
   );
