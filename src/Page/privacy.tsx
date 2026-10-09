@@ -1,4 +1,9 @@
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 const Privacy = () => {
+  usePageMeta(PUBLIC_PAGES.privacy);
+
   return (
     <div className="bg-white text-stone-700 px-6 md:px-20 py-12 leading-relaxed">
       <h1 className="text-3xl font-bold text-amber-600">

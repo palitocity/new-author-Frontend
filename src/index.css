@@ -3,3 +3,31 @@
 body {
   font-family: "Montserrat", sans-serif;
 }
+
+/* ---------- Protected reading surface ----------
+   Purchased/free content is read on the platform only (see MediaExperience). */
+.protected-surface,
+.protected-surface .rpv-core__text-layer,
+.protected-surface .rpv-core__text-layer * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.protected-surface img,
+.protected-surface canvas {
+  -webkit-user-drag: none;
+}
+
+@media print {
+  body.reading-protected * {
+    display: none !important;
+  }
+
+  body.reading-protected::after {
+    content: "This content can only be read on SankofaSeek.";
+    display: block;
+    padding: 2rem;
+    font: 600 16px/1.5 sans-serif;
+  }
+}

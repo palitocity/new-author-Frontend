@@ -57,7 +57,6 @@ export default function MyLibrary() {
           progress: item.progressPercentage ?? 0,
           progressPercentage: item.progressPercentage ?? 0,
           lastReadAt: item.lastReadAt ?? null,
-          pdfFile: book.pdfFile,
           orderId: item.orderId,
           transactionId: item.transactionId,
           paymentReference: item.paymentReference,

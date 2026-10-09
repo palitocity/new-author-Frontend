@@ -14,8 +14,6 @@ export type LibraryProduct = {
   progressPercentage: number;
   lastReadAt?: string | null;
 
-  pdfFile?: string;
-
   orderId: string;
   transactionId: string;
   paymentReference: string;

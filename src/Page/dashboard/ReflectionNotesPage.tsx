@@ -38,7 +38,7 @@ export default function ReflectionNotesPage() {
         params.productId = productId;
       }
 
-      const res = await axios.get("/reflection-notes/getNotes", {
+      const res = await axios.get("/reflection-notes", {
         params,
       });
 
@@ -76,7 +76,7 @@ export default function ReflectionNotesPage() {
         return;
       }
 
-      await axios.post("/reflection-notes/createNote", {
+      await axios.post("/reflection-notes", {
         productId: selectedProduct,
         title: "New Reflection Note",
         body: draft,

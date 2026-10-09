@@ -11,6 +11,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 
+import { usePageMeta } from "../seo/usePageMeta";
+import { PUBLIC_PAGES } from "../seo/pages";
+
 type GalleryImage = {
   url: string;
   description?: string;
@@ -61,6 +64,8 @@ function GalleryTile({ image, onClick }: { image: GalleryImage; onClick: () => v
 }
 
 const PictureGallery = () => {
+  usePageMeta(PUBLIC_PAGES.gallery);
+
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);

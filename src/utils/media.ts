@@ -1,143 +1,39 @@
-import type { Book } from "../types/book";
+import type { Book, MediaKind } from "../types/book";
 
-export type MediaKind = "pdf" | "audio" | "video";
+export type { MediaKind };
 
-export type MediaAsset = {
-  kind: MediaKind;
-  url: string;
-  label: string;
-};
+export const API_BASE_URL = (
+  import.meta.env.VITE_DEVE_URL || "https://api.sankofaseek.com/api"
+).replace(/\/$/, "");
 
-const cloudinaryCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "";
+const MEDIA_KINDS: MediaKind[] = ["pdf", "audio", "video"];
 
-const extensionPattern =
-  /\.(pdf|mp3|wav|m4a|aac|ogg|mp4|webm|mov|m4v)(?:[?#].*)?$/i;
+/**
+ * Which kinds of media a story has. The API only reports availability;
+ * the files themselves are streamed through /book/:id/stream/:kind and are
+ * never exposed as downloadable links.
+ */
+export const getMediaKinds = (
+  book: Pick<Book, "media" | "hasPdf" | "hasAudio" | "hasVideo"> | null | undefined,
+): MediaKind[] => {
+  if (!book) return [];
 
-const stripPdfExtension = (value: string) => value.replace(/(?:\.pdf)+$/i, "");
-
-const encodePublicId = (publicId: string) =>
-  publicId
-    .split("/")
-    .map((part) => encodeURIComponent(part))
-    .join("/");
-
-export const buildCloudinaryPdfUrl = (publicId: string) => {
-  const trimmedPublicId = publicId.trim();
-
-  if (!trimmedPublicId) return "";
-
-  if (/^https?:\/\//i.test(trimmedPublicId)) {
-    return normalizeCloudinaryUrl(trimmedPublicId);
+  if (Array.isArray(book.media)) {
+    return MEDIA_KINDS.filter((kind) => book.media?.includes(kind));
   }
 
-  if (!cloudinaryCloudName) {
-    return `${stripPdfExtension(trimmedPublicId)}.pdf`;
-  }
-
-  const encodedPublicId = encodePublicId(stripPdfExtension(trimmedPublicId));
-
-  return `https://res.cloudinary.com/${cloudinaryCloudName}/raw/upload/fl_attachment:false/${encodedPublicId}.pdf`;
-};
-
-export const normalizeCloudinaryUrl = (url: string) => {
-  if (!url) return url;
-
-  let normalizedUrl = url.trim();
-
-  normalizedUrl = normalizedUrl.replace(
-    "/image/upload/fl_attachment:false/",
-    "/image/upload/",
-  );
-
-  if (
-    normalizedUrl.includes("/image/upload/") &&
-    normalizedUrl.toLowerCase().includes(".pdf")
-  ) {
-    normalizedUrl = normalizedUrl.replace("/image/upload/", "/raw/upload/");
-  }
-
-  normalizedUrl = normalizedUrl.replace(
-    /\/raw\/upload\/(?:fl_attachment:false\/)?/i,
-    "/raw/upload/fl_attachment:false/",
-  );
-
-  return normalizedUrl;
-};
-
-const mediaKindFromUrl = (url: string): MediaKind | null => {
-  const normalizedUrl = normalizeCloudinaryUrl(url);
-  const match = normalizedUrl.match(extensionPattern);
-  const extension = match?.[1]?.toLowerCase();
-
-  if (extension === "pdf") return "pdf";
-  if (["mp3", "wav", "m4a", "aac", "ogg"].includes(extension || "")) {
-    return "audio";
-  }
-  if (["mp4", "webm", "mov", "m4v"].includes(extension || "")) {
-    return "video";
-  }
-
-  if (normalizedUrl.includes("/video/upload/")) return "video";
-  if (
-    normalizedUrl.includes("/raw/upload/") &&
-    normalizedUrl.toLowerCase().includes(".pdf")
-  ) {
-    return "pdf";
-  }
-
-  return null;
-};
-
-const addAsset = (
-  assets: MediaAsset[],
-  url: string | undefined,
-  fallbackKind: MediaKind | null,
-  label: string,
-) => {
-  if (!url) return;
-
-  const normalizedUrl = normalizeCloudinaryUrl(url);
-  const kind = mediaKindFromUrl(normalizedUrl) || fallbackKind;
-
-  if (!kind) return;
-
-  if (
-    !assets.some((asset) => asset.url === normalizedUrl && asset.kind === kind)
-  ) {
-    assets.push({
-      kind,
-      url: normalizedUrl,
-      label,
-    });
-  }
-};
-
-export const getMediaAssets = (book: Book): MediaAsset[] => {
-  const assets: MediaAsset[] = [];
-
-  addAsset(
-    assets,
-    book.pdfFile ? buildCloudinaryPdfUrl(book.pdfFile) : undefined,
-    "pdf",
-    "Read",
-  );
-  addAsset(assets, book.audioFile, "audio", "Listen");
-  addAsset(assets, book.videoFile, "video", "Watch");
-  addAsset(assets, book.mediaUrl, null, "Open");
-
-  return assets;
-};
-
-export const getPrimaryMediaAsset = (book: Book): MediaAsset | null => {
-  const assets = getMediaAssets(book);
-
-  return (
-    assets.find((asset) => asset.kind === "pdf") ||
-    assets.find((asset) => asset.kind === "audio") ||
-    assets.find((asset) => asset.kind === "video") ||
-    null
+  return MEDIA_KINDS.filter(
+    (kind) =>
+      (kind === "pdf" && book.hasPdf) ||
+      (kind === "audio" && book.hasAudio) ||
+      (kind === "video" && book.hasVideo),
   );
 };
+
+export const buildStreamUrl = (bookId: string, kind: MediaKind, token?: string) =>
+  `${API_BASE_URL}/book/${encodeURIComponent(bookId)}/stream/${kind}${
+    token ? `?token=${encodeURIComponent(token)}` : ""
+  }`;
 
 export const formatPrice = (price = 0) =>
   `NGN ${price.toLocaleString("en-NG", {

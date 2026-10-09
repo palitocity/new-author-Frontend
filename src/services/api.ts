@@ -185,7 +185,6 @@ export type LibraryBook = {
     subtitle?: string;
     author?: string;
     coverImage?: string;
-    pdfFile?: string;
   };
 };
 
@@ -443,18 +442,6 @@ export const api = createApi({
       void
     >({
       query: () => "/library/me",
-      providesTags: ["Library"],
-    }),
-
-    /* =====================================================
-       LIBRARY ITEM
-    ===================================================== */
-
-    libraryItem: builder.query<
-      LibraryResponse,
-      string
-    >({
-      query: (id) => `/library/${id}`,
       providesTags: ["Library"],
     }),
 
