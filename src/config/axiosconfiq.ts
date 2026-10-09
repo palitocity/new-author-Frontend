@@ -37,12 +37,16 @@ api.interceptors.response.use(
     const isAuthEndpoint = /^\/(auth|admin\/login)/.test(config?.url || "");
 
     if (status === 401 && sentAuth && !isAuthEndpoint) {
+      // Only end a session when the rejected token is the one we actually
+      // hold for it; a request sent with a stale or missing token must not
+      // log anyone out.
       const adminToken = localStorage.getItem("adminToken");
+      const userToken = localStorage.getItem("authToken");
 
       if (adminToken && sentAuth === `Bearer ${adminToken}`) {
         clearAdminSession();
         window.location.assign("/admin/login");
-      } else {
+      } else if (userToken && sentAuth === `Bearer ${userToken}`) {
         clearUserSession();
         window.location.assign("/session-expired");
       }
