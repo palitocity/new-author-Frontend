@@ -145,9 +145,11 @@ const StorybyId = () => {
 
     try {
       await saveStory(story._id).unwrap();
-      toast.success("Story saved");
-    } catch {
-      toast.error("Unable to save story");
+      toast.success("Story saved to Saved Stories");
+    } catch (saveError) {
+      const message = (saveError as { data?: { message?: string } })?.data
+        ?.message;
+      toast.error(message || "Unable to save story");
     }
   };
 

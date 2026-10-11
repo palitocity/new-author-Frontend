@@ -64,7 +64,7 @@ export default function SavedStories() {
                 </p>
                 <div className="mt-4 flex gap-2">
                   <Link
-                    to={`/story/${story.storyId}`}
+                    to={`/dashboard/story/${story.storyId}`}
                     className="flex-1 rounded-md bg-amber-700 px-3 py-2 text-center text-sm font-semibold text-white"
                   >
                     Continue Reading

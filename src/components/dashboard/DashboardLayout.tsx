@@ -1,5 +1,5 @@
 import {
-  // BookMarked,
+  BookMarked,
   ArrowLeft,
   Store,
   Clock3,
@@ -26,6 +26,7 @@ const navItems = [
   { label: "Marketplace", to: "/dashboard/marketplace", icon: Store },
 
   { label: "My Continuity Library", to: "/dashboard/library", icon: Library },
+  { label: "Saved Stories", to: "/dashboard/saved", icon: BookMarked },
   {
     label: "Reflection Notes",
     to: "/dashboard/reflection-notes",
