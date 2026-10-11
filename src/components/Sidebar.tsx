@@ -11,12 +11,14 @@ import {
   FileText,
   ImageUp,
   List,
+  Globe,
   // PackageOpen,
   // ShieldCheck,
   // LockKeyhole,
   // BadgeCheck,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { clearAdminSession } from "../utils/session";
 
 interface Props {
   setSidebarOpen: (open: boolean) => void;
@@ -84,7 +86,7 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
       path: "/admin/newsletter",
     },
     {
-      name: " Add Stories",
+      name: "Add Stories",
       icon: <BookOpen className="w-5 h-5" />,
       path: "/admin/stories",
     },
@@ -116,10 +118,43 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
+    clearAdminSession();
     localStorage.removeItem("adminUser");
     router("/admin/login");
   };
+
+  // In-app links (no full page reload) with the current page highlighted,
+  // plus a way back to the public site.
+  const navLinks = (onNavigate?: () => void) => (
+    <div className="space-y-2">
+      {menuItems.map((item) => (
+        <NavLink
+          key={item.path}
+          to={item.path}
+          onClick={onNavigate}
+          className={({ isActive }) =>
+            `flex items-center gap-3 rounded-lg px-3 py-2 transition ${
+              isActive ? "bg-orange-700 font-semibold" : "hover:bg-orange-700"
+            }`
+          }
+        >
+          {item.icon}
+          <span className="text-sm font-medium">{item.name}</span>
+        </NavLink>
+      ))}
+    </div>
+  );
+
+  const viewWebsiteLink = (onNavigate?: () => void) => (
+    <NavLink
+      to="/"
+      onClick={onNavigate}
+      className="mb-3 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-orange-700"
+    >
+      <Globe className="h-5 w-5" />
+      View website
+    </NavLink>
+  );
 
   return (
     <>
@@ -145,23 +180,12 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
 
         {/* Scrollable Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-4">
-          <div className="space-y-2">
-            {menuItems.map((item, idx) => (
-              <a
-                key={idx}
-                href={item.path}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-orange-700"
-                onClick={() => setSidebarOpen(false)}
-              >
-                {item.icon}
-                <span className="text-sm font-medium">{item.name}</span>
-              </a>
-            ))}
-          </div>
+          {navLinks(() => setSidebarOpen(false))}
         </nav>
 
         {/* Fixed Logout */}
         <div className="shrink-0 border-t border-stone-200/20 px-4 py-4">
+          {viewWebsiteLink(() => setSidebarOpen(false))}
           <button
             onClick={() => setShowLogoutModal(true)}
             className="flex items-center gap-3 text-sm font-medium text-stone-50 transition hover:text-orange-300"
@@ -180,23 +204,11 @@ const Sidebar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
         </div>
 
         {/* Scrollable Navigation */}
-        <nav className="flex-1 overflow-y-auto px-2 py-4">
-          <div className="space-y-2">
-            {menuItems.map((item, idx) => (
-              <a
-                key={idx}
-                href={item.path}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-orange-700"
-              >
-                {item.icon}
-                <span className="text-sm font-medium">{item.name}</span>
-              </a>
-            ))}
-          </div>
-        </nav>
+        <nav className="flex-1 overflow-y-auto px-2 py-4">{navLinks()}</nav>
 
         {/* Fixed Logout */}
         <div className="shrink-0 border-t border-stone-200/20 px-4 py-4">
+          {viewWebsiteLink()}
           <button
             onClick={() => setShowLogoutModal(true)}
             className="flex items-center gap-3 text-sm font-medium text-stone-50 transition hover:text-orange-300"

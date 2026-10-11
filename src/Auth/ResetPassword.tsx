@@ -1,10 +1,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useResetPasswordMutation } from "../services/api";
 import { resetPasswordSchema, type ResetPasswordForm } from "./validation";
 
@@ -54,6 +54,22 @@ export default function ResetPassword() {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md rounded-lg border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-800 dark:bg-stone-900"
       >
+        <div className="mb-6 flex items-center justify-between">
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Login
+          </Link>
+          <Link
+            to="/"
+            className="text-sm font-semibold text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+          >
+            Home
+          </Link>
+        </div>
+
         <h1 className="text-2xl font-bold text-stone-950 dark:text-white">
           Reset Password
         </h1>

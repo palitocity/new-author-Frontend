@@ -49,13 +49,21 @@ export default function ForgotPassword() {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md rounded-lg border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-800 dark:bg-stone-900"
       >
-        <Link
-          to="/login"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-stone-500 dark:text-stone-400"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Login
-        </Link>
+        <div className="mb-6 flex items-center justify-between">
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Login
+          </Link>
+          <Link
+            to="/"
+            className="text-sm font-semibold text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+          >
+            Home
+          </Link>
+        </div>
         <h1 className="text-2xl font-bold text-stone-950 dark:text-white">
           Forgot Password
         </h1>

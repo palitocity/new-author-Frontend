@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import logo from "../assets/sankofaseek.png";
-import { ChevronDown, LogOut, Search, User } from "lucide-react";
+import { ChevronDown, Globe, LogOut, Search, User } from "lucide-react";
 import userprofilepic from "../assets/facesofken.jpg";
 import { MdMenu } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { clearAdminSession } from "../utils/session";
 
 interface Props {
   setSidebarOpen: (open: boolean) => void;
@@ -16,19 +17,27 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    // The admin session lives under "adminToken"; removing "token" (the
+    // old code) left the admin signed in.
+    clearAdminSession();
+    localStorage.removeItem("adminUser");
+    setShowLogoutModal(false);
     router("/admin/login");
   };
 
   return (
     <header className="w-full h-[12vh] flex items-center justify-between px-4 md:px-6 bg-linear-to-r from-amber-600 to-orange-800 shadow-md">
       {/* Logo */}
-      <div className="flex items-center gap-2">
-        <img src={logo} alt="logo" className="h-10 w-auto" />
+      <Link
+        to="/admin/main"
+        aria-label="Admin dashboard"
+        className="flex items-center gap-2"
+      >
+        <img src={logo} alt="SankofaSeek" className="h-10 w-auto" />
         <h2 className="hidden md:block font-bold text-stone-50 text-lg">
           Sankofaseek Admin
         </h2>
-      </div>
+      </Link>
 
       {/* Search (Desktop) */}
       <div className="hidden md:flex items-center bg-stone-50/90 px-3 py-2 rounded-md w-[300px]">
@@ -42,6 +51,14 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
+        <Link
+          to="/"
+          className="hidden sm:inline-flex items-center gap-1.5 rounded-md bg-stone-50/15 px-3 py-2 text-sm font-semibold text-stone-50 hover:bg-stone-50/25"
+        >
+          <Globe className="h-4 w-4" />
+          View website
+        </Link>
+
         {/* Profile Dropdown */}
         <div className="relative">
           <button
@@ -59,14 +76,20 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen, sidebarOpen }) => {
           {dropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-stone-50 shadow-md rounded-md py-2 z-50">
               <button
-                onClick={() => router("/admin/settings")}
+                onClick={() => {
+                  setDropdown(false);
+                  router("/admin/settings");
+                }}
                 className="w-full text-left px-4 py-2 hover:bg-amber-100 text-sm flex items-center gap-2 text-stone-700"
               >
                 <User className="w-4 h-4" /> Profile
               </button>
 
               <button
-                onClick={() => setShowLogoutModal(true)}
+                onClick={() => {
+                  setDropdown(false);
+                  setShowLogoutModal(true);
+                }}
                 className="w-full text-left px-4 py-2 hover:bg-orange-600 hover:text-white text-sm flex items-center gap-2 text-stone-700"
               >
                 <LogOut className="w-4 h-4" /> Logout

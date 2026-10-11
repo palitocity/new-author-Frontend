@@ -1,5 +1,6 @@
 import {
   // BookMarked,
+  ArrowLeft,
   Store,
   Clock3,
   Home,
@@ -15,7 +16,7 @@ import {
   UserRoundCog,
 } from "lucide-react";
 import { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { logout } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -53,14 +54,19 @@ export default function DashboardLayout() {
   const sidebar = (
     <aside className="flex h-screen flex-col overflow-hidden border-r border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950">
       <div className="flex items-center justify-between px-5 py-5 shrink-0">
-        <div>
+        <Link
+          to="/"
+          onClick={() => setOpen(false)}
+          aria-label="Go to the SankofaSeek home page"
+          className="rounded-md hover:opacity-80"
+        >
           <p className="text-xs font-bold uppercase tracking-widest text-amber-700">
             Sankofa Seek
           </p>
           <p className="mt-1 text-lg font-bold text-stone-950 dark:text-white">
             Reader Dashboard
           </p>
-        </div>
+        </Link>
         <button
           className="lg:hidden"
           onClick={() => setOpen(false)}
@@ -72,6 +78,14 @@ export default function DashboardLayout() {
 
       {/* Scrollable navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-2">
+        <Link
+          to="/"
+          onClick={() => setOpen(false)}
+          className="mb-2 flex items-center gap-3 rounded-md border border-stone-200 px-3 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 dark:border-stone-800 dark:text-amber-300 dark:hover:bg-stone-900"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Back to website
+        </Link>
         <div className="space-y-1">
           {navItems.map(({ icon: Icon, label, to }) => (
             <NavLink
@@ -134,6 +148,14 @@ export default function DashboardLayout() {
           >
             <Menu className="h-5 w-5" />
           </button>
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900 lg:hidden"
+          >
+            <Home className="h-4 w-4" />
+            Home
+          </Link>
 
           <div className="hidden items-center gap-2 text-sm font-semibold text-emerald-700 sm:flex">
             <Lock className="h-4 w-4" />
