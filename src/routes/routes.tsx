@@ -34,6 +34,7 @@ import MediaPage from "../Admin/media";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AdminProtectedRoute from "../components/auth/AdminProtectedRoute";
 import NoIndexRoute from "../components/auth/NoIndexRoute";
+import { SiteTopBarLayout } from "../components/navigation/SiteTopBar";
 import DashboardLayout from "../components/dashboard/DashboardLayout";
 import DashboardOverview from "../Page/dashboard/DashboardOverview";
 import MyLibrary from "../Page/dashboard/MyLibrary";
@@ -109,16 +110,22 @@ export const router = createBrowserRouter([
     element: <NoIndexRoute />,
     children: [
       {
-        path: "access-denied",
-        element: <AccessDeniedPage />,
-      },
-      {
-        path: "session-expired",
-        element: <SessionExpiredPage />,
-      },
-      {
-        path: "restricted-content",
-        element: <RestrictedContentPage />,
+        // Access notices get the slim site bar so there's always a way home.
+        element: <SiteTopBarLayout />,
+        children: [
+          {
+            path: "access-denied",
+            element: <AccessDeniedPage />,
+          },
+          {
+            path: "session-expired",
+            element: <SessionExpiredPage />,
+          },
+          {
+            path: "restricted-content",
+            element: <RestrictedContentPage />,
+          },
+        ],
       },
       {
         path: "login",
@@ -169,24 +176,30 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "reader/:productId",
-        element: <ReaderPage />,
-      },
-      {
-        path: "checkout/:productId",
-        element: <CheckoutPage />,
-      },
-      {
-        path: "checkout/:productId/pending",
-        element: <PaymentPendingPage />,
-      },
-      {
-        path: "checkout/:productId/success",
-        element: <PaymentSuccessPage />,
-      },
-      {
-        path: "checkout/:productId/confirmation",
-        element: <PurchaseConfirmationPage />,
+        // Standalone reader and checkout pages get the slim site bar.
+        element: <SiteTopBarLayout />,
+        children: [
+          {
+            path: "reader/:productId",
+            element: <ReaderPage />,
+          },
+          {
+            path: "checkout/:productId",
+            element: <CheckoutPage />,
+          },
+          {
+            path: "checkout/:productId/pending",
+            element: <PaymentPendingPage />,
+          },
+          {
+            path: "checkout/:productId/success",
+            element: <PaymentSuccessPage />,
+          },
+          {
+            path: "checkout/:productId/confirmation",
+            element: <PurchaseConfirmationPage />,
+          },
+        ],
       },
     ],
   },

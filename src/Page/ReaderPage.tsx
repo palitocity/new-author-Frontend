@@ -48,7 +48,7 @@ export default function ReaderPage() {
 
   return (
     <main className="min-h-screen bg-stone-100">
-      <header className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-14 z-30 border-b border-stone-200 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <div>
             <Link to={`/library/${product.id}`} className="text-xs font-bold uppercase tracking-widest text-amber-700">

@@ -2,10 +2,11 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/sankofaseek.png";
 import { useEffect, useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
-import { ChevronDown, LogOut, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { logout } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAccountLinks } from "../hooks/useAccountLinks";
 
 const menuItems: Array<{ label: string; to: string; external?: boolean }> = [
   { label: "Home", to: "/" },
@@ -20,15 +21,10 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const user = useAppSelector((state) => state.auth.user);
-  const token = useAppSelector((state) => state.auth.token);
+  // Only treat the visitor as signed in while their session is valid.
+  const { isUser: token, isAdmin } = useAccountLinks();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-
-
-  console.log("Navbar user:", user);
-
-
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -94,7 +90,15 @@ export default function Navbar() {
         </ul>
 
     <div className="hidden items-center gap-3 md:flex">
-  
+  {isAdmin && (
+    <Link
+      to="/admin/main"
+      className="inline-flex items-center gap-1.5 rounded-md border border-current px-3 py-2 text-sm font-semibold"
+    >
+      <ShieldCheck className="h-4 w-4" />
+      Admin Panel
+    </Link>
+  )}
 
   {token ? (
     <>
@@ -151,7 +155,7 @@ export default function Navbar() {
         )}
       </div>
     </>
-  ) : (
+  ) : isAdmin ? null : (
     <>
       <Link
         to="/login"
@@ -194,6 +198,13 @@ export default function Navbar() {
               {renderMenuLink(item)}
             </li>
           ))}
+          {isAdmin && (
+            <li>
+              <Link to="/admin/main" onClick={() => setOpen(false)}>
+                Admin Panel
+              </Link>
+            </li>
+          )}
           {token ? (
             <>
               <li>
@@ -207,7 +218,7 @@ export default function Navbar() {
                 </button>
               </li>
             </>
-          ) : (
+          ) : isAdmin ? null : (
             <>
               <li>
                 <Link to="/login" onClick={() => setOpen(false)}>
